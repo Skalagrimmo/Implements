@@ -1,0 +1,40 @@
+name: Unpack tools
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Unzip all tool archives
+        run: |
+          for z in *.zip; do
+            [ -e "$z" ] || continue
+            name="${z%%-*}"
+            echo "Unpacking: $z -> $name/"
+            mkdir -p "$name"
+            unzip -o -q "$z" -d "$name"
+            rm -f "$z"
+          done
+
+      - name: List unpacked files
+        run: find . -path ./.git -prune -o -type f -print | sort
+
+      - name: Commit unpacked content
+        run: |
+          git config user.name "unpack-bot"
+          git config user.email "actions@github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+          else
+            git commit -m "Unpack tool archives into folders, remove zips"
+            git push
+          fi
