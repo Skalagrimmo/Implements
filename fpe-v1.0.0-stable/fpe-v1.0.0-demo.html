@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FPE v0.6 — Hierarchical View</title>
+<style>
+html,body{margin:0;overflow:hidden;background:#050508;color:#d8d8e6;font-family:"Courier New",monospace}canvas{display:block}.panel{position:fixed;z-index:5;background:rgba(8,8,14,.88);border:1px solid #303643;border-radius:8px;padding:12px 14px;backdrop-filter:blur(4px);box-shadow:0 0 22px #0008}.left{left:12px;top:12px;width:340px;max-height:90vh;overflow:auto}.right{right:12px;top:12px;width:305px}.title{color:#7fd6ff;font-size:13px;letter-spacing:1.5px}.sub{font-size:10px;color:#8a929f;line-height:1.45;margin:5px 0 12px}.kv{display:grid;grid-template-columns:1fr 1.3fr;gap:5px 8px;font-size:10px}.kv span{color:#777}.kv b{color:#cdd9e8;font-weight:normal;word-break:break-all}.sep{border-top:1px solid #252a35;margin:10px 0}.badge{display:inline-block;border:1px solid #3c5060;border-radius:4px;padding:2px 5px;margin:2px;font-size:9px;color:#9bcbe3}.note{font-size:9px;color:#68707d;line-height:1.45}.btn{background:#151b24;border:1px solid #405063;color:#cdd9e8;padding:5px 8px;border-radius:5px;font:10px inherit;cursor:pointer;margin:3px 4px 3px 0}.btn:hover{border-color:#7fd6ff}input[type=file]{width:100%;font-size:9px;color:#999}.bottom{position:fixed;bottom:10px;left:12px;z-index:5;color:#68707d;font-size:10px}.error{color:#ff8a7a}.ok{color:#8fd8a8}
+</style>
+</head>
+<body>
+<div class="panel left">
+  <div class="title">FPE v0.6 — HIERARCHICAL VIEW</div>
+  <div class="sub">World → cluster proxy → 4 bud proxies → geometry. View expansion is local, deterministic and has no semantic effect.</div>
+  <div class="kv"><span>source</span><b id="src">—</b><span>world</span><b id="world">—</b><span>revision</span><b id="rev">—</b><span>projection</span><b id="fp">—</b><span>view</span><b id="viewFp">—</b><span>visible</span><b id="visible">—</b></div>
+  <div class="sep"></div><button id="toggle" class="btn">розгорнути кластер</button><button id="collapseAll" class="btn">згорнути все</button>
+  <div class="note">Подвійний клік: cluster ↔ buds, bud ↔ geometry. Можна відкрити власний projection.json.</div>
+  <input id="file" type="file" accept="application/json,.json"><div id="loadStatus" class="note ok">canonical PixelGen 1.0 fixture</div>
+</div>
+<div class="panel right">
+  <div class="title">SELECTED</div>
+  <div class="kv"><span>item</span><b id="item">—</b><span>sector</span><b id="sector">—</b><span>biome</span><b id="biome">—</b><span>territory</span><b id="territory">—</b><span>fronts</span><b id="fronts">—</b><span>front status</span><b id="frontStatus">—</b><span>control</span><b id="control">—</b><span>stability</span><b id="stability">—</b><span>alert</span><b id="alert">—</b><span>cohesion</span><b id="cohesion">—</b><span>collapse bias</span><b id="collapse">—</b><span>agitation</span><b id="agitation">—</b></div>
+  <div class="sep"></div><div id="budBadges"></div>
+</div>
+<div class="bottom">ЛКМ — вибір · подвійний клік — рівень деталізації · ПКМ / Shift+drag — обертання · колесо — zoom</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script>
+"use strict";
+const FPE06 = (() => {
+  const GLYPHS = ['#','%','&','8','@','+','=','-',':','.','/','\\'];
+  const VERIFIED_PROJECTIONS=new WeakSet();
+  function deepFreeze(value,seen=new WeakSet()){if(!value||typeof value!=='object'||seen.has(value))return value;seen.add(value);for(const k of Object.keys(value))deepFreeze(value[k],seen);return Object.freeze(value);}
+  function isDeepFrozen(value,seen=new WeakSet()){if(!value||typeof value!=='object'||seen.has(value))return true;if(!Object.isFrozen(value))return false;seen.add(value);return Object.keys(value).every(k=>isDeepFrozen(value[k],seen));}
+  function assertJsonData(value,path='projection',seen=new WeakSet(),depth=0){
+    if(depth>64)throw new Error(path+' exceeds maximum JSON depth');
+    if(value===null||typeof value==='string'||typeof value==='boolean')return;
+    if(typeof value==='number'){if(!Number.isFinite(value))throw new Error(path+' contains non-finite number');return;}
+    if(typeof value!=='object')throw new Error(path+' is not JSON data');
+    if(seen.has(value))throw new Error(path+' contains a cycle');seen.add(value);
+    if(Object.getOwnPropertySymbols(value).length)throw new Error(path+' contains symbol properties');
+    if(Array.isArray(value)){
+      const keys=Object.keys(value);if(keys.length!==value.length||keys.some((k,i)=>k!==String(i)))throw new Error(path+' must be a dense JSON array');
+      for(let i=0;i<value.length;i++){const d=Object.getOwnPropertyDescriptor(value,String(i));if(!d||!('value' in d)||!d.enumerable)throw new Error(path+' contains an accessor');assertJsonData(d.value,path+'['+i+']',seen,depth+1);}
+      seen.delete(value);return;
+    }
+    const proto=Object.getPrototypeOf(value);if(proto!==null&&Object.getPrototypeOf(proto)!==null)throw new Error(path+' must contain only plain objects');
+    const keys=Object.keys(value),own=Reflect.ownKeys(value);if(keys.length!==own.length)throw new Error(path+' contains hidden properties');
+    for(const k of keys){const d=Object.getOwnPropertyDescriptor(value,k);if(!d||!('value' in d)||!d.enumerable)throw new Error(path+' contains an accessor');assertJsonData(d.value,path+'.'+k,seen,depth+1);}
+    seen.delete(value);
+  }
+  function hash32(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);} return h>>>0; }
+  function rand01(key){ return (hash32(key)%1000000)/1000000; }
+  // Synchronous SHA-256 keeps projection integrity checks available in both
+  // browsers and Node without depending on WebCrypto's async API.
+  function utf8Bytes(text){
+    const out=[];
+    for(let i=0;i<text.length;i++){let cp=text.charCodeAt(i);
+      if(cp>=0xd800&&cp<=0xdbff){if(i+1>=text.length)throw new Error('invalid unpaired UTF-16 surrogate');const lo=text.charCodeAt(++i);if(lo<0xdc00||lo>0xdfff)throw new Error('invalid unpaired UTF-16 surrogate');cp=0x10000+((cp-0xd800)<<10)+(lo-0xdc00);}
+      else if(cp>=0xdc00&&cp<=0xdfff)throw new Error('invalid unpaired UTF-16 surrogate');
+      if(cp<0x80)out.push(cp);else if(cp<0x800)out.push(0xc0|(cp>>6),0x80|(cp&63));else if(cp<0x10000)out.push(0xe0|(cp>>12),0x80|((cp>>6)&63),0x80|(cp&63));else out.push(0xf0|(cp>>18),0x80|((cp>>12)&63),0x80|((cp>>6)&63),0x80|(cp&63));
+    }
+    return Uint8Array.from(out);
+  }
+  function sha256(text){
+    const bytes=utf8Bytes(text),K=new Uint32Array([
+      0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+      0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+      0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+      0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+      0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+      0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+      0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+      0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+    const bitLen=bytes.length*8,total=((bytes.length+9+63)>>6)<<6,msg=new Uint8Array(total);msg.set(bytes);msg[bytes.length]=0x80;
+    const dv=new DataView(msg.buffer);dv.setUint32(total-8,Math.floor(bitLen/0x100000000),false);dv.setUint32(total-4,bitLen>>>0,false);
+    const h=new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]),w=new Uint32Array(64),rotr=(x,n)=>(x>>>n)|(x<<(32-n));
+    for(let off=0;off<total;off+=64){
+      for(let i=0;i<16;i++)w[i]=dv.getUint32(off+i*4,false);
+      for(let i=16;i<64;i++){const a=w[i-15],b=w[i-2],s0=rotr(a,7)^rotr(a,18)^(a>>>3),s1=rotr(b,17)^rotr(b,19)^(b>>>10);w[i]=(w[i-16]+s0+w[i-7]+s1)>>>0;}
+      let [a,b,c,d,e,f,g,hh]=h;
+      for(let i=0;i<64;i++){const S1=rotr(e,6)^rotr(e,11)^rotr(e,25),ch=(e&f)^((~e)&g),t1=(hh+S1+ch+K[i]+w[i])>>>0,S0=rotr(a,2)^rotr(a,13)^rotr(a,22),maj=(a&b)^(a&c)^(b&c),t2=(S0+maj)>>>0;hh=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b;b=a;a=(t1+t2)>>>0;}
+      h[0]=(h[0]+a)>>>0;h[1]=(h[1]+b)>>>0;h[2]=(h[2]+c)>>>0;h[3]=(h[3]+d)>>>0;h[4]=(h[4]+e)>>>0;h[5]=(h[5]+f)>>>0;h[6]=(h[6]+g)>>>0;h[7]=(h[7]+hh)>>>0;
+    }
+    return [...h].map(x=>x.toString(16).padStart(8,'0')).join('');
+  }
+  const FLOAT_STATE=new Set(['control_strength','stability','alert','front_tension','front_activity']);
+  const FLOAT_PROJECTION=new Set(['cohesion','breakup_resistance','agitation','collapse_bias','damage_proxy','update_rate']);
+  function projectionFloatPath(path){
+    if(path.length===2&&path[0]==='layout'&&(path[1]==='sector_spacing'||path[1]==='local_bud_offset'))return true;
+    if(path.length===4&&path[0]==='clusters'&&Number.isInteger(path[1])&&path[2]==='state'&&FLOAT_STATE.has(path[3]))return true;
+    return path.length===4&&path[0]==='clusters'&&Number.isInteger(path[1])&&path[2]==='projection'&&FLOAT_PROJECTION.has(path[3]);
+  }
+  // PixelGen bridge fingerprints use Python json.dumps(sort_keys=True,
+  // ensure_ascii=False). Numeric fields produced as Python floats retain '.0'.
+  function pythonFloatNumber(v){
+    if(!Number.isFinite(v))throw new Error('non-finite projection number');
+    if(Object.is(v,-0))return '-0.0';
+    if(Number.isInteger(v))return String(v)+'.0';
+    const a=Math.abs(v);
+    if(a!==0&&a<1e-4){
+      const parts=v.toExponential().split('e'),exp=Number(parts[1]);
+      return parts[0]+'e'+(exp<0?'-':'+')+String(Math.abs(exp)).padStart(2,'0');
+    }
+    return String(v);
+  }
+  function projectionCanonical(v,path=[]){
+    if(v===null)return 'null';
+    if(typeof v==='number'){if(projectionFloatPath(path))return pythonFloatNumber(v);return JSON.stringify(v);}
+    if(typeof v!=='object')return JSON.stringify(v);
+    if(Array.isArray(v))return '['+v.map((x,i)=>projectionCanonical(x,path.concat(i))).join(',')+']';
+    return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+projectionCanonical(v[k],path.concat(k))).join(',')+'}';
+  }
+  function projectionFingerprint(p){const copy={...p};delete copy.projection_fingerprint;return sha256(projectionCanonical(copy));}
+  function assertProjection(p){
+    if(p&&typeof p==='object'&&VERIFIED_PROJECTIONS.has(p))return p;
+    assertJsonData(p);
+    const obj=(v)=>v!==null&&typeof v==='object'&&!Array.isArray(v);
+    const need=(ok,msg)=>{if(!ok)throw new Error(msg);};
+    const num=(v,lo,hi)=>typeof v==='number'&&Number.isFinite(v)&&v>=lo&&v<=hi;
+    const text=(v)=>typeof v==='string'&&v.length>0;
+    const hex=(v)=>typeof v==='string'&&/^[0-9a-f]{64}$/.test(v);
+    need(obj(p)&&obj(p.source)&&obj(p.layout)&&obj(p.authority)&&obj(p.summary),'missing projection objects');
+    need(p.fpe_version==='0.6.0'&&p.bridge_version==='0.6.0','unsupported bridge/runtime projection version');
+    need(p.authority.objective_state_owner==='PixelGen'&&p.authority.geometry_owner==='FPE'&&p.authority.writeback==='disabled_in_v0.6','invalid authority');
+    need(hex(p.projection_fingerprint)&&hex(p.source.pixelgen_world_fingerprint),'invalid fingerprints');
+    need(Number.isSafeInteger(p.source.seed),'invalid seed');
+    for(const key of ['state_revision','state_tick'])need(Number.isSafeInteger(p.source[key])&&p.source[key]>=0,'invalid source clock');
+    need(num(p.layout.sector_spacing,0.001,1000000)&&num(p.layout.local_bud_offset,0.001,1000000)&&p.layout.buds_per_sector===4,'invalid layout');
+    if(!p || p.schema!=="fpe.pixelgen_hierarchy/0.6.0") throw new Error("unsupported FPE projection schema");
+    if(p.mode!=="read_only_hierarchical_projection") throw new Error("v0.6 viewer accepts read-only hierarchical projections only");
+    if(!p.hierarchy || p.hierarchy.schema!=="fpe.view_hierarchy/0.6.0") throw new Error("missing FPE hierarchy contract");
+    if(JSON.stringify(p.hierarchy.levels)!==JSON.stringify(["world","cluster","bud","geometry"])) throw new Error("invalid hierarchy levels");
+    need(p.hierarchy.initial_detail==='cluster_proxy'&&p.hierarchy.expansion_state_owner==='viewer'&&p.hierarchy.semantic_effect==='none','invalid hierarchy authority');
+    const [cols,rows]=p.source.dimensions||[];
+    if(!Number.isSafeInteger(cols)||!Number.isSafeInteger(rows)||cols<1||rows<1) throw new Error("invalid source dimensions");
+    need(p.layout.cluster_kind==='pixelgen_sector','invalid cluster kind');
+    if(!Array.isArray(p.clusters)||p.clusters.length!==cols*rows) throw new Error("cluster count mismatch");
+    const clusterIds=new Set(),budIds=new Set(),coordinates=new Set();
+    for(const c of p.clusters){
+      need(obj(c)&&obj(c.state)&&obj(c.projection)&&obj(c.source),'invalid cluster objects');
+      need(Array.isArray(c.sector)&&c.sector.length===2&&c.sector.every(Number.isSafeInteger),'invalid sector');
+      const [x,y]=c.sector,key=`${x},${y}`;
+      need(x>=0&&x<cols&&y>=0&&y<rows&&!coordinates.has(key),'duplicate/outside sector');coordinates.add(key);
+      need(c.id===`sector_${x}_${y}`,'noncanonical cluster id');
+      for(const k of ['cohesion','breakup_resistance','agitation','collapse_bias','damage_proxy','update_rate'])need(num(c.projection[k],0,1),'invalid projection number');
+      for(const k of ['stability','alert','front_tension','front_activity'])need(num(c.state[k],0,1),'invalid state number');
+      need(num(c.state.control_strength,0,1.75)&&['quiet','active','tense','volatile'].includes(c.state.front_status),'invalid cluster state');
+      need(Array.isArray(c.source.front_ids)&&c.source.front_ids.every(text),'invalid fronts');
+      need(c.source.territory_id===null||text(c.source.territory_id),'invalid territory');
+      if(typeof c.id!=="string"||clusterIds.has(c.id)) throw new Error("invalid or duplicate cluster id");clusterIds.add(c.id);
+      if(!Array.isArray(c.buds)||c.buds.length!==4) throw new Error(`cluster ${c.id} must contain 4 buds`);
+      for(const [i,b] of c.buds.entries()){
+        need(obj(b)&&b.index===i&&b.id===`${c.id}_bud_${i}`&&text(b.seed_key),'invalid bud identity');
+        need(JSON.stringify(b.offset)===JSON.stringify([[-1,-1],[1,-1],[-1,1],[1,1]][i]),'invalid bud offset');
+        if(b.type!=="STRAIGHT"&&b.type!=="CURVED") throw new Error(`invalid bud type in ${c.id}`);if(typeof b.id!=="string"||budIds.has(b.id)) throw new Error(`invalid or duplicate bud id in ${c.id}`);budIds.add(b.id);
+      }
+    }
+    const straight=p.clusters.reduce((n,c)=>n+c.buds.filter(b=>b.type==='STRAIGHT').length,0),curved=budIds.size-straight;
+    for(const k of ['cluster_count','bud_count','territory_cluster_count','front_cluster_count','straight_bud_count','curved_bud_count'])need(Number.isSafeInteger(p.summary[k])&&p.summary[k]>=0,'invalid summary integer');
+    need(p.summary.cluster_count===p.clusters.length&&p.summary.bud_count===budIds.size,'invalid summary counts');
+    need(Number.isSafeInteger(p.summary.territory_cluster_count)&&p.summary.territory_cluster_count===p.clusters.filter(c=>c.source.territory_id!==null).length,'invalid territory summary');
+    need(Number.isSafeInteger(p.summary.front_cluster_count)&&p.summary.front_cluster_count===p.clusters.filter(c=>c.source.front_ids.length>0).length,'invalid front summary');
+    need(p.summary.straight_bud_count===straight&&p.summary.curved_bud_count===curved,'invalid bud type summary');
+    need(projectionFingerprint(p)===p.projection_fingerprint,'projection_fingerprint mismatch');
+    if(isDeepFrozen(p))VERIFIED_PROJECTIONS.add(p);
+    return p;
+  }
+  function sectorKey(sx,sy){return `${sx},${sy}`;}
+  function sectorCenter(p,sx,sy){const [cols,rows]=p.source.dimensions,spacing=p.layout.sector_spacing;return {x:(sx-(cols-1)/2)*spacing,y:3,z:(sy-(rows-1)/2)*spacing};}
+  function makeStraightBud(center,size){
+    const pts=[],s=size/2;for(let x=-1;x<=1;x+=2)for(let y=-1;y<=1;y+=2)for(let z=-1;z<=1;z+=2)pts.push({x:center.x+x*s,y:center.y+y*s,z:center.z+z*s});
+    const edges=[];for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const a=pts[i],b=pts[j],d=(a.x!==b.x?1:0)+(a.y!==b.y?1:0)+(a.z!==b.z?1:0);if(d===1)edges.push([i,j,0]);}return {points:pts,edges};
+  }
+  function makeCurvedBud(center,size,key){
+    const n=14,pts=[],g=Math.PI*(3-Math.sqrt(5)),r=size/1.8;for(let i=0;i<n;i++){const y=1-(i/(n-1))*2,rr=Math.sqrt(Math.max(0,1-y*y)),t=g*i;pts.push({x:center.x+Math.cos(t)*rr*r,y:center.y+y*r*.8+size*.35,z:center.z+Math.sin(t)*rr*r});}
+    const edges=[],seen=new Set();for(let i=0;i<n;i++){const ds=[];for(let j=0;j<n;j++)if(i!==j){const a=pts[i],b=pts[j];ds.push([j,Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)]);}ds.sort((a,b)=>a[1]-b[1]);for(let k=0;k<3;k++){const j=ds[k][0],ek=i<j?`${i}_${j}`:`${j}_${i}`;if(seen.has(ek))continue;seen.add(ek);edges.push([i,j,.35+rand01(`${key}:edge:${ek}`)*.25]);}}return {points:pts,edges};
+  }
+  function buildBudGeometry(projection,cluster,bud,center){
+    const local=projection.layout.local_bud_offset,c={x:center.x+bud.offset[0]*local,y:3.0+rand01(`${bud.seed_key}:height`)*1.8,z:center.z+bud.offset[1]*local};
+    const geom=(bud.type==="STRAIGHT"?makeStraightBud:makeCurvedBud)(c,3.2,bud.seed_key);
+    const nodes=geom.points.map((pt,ni)=>({base:pt,rnd:rand01(`${bud.seed_key}:node:${ni}:rnd`),phase:rand01(`${bud.seed_key}:node:${ni}:phase`)*Math.PI*2,glyphIdx:Math.floor(rand01(`${bud.seed_key}:node:${ni}:glyph`)*GLYPHS.length)}));
+    return {...bud,center:c,edges:geom.edges,nodes,cluster_id:cluster.id};
+  }
+  function buildGeometryPlan(projection){const p=assertProjection(projection),result=[];for(const cluster of p.clusters){const center=sectorCenter(p,...cluster.sector);result.push({...cluster,center,buds:cluster.buds.map(b=>buildBudGeometry(p,cluster,b,center))});}return result;}
+  function emptyViewState(){return {expandedClusters:[],expandedBuds:[]};}
+  function normalizeViewState(projection,state){
+    const p=assertProjection(projection),s=state||{},clusterIds=new Set(p.clusters.map(c=>c.id)),budParent=new Map();for(const c of p.clusters)for(const b of c.buds)budParent.set(b.id,c.id);
+    const expandedClusters=[...new Set(Array.isArray(s.expandedClusters)?s.expandedClusters:[])].filter(id=>clusterIds.has(id)).sort(),expandedSet=new Set(expandedClusters);
+    const expandedBuds=[...new Set(Array.isArray(s.expandedBuds)?s.expandedBuds:[])].filter(id=>budParent.has(id)&&expandedSet.has(budParent.get(id))).sort();return {expandedClusters,expandedBuds};
+  }
+  function toggleCluster(projection,state,clusterId){
+    const s=normalizeViewState(projection,state),clusters=new Set(s.expandedClusters),buds=new Set(s.expandedBuds);
+    if(clusters.has(clusterId)){clusters.delete(clusterId);const c=projection.clusters.find(x=>x.id===clusterId);if(c)for(const b of c.buds)buds.delete(b.id);}else if(projection.clusters.some(c=>c.id===clusterId))clusters.add(clusterId);
+    return normalizeViewState(projection,{expandedClusters:[...clusters],expandedBuds:[...buds]});
+  }
+  function toggleBud(projection,state,budId){
+    const s=normalizeViewState(projection,state),buds=new Set(s.expandedBuds),parent=projection.clusters.find(c=>c.buds.some(b=>b.id===budId));if(!parent||!s.expandedClusters.includes(parent.id))return s;
+    if(buds.has(budId))buds.delete(budId);else buds.add(budId);return normalizeViewState(projection,{expandedClusters:s.expandedClusters,expandedBuds:[...buds]});
+  }
+  function buildHierarchyPlan(projection,state){
+    const p=assertProjection(projection),s=normalizeViewState(p,state),openC=new Set(s.expandedClusters),openB=new Set(s.expandedBuds),items=[];
+    for(const cluster of p.clusters){const center=sectorCenter(p,...cluster.sector);if(!openC.has(cluster.id)){items.push({kind:"cluster_proxy",id:cluster.id,cluster,center});continue;}for(const bud of cluster.buds){const local=p.layout.local_bud_offset,budCenter={x:center.x+bud.offset[0]*local,y:3.0+rand01(`${bud.seed_key}:height`)*1.8,z:center.z+bud.offset[1]*local};if(!openB.has(bud.id))items.push({kind:"bud_proxy",id:bud.id,cluster,bud,center:budCenter});else items.push({kind:"geometry",id:bud.id,cluster,bud:buildBudGeometry(p,cluster,bud,center),center:budCenter});}}
+    const counts={cluster_proxy:0,bud_proxy:0,geometry:0,nodes:0,edges:0};for(const item of items){counts[item.kind]++;if(item.kind==="geometry"){counts.nodes+=item.bud.nodes.length;counts.edges+=item.bud.edges.length;}}return {state:s,items,counts};
+  }
+  function viewStateFingerprint(projection,state){const s=normalizeViewState(projection,state);return `fpe-view-v1:${hash32(JSON.stringify(s)).toString(16).padStart(8,'0')}`;}
+  return {GLYPHS,hash32,rand01,sha256,projectionFingerprint,deepFreeze,assertProjection,sectorKey,sectorCenter,buildGeometryPlan,emptyViewState,normalizeViewState,toggleCluster,toggleBud,buildHierarchyPlan,viewStateFingerprint};
+})();
+if(typeof module!=="undefined"&&module.exports)module.exports=FPE06;
+
+</script><script>
+"use strict";
+const FPEHandoff08=(()=>{
+  const C=typeof module!=='undefined'&&module.exports?require('./fpe_core.js'):FPE06;
+  function canonical(v){
+    if(v===null||typeof v!=='object')return JSON.stringify(v);
+    if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';
+    return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonical(v[k])).join(',')+'}';
+  }
+  function prepare(current,incoming,view){
+    C.assertProjection(incoming);
+    const next=JSON.parse(JSON.stringify(incoming));
+    if(current){
+      C.assertProjection(current);
+      const a=current.source,b=next.source;
+      if(a.pixelgen_world_fingerprint!==b.pixelgen_world_fingerprint||a.seed!==b.seed||canonical(a.dimensions)!==canonical(b.dimensions))throw new Error('foreign world: start a new viewer session');
+      if(b.state_revision<a.state_revision||b.state_tick<a.state_tick)throw new Error('stale projection');
+      if(b.state_revision===a.state_revision){
+        if(canonical(current)!==canonical(next))throw new Error('conflicting projection at same revision');
+        return {projection:current,viewState:C.normalizeViewState(current,view),changed:false};
+      }
+    }
+    return {projection:next,viewState:C.normalizeViewState(next,view),changed:true};
+  }
+  return {prepare};
+})();
+if(typeof module!=='undefined'&&module.exports)module.exports=FPEHandoff08;
+
+</script><script>
+"use strict";
+// Scheduling ticks are supplied by the host, never PixelGen clock mutations.
+const FPEScheduler07 = (() => {
+  const Core = typeof module !== 'undefined' && module.exports ? require('./fpe_core.js') : FPE06;
+  const STATE_SCHEMA='fpe.scheduler_state/0.11.0';
+  const DETAILS=new Set(['cluster_proxy','bud_proxy','geometry']);
+  const clone=x=>JSON.parse(JSON.stringify(x));
+  function integer(n, name, min=0) {
+    if (!Number.isSafeInteger(n) || n < min) throw new Error(`invalid ${name}`);
+  }
+  function expectedEntries(p){
+    return p.clusters.map(c=>({id:c.id,rate:c.projection.update_rate,next:0,last:null,detail:'cluster_proxy'}))
+      .sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
+  }
+  function restoreEntries(p,budget,state){
+    if(!state||typeof state!=='object'||Array.isArray(state))throw new Error('invalid scheduler state');
+    if(state.schema!==STATE_SCHEMA)throw new Error('unsupported scheduler state schema');
+    if(state.budget!==budget)throw new Error('scheduler budget mismatch');
+    if(state.projection_fingerprint!==p.projection_fingerprint)throw new Error('scheduler projection mismatch');
+    if(state.source_revision!==p.source.state_revision||state.source_tick!==p.source.state_tick)throw new Error('scheduler source clock mismatch');
+    if(!Number.isSafeInteger(state.last_tick)||state.last_tick < -1 || state.last_tick > Number.MAX_SAFE_INTEGER-16)throw new Error('invalid scheduler last tick');
+    if(!Array.isArray(state.entries)||state.entries.length!==p.clusters.length)throw new Error('scheduler entry count mismatch');
+    const byId=new Map();
+    for(const raw of state.entries){
+      if(!raw||typeof raw!=='object'||Array.isArray(raw)||typeof raw.id!=='string'||byId.has(raw.id))throw new Error('invalid scheduler entry');
+      byId.set(raw.id,raw);
+    }
+    const entries=expectedEntries(p);
+    for(const e of entries){
+      const raw=byId.get(e.id);if(!raw)throw new Error('scheduler entry id mismatch');
+      if(typeof raw.rate!=='number'||!Number.isFinite(raw.rate)||raw.rate!==e.rate)throw new Error('scheduler rate mismatch');
+      if(!Number.isSafeInteger(raw.next)||raw.next<0||raw.next>Number.MAX_SAFE_INTEGER)throw new Error('invalid scheduler next tick');
+      if(raw.last!==null&&(!Number.isSafeInteger(raw.last)||raw.last<0||raw.last>state.last_tick))throw new Error('invalid scheduler last service tick');
+      if(raw.last===null&&raw.next!==0)throw new Error('unserved scheduler entry must remain due at tick 0');
+      if(raw.last!==null&&raw.next<=raw.last)throw new Error('scheduler next tick must follow last service tick');
+      if(state.last_tick===-1&&(raw.last!==null||raw.next!==0||raw.detail!=='cluster_proxy'))throw new Error('noncanonical fresh scheduler entry');
+      if(!DETAILS.has(raw.detail))throw new Error('invalid scheduler detail');
+      e.next=raw.next;e.last=raw.last;e.detail=raw.detail;
+    }
+    return {entries,lastTick:state.last_tick};
+  }
+  function create(projection, {budget=8,state=null}={}) {
+    Core.assertProjection(projection);
+    integer(budget, 'budget', 1);
+    // Own an immutable detached copy; validation is cached only after a full
+    // deep freeze, so hot scheduler steps never re-hash mutable input.
+    const p = Core.deepFreeze(clone(projection));Core.assertProjection(p);
+    let entries,lastTick;
+    if(state===null){entries=expectedEntries(p);lastTick=-1;}
+    else {const restored=restoreEntries(p,budget,state);entries=restored.entries;lastTick=restored.lastTick;}
+    function step(tick, view) {
+      integer(tick, 'tick');
+      if(tick>Number.MAX_SAFE_INTEGER-16) throw new Error('tick too large');
+      if (tick < lastTick) throw new Error('scheduler tick cannot move backward');
+      if (tick === lastTick) return {tick, updates:[], deferred:0, repeated:true};
+      const s=Core.normalizeViewState(p,view), open=new Set(s.expandedClusters), buds=new Set(s.expandedBuds);
+      const details=new Map(p.clusters.map(c=>[c.id, !open.has(c.id)?'cluster_proxy':c.buds.some(b=>buds.has(b.id))?'geometry':'bud_proxy']));
+      for (const e of entries) {
+        const detail=details.get(e.id);
+        if (detail!==e.detail) {e.next=Math.min(e.next,tick);e.detail=detail;}
+      }
+      const due=entries.filter(e=>e.next<=tick).sort((a,b)=>a.next-b.next || (a.id<b.id?-1:a.id>b.id?1:0));
+      const updates=[];
+      for (const e of due.slice(0,budget)) {
+        // Integer periods: active/detailed clusters update more often.
+        const base=e.rate>=0.66?1:e.rate>=0.33?2:4;
+        const period=base*(e.detail==='cluster_proxy'?4:e.detail==='bud_proxy'?2:1);
+        if (!Number.isSafeInteger(tick+period)) throw new Error('tick too large');
+        updates.push({id:e.id, tick, elapsed:e.last===null?0:tick-e.last, period, detail:e.detail});
+      }
+      // Commit only after all output validation succeeds.
+      for (let i=0;i<updates.length;i++) {due[i].last=tick;due[i].next=tick+updates[i].period;}
+      lastTick=tick;
+      return {tick,updates,deferred:due.length-updates.length,repeated:false};
+    }
+    function snapshot(){
+      return clone({schema:STATE_SCHEMA,budget,projection_fingerprint:p.projection_fingerprint,
+        source_revision:p.source.state_revision,source_tick:p.source.state_tick,last_tick:lastTick,entries});
+    }
+    return Object.freeze({step,snapshot});
+  }
+  return {create,version:'0.7.0',stateSchema:STATE_SCHEMA};
+})();
+if(typeof module!=='undefined'&&module.exports)module.exports=FPEScheduler07;
+
+</script><script>
+'use strict';
+const FPE=(()=>{
+  const node=typeof module!=='undefined'&&module.exports;
+  const C=node?require('./fpe_core'):FPE06;
+  const H=node?require('./fpe_handoff'):FPEHandoff08;
+  const S=node?require('./fpe_scheduler'):FPEScheduler07;
+  const VERSION='1.0.0',PROJECTION_SCHEMA='fpe.pixelgen_hierarchy/0.6.0',ACTION_SCHEMA='fpe.action_request/0.10.0',SNAPSHOT_SCHEMA='fpe.runtime_snapshot/0.11.0',RESTORE_VERSIONS=new Set(['0.11.0','0.12.0','1.0.0']);
+  const clone=x=>JSON.parse(JSON.stringify(x));
+  const freezeProjection=p=>{C.deepFreeze(p);C.assertProjection(p);return p;};
+  class FPEError extends Error {
+    constructor(code,message){super(message);this.name='FPEError';this.code=code;}
+  }
+  function call(code,fn){try{return fn();}catch(e){if(e instanceof FPEError)throw e;throw new FPEError(code,e.message||String(e));}}
+  function canonical(v){
+    if(v===null||typeof v!=='object')return JSON.stringify(v);
+    if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';
+    return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonical(v[k])).join(',')+'}';
+  }
+  function assertJsonValue(value,path='payload',code='INVALID_REQUEST',seen=new WeakSet(),depth=0){
+    if(depth>32)throw new FPEError(code,path+' exceeds maximum nesting depth');
+    if(value===null||typeof value==='string'||typeof value==='boolean')return;
+    if(typeof value==='number'){if(!Number.isFinite(value))throw new FPEError(code,path+' must contain finite JSON values');return;}
+    if(typeof value!=='object')throw new FPEError(code,path+' must be JSON-compatible');
+    if(seen.has(value))throw new FPEError(code,path+' must not contain cycles');
+    seen.add(value);
+    if(Array.isArray(value)){
+      if(Object.getOwnPropertySymbols(value).length)throw new FPEError(code,path+' must not contain symbol properties');
+      const keys=Object.keys(value);
+      if(keys.length!==value.length||keys.some((k,i)=>k!==String(i)))throw new FPEError(code,path+' must be a dense JSON array without extra properties');
+      for(let i=0;i<value.length;i++){const d=Object.getOwnPropertyDescriptor(value,String(i));if(!d||!('value' in d)||!d.enumerable)throw new FPEError(code,path+' must contain data properties only');assertJsonValue(d.value,path+'['+i+']',code,seen,depth+1);}
+      seen.delete(value);return;
+    }
+    const proto=Object.getPrototypeOf(value);
+    if(proto!==Object.prototype&&proto!==null)throw new FPEError(code,path+' must contain only plain objects');
+    if(Object.getOwnPropertySymbols(value).length)throw new FPEError(code,path+' must not contain symbol properties');
+    const own=Reflect.ownKeys(value),keys=Object.keys(value);
+    if(own.length!==keys.length)throw new FPEError(code,path+' must not contain hidden properties');
+    for(const k of keys){const d=Object.getOwnPropertyDescriptor(value,k);if(!d||!('value' in d)||!d.enumerable)throw new FPEError(code,path+' must contain data properties only');assertJsonValue(d.value,path+'.'+k,code,seen,depth+1);}
+    seen.delete(value);
+  }
+  function assertViewShape(value,code='INVALID_VIEW'){
+    if(!value||typeof value!=='object'||Array.isArray(value)||!Array.isArray(value.expandedClusters)||!Array.isArray(value.expandedBuds)||![...value.expandedClusters,...value.expandedBuds].every(x=>typeof x==='string'))throw new FPEError(code,'view requires two arrays of string IDs');
+  }
+  function requestSource(projection){
+    return clone({seed:projection.source.seed,pixelgen_world_fingerprint:projection.source.pixelgen_world_fingerprint,
+      dimensions:projection.source.dimensions,state_revision:projection.source.state_revision,state_tick:projection.source.state_tick});
+  }
+  function validateOptions(options){
+    if(!options||typeof options!=='object'||Array.isArray(options))throw new FPEError('INVALID_OPTIONS','options must be an object');
+    const budget=options.budget===undefined?8:options.budget;
+    if(!Number.isSafeInteger(budget)||budget<1)throw new FPEError('INVALID_OPTIONS','budget must be a positive safe integer');
+    return {budget};
+  }
+  function validateSnapshot(input){
+    assertJsonValue(input,'snapshot','INVALID_SNAPSHOT');
+    if(!input||typeof input!=='object'||Array.isArray(input))throw new FPEError('INVALID_SNAPSHOT','snapshot must be an object');
+    if(input.schema!==SNAPSHOT_SCHEMA||!RESTORE_VERSIONS.has(input.runtime_version))throw new FPEError('INVALID_SNAPSHOT','unsupported runtime snapshot schema or version');
+    if(input.projection_schema!==PROJECTION_SCHEMA||input.action_request_schema!==ACTION_SCHEMA)throw new FPEError('INVALID_SNAPSHOT','snapshot contract mismatch');
+    if(!input.options||typeof input.options!=='object'||Array.isArray(input.options)||!Number.isSafeInteger(input.options.budget)||input.options.budget<1)throw new FPEError('INVALID_SNAPSHOT','invalid snapshot options');
+    call('INVALID_SNAPSHOT',()=>C.assertProjection(input.projection));
+    assertViewShape(input.view,'INVALID_SNAPSHOT');
+    const normalized=call('INVALID_SNAPSHOT',()=>C.normalizeViewState(input.projection,input.view));
+    if(canonical(normalized)!==canonical(input.view))throw new FPEError('INVALID_SNAPSHOT','snapshot view is not canonical for its projection');
+    if(!input.clock||typeof input.clock!=='object'||Array.isArray(input.clock)||!Number.isSafeInteger(input.clock.last_tick)||input.clock.last_tick < -1 || input.clock.last_tick > Number.MAX_SAFE_INTEGER-16)throw new FPEError('INVALID_SNAPSHOT','invalid runtime clock');
+    if(!input.scheduler||typeof input.scheduler!=='object'||Array.isArray(input.scheduler))throw new FPEError('INVALID_SNAPSHOT','missing scheduler state');
+    if(!Number.isSafeInteger(input.scheduler.last_tick)||input.scheduler.last_tick>input.clock.last_tick)throw new FPEError('INVALID_SNAPSHOT','scheduler clock is ahead of runtime clock');
+    if(input.scheduler.last_tick!==-1&&input.scheduler.last_tick!==input.clock.last_tick)throw new FPEError('INVALID_SNAPSHOT','scheduler/runtime clocks describe an impossible runtime state');
+    call('INVALID_SNAPSHOT',()=>S.create(input.projection,{budget:input.options.budget,state:input.scheduler}));
+    if(!input.request_context||typeof input.request_context!=='object'||Array.isArray(input.request_context)||input.request_context.action_request_schema!==ACTION_SCHEMA)throw new FPEError('INVALID_SNAPSHOT','invalid request context');
+    if(canonical(input.request_context.source)!==canonical(requestSource(input.projection)))throw new FPEError('INVALID_SNAPSHOT','request context does not match projection source');
+    return clone(input);
+  }
+  function createRuntime(initial,options={},restored=null){
+    const {budget}=validateOptions(options);
+    let projection=call(restored?'INVALID_SNAPSHOT':'INVALID_PROJECTION',()=>freezeProjection(H.prepare(null,initial,{}).projection));
+    let view,scheduler,lastTick;
+    if(restored){
+      view=clone(restored.view);
+      scheduler=call('INVALID_SNAPSHOT',()=>S.create(projection,{budget,state:restored.scheduler}));
+      lastTick=restored.clock.last_tick;
+    }else{
+      view=C.emptyViewState();scheduler=S.create(projection,{budget});lastTick=-1;
+    }
+    function accept(incoming){
+      call('INVALID_PROJECTION',()=>C.assertProjection(incoming));
+      const a=projection.source,b=incoming.source;
+      if(a.seed!==b.seed||a.pixelgen_world_fingerprint!==b.pixelgen_world_fingerprint||JSON.stringify(a.dimensions)!==JSON.stringify(b.dimensions))throw new FPEError('FOREIGN_WORLD','create a new runtime for another world');
+      if(b.state_revision<a.state_revision||b.state_tick<a.state_tick)throw new FPEError('STALE_REVISION','revision or tick moved backward');
+      const next=call('REVISION_CONFLICT',()=>H.prepare(projection,incoming,view));
+      if(!next.changed)return {changed:false,revision:a.state_revision};
+      const nextProjection=call('INVALID_PROJECTION',()=>freezeProjection(next.projection));
+      const prepared=call('INVALID_PROJECTION',()=>{C.buildHierarchyPlan(nextProjection,next.viewState);return S.create(nextProjection,{budget});});
+      projection=nextProjection;view=next.viewState;scheduler=prepared;
+      return {changed:true,revision:projection.source.state_revision};
+    }
+    function setView(value){
+      assertViewShape(value);
+      view=C.normalizeViewState(projection,value);return clone(view);
+    }
+    function toggleCluster(id){
+      if(!projection.clusters.some(c=>c.id===id))throw new FPEError('UNKNOWN_ID','unknown cluster');
+      view=C.toggleCluster(projection,view,id);return clone(view);
+    }
+    function toggleBud(id){
+      const parent=projection.clusters.find(c=>c.buds.some(b=>b.id===id));
+      if(!parent)throw new FPEError('UNKNOWN_ID','unknown bud');
+      if(!view.expandedClusters.includes(parent.id))throw new FPEError('PARENT_COLLAPSED','expand parent first');
+      view=C.toggleBud(projection,view,id);return clone(view);
+    }
+    function step(tick){
+      if(!Number.isSafeInteger(tick)||tick<0||tick>Number.MAX_SAFE_INTEGER-16||tick<lastTick)throw new FPEError('INVALID_TICK','tick must be monotonic and in safe range');
+      const result=scheduler.step(tick,view);lastTick=tick;return result;
+    }
+    function request(action,targetId,payload={}){
+      if(typeof action!=='string'||!action.trim()||action.length>64)throw new FPEError('INVALID_REQUEST','action must be a non-empty string up to 64 characters');
+      if(typeof targetId!=='string'||!targetId)throw new FPEError('INVALID_REQUEST','targetId must be a non-empty string');
+      let targetKind=null;
+      if(projection.clusters.some(c=>c.id===targetId))targetKind='cluster';
+      else if(projection.clusters.some(c=>c.buds.some(b=>b.id===targetId)))targetKind='bud';
+      else throw new FPEError('UNKNOWN_ID','unknown request target');
+      if(!payload||typeof payload!=='object'||Array.isArray(payload))throw new FPEError('INVALID_REQUEST','payload must be an object');
+      assertJsonValue(payload);
+      return clone({schema:ACTION_SCHEMA,action:action.trim(),target:{kind:targetKind,id:targetId},payload,source:requestSource(projection)});
+    }
+    function serialize(){
+      const schedulerState=scheduler.snapshot();
+      return clone({schema:SNAPSHOT_SCHEMA,runtime_version:VERSION,projection_schema:PROJECTION_SCHEMA,action_request_schema:ACTION_SCHEMA,
+        options:{budget},projection,view,clock:{last_tick:lastTick},scheduler:schedulerState,
+        request_context:{action_request_schema:ACTION_SCHEMA,source:requestSource(projection)}});
+    }
+    return Object.freeze({accept,setView,toggleCluster,toggleBud,step,request,serialize,
+      getProjection:()=>clone(projection),getView:()=>clone(view),
+      getPlan:()=>clone(C.buildHierarchyPlan(projection,view))});
+  }
+  function create(initial,options={}){return createRuntime(initial,options,null);}
+  function restore(snapshot){const s=validateSnapshot(snapshot);return createRuntime(s.projection,s.options,s);}
+  function describe(){return {version:VERSION,projectionSchema:PROJECTION_SCHEMA,actionRequestSchema:ACTION_SCHEMA,snapshotSchema:SNAPSHOT_SCHEMA,writeback:false,
+    methods:['accept','setView','toggleCluster','toggleBud','step','request','serialize','getProjection','getView','getPlan'],
+    errors:['INVALID_OPTIONS','INVALID_PROJECTION','FOREIGN_WORLD','STALE_REVISION','REVISION_CONFLICT','INVALID_VIEW','UNKNOWN_ID','PARENT_COLLAPSED','INVALID_TICK','INVALID_REQUEST','INVALID_SNAPSHOT']};}
+  return Object.freeze({version:VERSION,create,restore,describe,FPEError});
+})();
+if(typeof module!=='undefined'&&module.exports)module.exports=FPE;
+
+</script><script>
+const FPE_CANONICAL_PROJECTION={"authority":{"geometry_owner":"FPE","objective_state_owner":"PixelGen","writeback":"disabled_in_v0.6"},"bridge_version":"0.6.0","clusters":[{"buds":[{"id":"sector_0_0_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:0:0:bud:0","type":"CURVED"},{"id":"sector_0_0_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:0:0:bud:1","type":"CURVED"},{"id":"sector_0_0_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:0:0:bud:2","type":"STRAIGHT"},{"id":"sector_0_0_bud_3","index":3,"offset":[1,1],"seed_key":"7301:0:0:bud:3","type":"CURVED"}],"id":"sector_0_0","projection":{"agitation":0.2016,"breakup_resistance":0.598187,"cohesion":0.677421,"collapse_bias":0.184834,"damage_proxy":0.216009,"update_rate":0.18},"sector":[0,0],"source":{"biome":"dark_forest","corridors":[{"id":"corridor_01_old_road","kind":"old_road","role":"source"},{"id":"corridor_05_silt_vein","kind":"silt_vein","role":"target"}],"front_ids":[],"geography_zone":"margin","region_id":0,"subbiome":"scrub_march","territory_alignment":"nano_signal","territory_id":"territory_0","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.5175,"front_activity":0.0,"front_status":"quiet","front_tension":0.0,"stability":0.6835}},{"buds":[{"id":"sector_1_0_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:1:0:bud:0","type":"CURVED"},{"id":"sector_1_0_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:1:0:bud:1","type":"CURVED"},{"id":"sector_1_0_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:1:0:bud:2","type":"STRAIGHT"},{"id":"sector_1_0_bud_3","index":3,"offset":[1,1],"seed_key":"7301:1:0:bud:3","type":"CURVED"}],"id":"sector_1_0","projection":{"agitation":0.2016,"breakup_resistance":0.598187,"cohesion":0.677421,"collapse_bias":0.184834,"damage_proxy":0.216009,"update_rate":0.18},"sector":[1,0],"source":{"biome":"dark_forest","corridors":[{"id":"corridor_05_silt_vein","kind":"silt_vein","role":"source"},{"id":"corridor_06_silt_vein","kind":"silt_vein","role":"target"}],"front_ids":[],"geography_zone":"mid","region_id":0,"subbiome":"wet_pine","territory_alignment":"nano_signal","territory_id":"territory_0","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.5175,"front_activity":0.0,"front_status":"quiet","front_tension":0.0,"stability":0.6835}},{"buds":[{"id":"sector_2_0_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:2:0:bud:0","type":"CURVED"},{"id":"sector_2_0_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:2:0:bud:1","type":"STRAIGHT"},{"id":"sector_2_0_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:2:0:bud:2","type":"STRAIGHT"},{"id":"sector_2_0_bud_3","index":3,"offset":[1,1],"seed_key":"7301:2:0:bud:3","type":"CURVED"}],"id":"sector_2_0","projection":{"agitation":0.341476,"breakup_resistance":0.598187,"cohesion":0.607725,"collapse_bias":0.437482,"damage_proxy":0.407325,"update_rate":0.517348},"sector":[2,0],"source":{"biome":"dark_forest","corridors":[{"id":"corridor_06_silt_vein","kind":"silt_vein","role":"through"}],"front_ids":["front_1"],"geography_zone":"core","region_id":0,"subbiome":"root_maze","territory_alignment":"nano_signal","territory_id":"territory_0","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.5175,"front_activity":0.4114,"front_status":"active","front_tension":0.4356,"stability":0.6835}},{"buds":[{"id":"sector_3_0_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:3:0:bud:0","type":"CURVED"},{"id":"sector_3_0_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:3:0:bud:1","type":"STRAIGHT"},{"id":"sector_3_0_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:3:0:bud:2","type":"STRAIGHT"},{"id":"sector_3_0_bud_3","index":3,"offset":[1,1],"seed_key":"7301:3:0:bud:3","type":"CURVED"}],"id":"sector_3_0","projection":{"agitation":0.226276,"breakup_resistance":0.548971,"cohesion":0.589218,"collapse_bias":0.460121,"damage_proxy":0.427901,"update_rate":0.517348},"sector":[3,0],"source":{"biome":"dark_forest","corridors":[{"id":"corridor_06_silt_vein","kind":"silt_vein","role":"through"}],"front_ids":["front_1"],"geography_zone":"mid","region_id":0,"subbiome":"wet_pine","territory_alignment":null,"territory_id":null,"territory_status":"neutral","topology_status":"contested"},"state":{"alert":0.12,"control_strength":0.52,"front_activity":0.4114,"front_status":"active","front_tension":0.4356,"stability":0.62}},{"buds":[{"id":"sector_4_0_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:4:0:bud:0","type":"STRAIGHT"},{"id":"sector_4_0_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:4:0:bud:1","type":"STRAIGHT"},{"id":"sector_4_0_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:4:0:bud:2","type":"CURVED"},{"id":"sector_4_0_bud_3","index":3,"offset":[1,1],"seed_key":"7301:4:0:bud:3","type":"CURVED"}],"id":"sector_4_0","projection":{"agitation":0.341476,"breakup_resistance":0.6003,"cohesion":0.609804,"collapse_bias":0.43651,"damage_proxy":0.406082,"update_rate":0.517348},"sector":[4,0],"source":{"biome":"dark_forest","corridors":[{"id":"corridor_06_silt_vein","kind":"silt_vein","role":"through"}],"front_ids":["front_1"],"geography_zone":"margin","region_id":0,"subbiome":"forest_edge","territory_alignment":"nano_signal","territory_id":"territory_4","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.525,"front_activity":0.4114,"front_status":"active","front_tension":0.4356,"stability":0.685}},{"buds":[{"id":"sector_5_0_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:5:0:bud:0","type":"CURVED"},{"id":"sector_5_0_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:5:0:bud:1","type":"CURVED"},{"id":"sector_5_0_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:5:0:bud:2","type":"STRAIGHT"},{"id":"sector_5_0_bud_3","index":3,"offset":[1,1],"seed_key":"7301:5:0:bud:3","type":"CURVED"}],"id":"sector_5_0","projection":{"agitation":0.2016,"breakup_resistance":0.6003,"cohesion":0.6795,"collapse_bias":0.183862,"damage_proxy":0.214766,"update_rate":0.18},"sector":[5,0],"source":{"biome":"dark_forest","corridors":[{"id":"corridor_06_silt_vein","kind":"silt_vein","role":"source"}],"front_ids":[],"geography_zone":"margin","region_id":0,"subbiome":"forest_edge","territory_alignment":"nano_signal","territory_id":"territory_4","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.525,"front_activity":0.0,"front_status":"quiet","front_tension":0.0,"stability":0.685}},{"buds":[{"id":"sector_0_1_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:0:1:bud:0","type":"CURVED"},{"id":"sector_0_1_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:0:1:bud:1","type":"CURVED"},{"id":"sector_0_1_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:0:1:bud:2","type":"CURVED"},{"id":"sector_0_1_bud_3","index":3,"offset":[1,1],"seed_key":"7301:0:1:bud:3","type":"STRAIGHT"}],"id":"sector_0_1","projection":{"agitation":0.0864,"breakup_resistance":0.548971,"cohesion":0.658914,"collapse_bias":0.207473,"damage_proxy":0.236586,"update_rate":0.18},"sector":[0,1],"source":{"biome":"dark_forest","corridors":[{"id":"corridor_01_old_road","kind":"old_road","role":"through"}],"front_ids":[],"geography_zone":"mid","region_id":0,"subbiome":"chapel_wood","territory_alignment":null,"territory_id":null,"territory_status":"neutral","topology_status":"neutral"},"state":{"alert":0.12,"control_strength":0.52,"front_activity":0.0,"front_status":"quiet","front_tension":0.0,"stability":0.62}},{"buds":[{"id":"sector_1_1_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:1:1:bud:0","type":"CURVED"},{"id":"sector_1_1_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:1:1:bud:1","type":"STRAIGHT"},{"id":"sector_1_1_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:1:1:bud:2","type":"STRAIGHT"},{"id":"sector_1_1_bud_3","index":3,"offset":[1,1],"seed_key":"7301:1:1:bud:3","type":"CURVED"}],"id":"sector_1_1","projection":{"agitation":0.341476,"breakup_resistance":0.598187,"cohesion":0.607725,"collapse_bias":0.437482,"damage_proxy":0.407325,"update_rate":0.517348},"sector":[1,1],"source":{"biome":"dark_forest","corridors":[],"front_ids":["front_1"],"geography_zone":"core","region_id":0,"subbiome":"root_maze","territory_alignment":"nano_signal","territory_id":"territory_0","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.5175,"front_activity":0.4114,"front_status":"active","front_tension":0.4356,"stability":0.6835}},{"buds":[{"id":"sector_2_1_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:2:1:bud:0","type":"CURVED"},{"id":"sector_2_1_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:2:1:bud:1","type":"STRAIGHT"},{"id":"sector_2_1_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:2:1:bud:2","type":"STRAIGHT"},{"id":"sector_2_1_bud_3","index":3,"offset":[1,1],"seed_key":"7301:2:1:bud:3","type":"CURVED"}],"id":"sector_2_1","projection":{"agitation":0.226276,"breakup_resistance":0.548971,"cohesion":0.589218,"collapse_bias":0.460121,"damage_proxy":0.427901,"update_rate":0.517348},"sector":[2,1],"source":{"biome":"dark_forest","corridors":[{"id":"corridor_02_old_road","kind":"old_road","role":"source"}],"front_ids":["front_1"],"geography_zone":"core","region_id":0,"subbiome":"root_maze","territory_alignment":null,"territory_id":null,"territory_status":"neutral","topology_status":"contested"},"state":{"alert":0.12,"control_strength":0.52,"front_activity":0.4114,"front_status":"active","front_tension":0.4356,"stability":0.62}},{"buds":[{"id":"sector_3_1_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:3:1:bud:0","type":"STRAIGHT"},{"id":"sector_3_1_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:3:1:bud:1","type":"CURVED"},{"id":"sector_3_1_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:3:1:bud:2","type":"CURVED"},{"id":"sector_3_1_bud_3","index":3,"offset":[1,1],"seed_key":"7301:3:1:bud:3","type":"CURVED"}],"id":"sector_3_1","projection":{"agitation":0.4176,"breakup_resistance":0.626243,"cohesion":0.705041,"collapse_bias":0.171928,"damage_proxy":0.1995,"update_rate":0.18},"sector":[3,1],"source":{"biome":"dark_forest","corridors":[],"front_ids":[],"geography_zone":"core","region_id":0,"subbiome":"redwood_core","territory_alignment":"silt_contamination","territory_id":"territory_3","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.58,"control_strength":0.6172,"front_activity":0.0,"front_status":"quiet","front_tension":0.0,"stability":0.7034}},{"buds":[{"id":"sector_4_1_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:4:1:bud:0","type":"STRAIGHT"},{"id":"sector_4_1_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:4:1:bud:1","type":"CURVED"},{"id":"sector_4_1_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:4:1:bud:2","type":"CURVED"},{"id":"sector_4_1_bud_3","index":3,"offset":[1,1],"seed_key":"7301:4:1:bud:3","type":"STRAIGHT"}],"id":"sector_4_1","projection":{"agitation":0.557476,"breakup_resistance":0.626243,"cohesion":0.635345,"collapse_bias":0.424576,"damage_proxy":0.390815,"update_rate":0.517348},"sector":[4,1],"source":{"biome":"dark_forest","corridors":[],"front_ids":["front_1"],"geography_zone":"mid","region_id":0,"subbiome":"overgrown_ruins","territory_alignment":"silt_contamination","territory_id":"territory_3","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.58,"control_strength":0.6172,"front_activity":0.4114,"front_status":"active","front_tension":0.4356,"stability":0.7034}},{"buds":[{"id":"sector_5_1_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:5:1:bud:0","type":"STRAIGHT"},{"id":"sector_5_1_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:5:1:bud:1","type":"CURVED"},{"id":"sector_5_1_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:5:1:bud:2","type":"CURVED"},{"id":"sector_5_1_bud_3","index":3,"offset":[1,1],"seed_key":"7301:5:1:bud:3","type":"STRAIGHT"}],"id":"sector_5_1","projection":{"agitation":0.341476,"breakup_resistance":0.6003,"cohesion":0.609804,"collapse_bias":0.43651,"damage_proxy":0.406082,"update_rate":0.517348},"sector":[5,1],"source":{"biome":"dark_forest","corridors":[],"front_ids":["front_1"],"geography_zone":"margin","region_id":0,"subbiome":"overgrown_ruins","territory_alignment":"nano_signal","territory_id":"territory_4","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.525,"front_activity":0.4114,"front_status":"active","front_tension":0.4356,"stability":0.685}},{"buds":[{"id":"sector_0_2_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:0:2:bud:0","type":"CURVED"},{"id":"sector_0_2_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:0:2:bud:1","type":"CURVED"},{"id":"sector_0_2_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:0:2:bud:2","type":"STRAIGHT"},{"id":"sector_0_2_bud_3","index":3,"offset":[1,1],"seed_key":"7301:0:2:bud:3","type":"CURVED"}],"id":"sector_0_2","projection":{"agitation":0.0864,"breakup_resistance":0.548971,"cohesion":0.658914,"collapse_bias":0.207473,"damage_proxy":0.236586,"update_rate":0.18},"sector":[0,2],"source":{"biome":"reformed_chapel","corridors":[{"id":"corridor_01_old_road","kind":"old_road","role":"through"},{"id":"corridor_04_pilgrim_route","kind":"pilgrim_route","role":"target"}],"front_ids":[],"geography_zone":"margin","region_id":2,"subbiome":"chapel_wood","territory_alignment":null,"territory_id":null,"territory_status":"neutral","topology_status":"neutral"},"state":{"alert":0.12,"control_strength":0.52,"front_activity":0.0,"front_status":"quiet","front_tension":0.0,"stability":0.62}},{"buds":[{"id":"sector_1_2_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:1:2:bud:0","type":"CURVED"},{"id":"sector_1_2_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:1:2:bud:1","type":"CURVED"},{"id":"sector_1_2_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:1:2:bud:2","type":"STRAIGHT"},{"id":"sector_1_2_bud_3","index":3,"offset":[1,1],"seed_key":"7301:1:2:bud:3","type":"STRAIGHT"}],"id":"sector_1_2","projection":{"agitation":0.226276,"breakup_resistance":0.548971,"cohesion":0.589218,"collapse_bias":0.460121,"damage_proxy":0.427901,"update_rate":0.517348},"sector":[1,2],"source":{"biome":"dark_forest","corridors":[{"id":"corridor_01_old_road","kind":"old_road","role":"through"}],"front_ids":["front_1"],"geography_zone":"mid","region_id":0,"subbiome":"chapel_wood","territory_alignment":null,"territory_id":null,"territory_status":"neutral","topology_status":"contested"},"state":{"alert":0.12,"control_strength":0.52,"front_activity":0.4114,"front_status":"active","front_tension":0.4356,"stability":0.62}},{"buds":[{"id":"sector_2_2_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:2:2:bud:0","type":"STRAIGHT"},{"id":"sector_2_2_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:2:2:bud:1","type":"STRAIGHT"},{"id":"sector_2_2_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:2:2:bud:2","type":"STRAIGHT"},{"id":"sector_2_2_bud_3","index":3,"offset":[1,1],"seed_key":"7301:2:2:bud:3","type":"CURVED"}],"id":"sector_2_2","projection":{"agitation":0.610244,"breakup_resistance":0.626243,"cohesion":0.593937,"collapse_bias":0.57468,"damage_proxy":0.50448,"update_rate":0.644612},"sector":[2,2],"source":{"biome":"dark_forest","corridors":[{"id":"corridor_01_old_road","kind":"old_road","role":"through"},{"id":"corridor_02_old_road","kind":"old_road","role":"target"},{"id":"corridor_07_silt_vein","kind":"silt_vein","role":"target"}],"front_ids":["front_2"],"geography_zone":"core","region_id":0,"subbiome":"redwood_core","territory_alignment":"silt_contamination","territory_id":"territory_3","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.58,"control_strength":0.6172,"front_activity":0.5666,"front_status":"tense","front_tension":0.6944,"stability":0.7034}},{"buds":[{"id":"sector_3_2_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:3:2:bud:0","type":"CURVED"},{"id":"sector_3_2_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:3:2:bud:1","type":"STRAIGHT"},{"id":"sector_3_2_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:3:2:bud:2","type":"CURVED"},{"id":"sector_3_2_bud_3","index":3,"offset":[1,1],"seed_key":"7301:3:2:bud:3","type":"CURVED"}],"id":"sector_3_2","projection":{"agitation":0.4176,"breakup_resistance":0.626243,"cohesion":0.705041,"collapse_bias":0.171928,"damage_proxy":0.1995,"update_rate":0.18},"sector":[3,2],"source":{"biome":"dark_forest","corridors":[{"id":"corridor_01_old_road","kind":"old_road","role":"target"},{"id":"corridor_03_old_road","kind":"old_road","role":"target"}],"front_ids":[],"geography_zone":"mid","region_id":0,"subbiome":"overgrown_ruins","territory_alignment":"silt_contamination","territory_id":"territory_3","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.58,"control_strength":0.6172,"front_activity":0.0,"front_status":"quiet","front_tension":0.0,"stability":0.7034}},{"buds":[{"id":"sector_4_2_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:4:2:bud:0","type":"CURVED"},{"id":"sector_4_2_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:4:2:bud:1","type":"CURVED"},{"id":"sector_4_2_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:4:2:bud:2","type":"STRAIGHT"},{"id":"sector_4_2_bud_3","index":3,"offset":[1,1],"seed_key":"7301:4:2:bud:3","type":"CURVED"}],"id":"sector_4_2","projection":{"agitation":0.4176,"breakup_resistance":0.626243,"cohesion":0.705041,"collapse_bias":0.171928,"damage_proxy":0.1995,"update_rate":0.18},"sector":[4,2],"source":{"biome":"ruined_settlement","corridors":[],"front_ids":[],"geography_zone":"margin","region_id":1,"subbiome":"overgrown_ruins","territory_alignment":"silt_contamination","territory_id":"territory_3","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.58,"control_strength":0.6172,"front_activity":0.0,"front_status":"quiet","front_tension":0.0,"stability":0.7034}},{"buds":[{"id":"sector_5_2_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:5:2:bud:0","type":"CURVED"},{"id":"sector_5_2_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:5:2:bud:1","type":"STRAIGHT"},{"id":"sector_5_2_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:5:2:bud:2","type":"STRAIGHT"},{"id":"sector_5_2_bud_3","index":3,"offset":[1,1],"seed_key":"7301:5:2:bud:3","type":"CURVED"}],"id":"sector_5_2","projection":{"agitation":0.557476,"breakup_resistance":0.626243,"cohesion":0.635345,"collapse_bias":0.424576,"damage_proxy":0.390815,"update_rate":0.517348},"sector":[5,2],"source":{"biome":"ruined_settlement","corridors":[],"front_ids":["front_1","front_4"],"geography_zone":"mid","region_id":1,"subbiome":"overgrown_ruins","territory_alignment":"silt_contamination","territory_id":"territory_3","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.58,"control_strength":0.6172,"front_activity":0.4114,"front_status":"active","front_tension":0.4356,"stability":0.7034}},{"buds":[{"id":"sector_0_3_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:0:3:bud:0","type":"CURVED"},{"id":"sector_0_3_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:0:3:bud:1","type":"CURVED"},{"id":"sector_0_3_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:0:3:bud:2","type":"STRAIGHT"},{"id":"sector_0_3_bud_3","index":3,"offset":[1,1],"seed_key":"7301:0:3:bud:3","type":"STRAIGHT"}],"id":"sector_0_3","projection":{"agitation":0.33522,"breakup_resistance":0.596074,"cohesion":0.610543,"collapse_bias":0.420706,"damage_proxy":0.395128,"update_rate":0.50226},"sector":[0,3],"source":{"biome":"reformed_chapel","corridors":[{"id":"corridor_04_pilgrim_route","kind":"pilgrim_route","role":"through"}],"front_ids":["front_0"],"geography_zone":"mid","region_id":2,"subbiome":"wax_yard","territory_alignment":"print_civic","territory_id":"territory_1","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.51,"front_activity":0.393,"front_status":"active","front_tension":0.405,"stability":0.682}},{"buds":[{"id":"sector_1_3_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:1:3:bud:0","type":"CURVED"},{"id":"sector_1_3_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:1:3:bud:1","type":"CURVED"},{"id":"sector_1_3_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:1:3:bud:2","type":"STRAIGHT"},{"id":"sector_1_3_bud_3","index":3,"offset":[1,1],"seed_key":"7301:1:3:bud:3","type":"STRAIGHT"}],"id":"sector_1_3","projection":{"agitation":0.557476,"breakup_resistance":0.6003,"cohesion":0.609804,"collapse_bias":0.43651,"damage_proxy":0.406082,"update_rate":0.517348},"sector":[1,3],"source":{"biome":"reformed_chapel","corridors":[],"front_ids":["front_0","front_1"],"geography_zone":"margin","region_id":2,"subbiome":"chapel_wood","territory_alignment":"nano_signal","territory_id":"territory_2","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.58,"control_strength":0.525,"front_activity":0.4114,"front_status":"active","front_tension":0.4356,"stability":0.685}},{"buds":[{"id":"sector_2_3_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:2:3:bud:0","type":"STRAIGHT"},{"id":"sector_2_3_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:2:3:bud:1","type":"STRAIGHT"},{"id":"sector_2_3_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:2:3:bud:2","type":"STRAIGHT"},{"id":"sector_2_3_bud_3","index":3,"offset":[1,1],"seed_key":"7301:2:3:bud:3","type":"CURVED"}],"id":"sector_2_3","projection":{"agitation":0.610244,"breakup_resistance":0.6003,"cohesion":0.568396,"collapse_bias":0.586614,"damage_proxy":0.519747,"update_rate":0.644612},"sector":[2,3],"source":{"biome":"dark_forest","corridors":[{"id":"corridor_07_silt_vein","kind":"silt_vein","role":"source"}],"front_ids":["front_2"],"geography_zone":"mid","region_id":0,"subbiome":"chapel_wood","territory_alignment":"nano_signal","territory_id":"territory_2","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.58,"control_strength":0.525,"front_activity":0.5666,"front_status":"tense","front_tension":0.6944,"stability":0.685}},{"buds":[{"id":"sector_3_3_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:3:3:bud:0","type":"STRAIGHT"},{"id":"sector_3_3_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:3:3:bud:1","type":"CURVED"},{"id":"sector_3_3_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:3:3:bud:2","type":"STRAIGHT"},{"id":"sector_3_3_bud_3","index":3,"offset":[1,1],"seed_key":"7301:3:3:bud:3","type":"STRAIGHT"}],"id":"sector_3_3","projection":{"agitation":0.610244,"breakup_resistance":0.626243,"cohesion":0.593937,"collapse_bias":0.57468,"damage_proxy":0.50448,"update_rate":0.644612},"sector":[3,3],"source":{"biome":"ruined_settlement","corridors":[{"id":"corridor_03_old_road","kind":"old_road","role":"through"}],"front_ids":["front_2"],"geography_zone":"margin","region_id":1,"subbiome":"overgrown_ruins","territory_alignment":"silt_contamination","territory_id":"territory_3","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.58,"control_strength":0.6172,"front_activity":0.5666,"front_status":"tense","front_tension":0.6944,"stability":0.7034}},{"buds":[{"id":"sector_4_3_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:4:3:bud:0","type":"STRAIGHT"},{"id":"sector_4_3_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:4:3:bud:1","type":"STRAIGHT"},{"id":"sector_4_3_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:4:3:bud:2","type":"CURVED"},{"id":"sector_4_3_bud_3","index":3,"offset":[1,1],"seed_key":"7301:4:3:bud:3","type":"CURVED"}],"id":"sector_4_3","projection":{"agitation":0.55122,"breakup_resistance":0.626243,"cohesion":0.640241,"collapse_bias":0.406828,"damage_proxy":0.377376,"update_rate":0.50226},"sector":[4,3],"source":{"biome":"ruined_settlement","corridors":[{"id":"corridor_03_old_road","kind":"old_road","role":"through"}],"front_ids":["front_4"],"geography_zone":"mid","region_id":1,"subbiome":"ash_courtyards","territory_alignment":"silt_contamination","territory_id":"territory_3","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.58,"control_strength":0.6172,"front_activity":0.393,"front_status":"active","front_tension":0.405,"stability":0.7034}},{"buds":[{"id":"sector_5_3_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:5:3:bud:0","type":"CURVED"},{"id":"sector_5_3_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:5:3:bud:1","type":"CURVED"},{"id":"sector_5_3_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:5:3:bud:2","type":"STRAIGHT"},{"id":"sector_5_3_bud_3","index":3,"offset":[1,1],"seed_key":"7301:5:3:bud:3","type":"STRAIGHT"}],"id":"sector_5_3","projection":{"agitation":0.33522,"breakup_resistance":0.596074,"cohesion":0.610543,"collapse_bias":0.420706,"damage_proxy":0.395128,"update_rate":0.50226},"sector":[5,3],"source":{"biome":"ruined_settlement","corridors":[],"front_ids":["front_4"],"geography_zone":"core","region_id":1,"subbiome":"collapsed_market","territory_alignment":"print_civic","territory_id":"territory_5","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.51,"front_activity":0.393,"front_status":"active","front_tension":0.405,"stability":0.682}},{"buds":[{"id":"sector_0_4_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:0:4:bud:0","type":"STRAIGHT"},{"id":"sector_0_4_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:0:4:bud:1","type":"CURVED"},{"id":"sector_0_4_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:0:4:bud:2","type":"CURVED"},{"id":"sector_0_4_bud_3","index":3,"offset":[1,1],"seed_key":"7301:0:4:bud:3","type":"CURVED"}],"id":"sector_0_4","projection":{"agitation":0.2016,"breakup_resistance":0.596074,"cohesion":0.675343,"collapse_bias":0.185806,"damage_proxy":0.217252,"update_rate":0.18},"sector":[0,4],"source":{"biome":"reformed_chapel","corridors":[{"id":"corridor_04_pilgrim_route","kind":"pilgrim_route","role":"source"}],"front_ids":[],"geography_zone":"core","region_id":2,"subbiome":"print_cloister","territory_alignment":"print_civic","territory_id":"territory_1","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.51,"front_activity":0.0,"front_status":"quiet","front_tension":0.0,"stability":0.682}},{"buds":[{"id":"sector_1_4_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:1:4:bud:0","type":"CURVED"},{"id":"sector_1_4_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:1:4:bud:1","type":"CURVED"},{"id":"sector_1_4_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:1:4:bud:2","type":"STRAIGHT"},{"id":"sector_1_4_bud_3","index":3,"offset":[1,1],"seed_key":"7301:1:4:bud:3","type":"STRAIGHT"}],"id":"sector_1_4","projection":{"agitation":0.33522,"breakup_resistance":0.596074,"cohesion":0.610543,"collapse_bias":0.420706,"damage_proxy":0.395128,"update_rate":0.50226},"sector":[1,4],"source":{"biome":"reformed_chapel","corridors":[],"front_ids":["front_0"],"geography_zone":"mid","region_id":2,"subbiome":"wax_yard","territory_alignment":"print_civic","territory_id":"territory_1","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.51,"front_activity":0.393,"front_status":"active","front_tension":0.405,"stability":0.682}},{"buds":[{"id":"sector_2_4_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:2:4:bud:0","type":"CURVED"},{"id":"sector_2_4_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:2:4:bud:1","type":"CURVED"},{"id":"sector_2_4_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:2:4:bud:2","type":"STRAIGHT"},{"id":"sector_2_4_bud_3","index":3,"offset":[1,1],"seed_key":"7301:2:4:bud:3","type":"STRAIGHT"}],"id":"sector_2_4","projection":{"agitation":0.55122,"breakup_resistance":0.6003,"cohesion":0.6147,"collapse_bias":0.418762,"damage_proxy":0.392642,"update_rate":0.50226},"sector":[2,4],"source":{"biome":"reformed_chapel","corridors":[],"front_ids":["front_0","front_3"],"geography_zone":"margin","region_id":2,"subbiome":"chapel_wood","territory_alignment":"nano_signal","territory_id":"territory_2","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.58,"control_strength":0.525,"front_activity":0.393,"front_status":"active","front_tension":0.405,"stability":0.685}},{"buds":[{"id":"sector_3_4_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:3:4:bud:0","type":"CURVED"},{"id":"sector_3_4_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:3:4:bud:1","type":"CURVED"},{"id":"sector_3_4_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:3:4:bud:2","type":"STRAIGHT"},{"id":"sector_3_4_bud_3","index":3,"offset":[1,1],"seed_key":"7301:3:4:bud:3","type":"STRAIGHT"}],"id":"sector_3_4","projection":{"agitation":0.55122,"breakup_resistance":0.626243,"cohesion":0.640241,"collapse_bias":0.406828,"damage_proxy":0.377376,"update_rate":0.50226},"sector":[3,4],"source":{"biome":"ruined_settlement","corridors":[],"front_ids":["front_3","front_4"],"geography_zone":"mid","region_id":1,"subbiome":"print_district_ruins","territory_alignment":"silt_contamination","territory_id":"territory_3","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.58,"control_strength":0.6172,"front_activity":0.393,"front_status":"active","front_tension":0.405,"stability":0.7034}},{"buds":[{"id":"sector_4_4_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:4:4:bud:0","type":"STRAIGHT"},{"id":"sector_4_4_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:4:4:bud:1","type":"STRAIGHT"},{"id":"sector_4_4_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:4:4:bud:2","type":"CURVED"},{"id":"sector_4_4_bud_3","index":3,"offset":[1,1],"seed_key":"7301:4:4:bud:3","type":"CURVED"}],"id":"sector_4_4","projection":{"agitation":0.33522,"breakup_resistance":0.596074,"cohesion":0.610543,"collapse_bias":0.420706,"damage_proxy":0.395128,"update_rate":0.50226},"sector":[4,4],"source":{"biome":"ruined_settlement","corridors":[{"id":"corridor_03_old_road","kind":"old_road","role":"through"}],"front_ids":["front_4"],"geography_zone":"core","region_id":1,"subbiome":"collapsed_market","territory_alignment":"print_civic","territory_id":"territory_5","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.51,"front_activity":0.393,"front_status":"active","front_tension":0.405,"stability":0.682}},{"buds":[{"id":"sector_5_4_bud_0","index":0,"offset":[-1,-1],"seed_key":"7301:5:4:bud:0","type":"STRAIGHT"},{"id":"sector_5_4_bud_1","index":1,"offset":[1,-1],"seed_key":"7301:5:4:bud:1","type":"CURVED"},{"id":"sector_5_4_bud_2","index":2,"offset":[-1,1],"seed_key":"7301:5:4:bud:2","type":"CURVED"},{"id":"sector_5_4_bud_3","index":3,"offset":[1,1],"seed_key":"7301:5:4:bud:3","type":"CURVED"}],"id":"sector_5_4","projection":{"agitation":0.2016,"breakup_resistance":0.596074,"cohesion":0.675343,"collapse_bias":0.185806,"damage_proxy":0.217252,"update_rate":0.18},"sector":[5,4],"source":{"biome":"ruined_settlement","corridors":[{"id":"corridor_03_old_road","kind":"old_road","role":"source"}],"front_ids":[],"geography_zone":"core","region_id":1,"subbiome":"charred_blocks","territory_alignment":"print_civic","territory_id":"territory_5","territory_status":"stable","topology_status":"dominated"},"state":{"alert":0.28,"control_strength":0.51,"front_activity":0.0,"front_status":"quiet","front_tension":0.0,"stability":0.682}}],"fpe_version":"0.6.0","hierarchy":{"expansion_state_owner":"viewer","initial_detail":"cluster_proxy","levels":["world","cluster","bud","geometry"],"schema":"fpe.view_hierarchy/0.6.0","semantic_effect":"none"},"layout":{"buds_per_sector":4,"cluster_kind":"pixelgen_sector","local_bud_offset":2.15,"sector_spacing":10.0},"mode":"read_only_hierarchical_projection","projection_fingerprint":"e62718146d9393f265317e3a2351fecc0ba0757862748be2d322ec4043e699c8","schema":"fpe.pixelgen_hierarchy/0.6.0","source":{"dimensions":[6,5],"pixelgen_generator_version":"1.0.0","pixelgen_state_version":"0.8.0","pixelgen_world_fingerprint":"ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a","seed":7301,"state_revision":0,"state_tick":0},"summary":{"bud_count":120,"cluster_count":30,"curved_bud_count":67,"front_cluster_count":20,"straight_bud_count":53,"territory_cluster_count":25}};
+</script>
+<script>
+if(typeof THREE==='undefined'){const s=document.getElementById('loadStatus');s.textContent='Three.js не завантажився; для CDN потрібне з’єднання.';s.className='note error';throw new Error('Three.js unavailable');}
+const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x050508,.011);const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,500),renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));document.body.appendChild(renderer.domElement);scene.add(new THREE.AmbientLight(0x334455,1.15));const dl=new THREE.DirectionalLight(0xaabbff,.9);dl.position.set(15,25,10);scene.add(dl);
+let theta=.85,phi=1.05,radius=55,isDown=false,lastX=0,lastY=0;function cam(){camera.position.set(radius*Math.sin(phi)*Math.cos(theta),radius*Math.cos(phi),radius*Math.sin(phi)*Math.sin(theta));camera.lookAt(0,4,0)}cam();renderer.domElement.addEventListener('mousedown',e=>{if(e.button===2||e.shiftKey){isDown=true;lastX=e.clientX;lastY=e.clientY}});addEventListener('mouseup',()=>isDown=false);addEventListener('mousemove',e=>{if(!isDown)return;theta-=(e.clientX-lastX)*.005;phi-=(e.clientY-lastY)*.005;phi=Math.max(.15,Math.min(Math.PI-.15,phi));lastX=e.clientX;lastY=e.clientY;cam()});renderer.domElement.addEventListener('wheel',e=>{radius=Math.max(12,Math.min(180,radius+e.deltaY*.035));cam()});renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
+const root=new THREE.Group();scene.add(root);const ray=new THREE.Raycaster(),mouse=new THREE.Vector2(),glyphCache={};let projection=null,viewState=null,hitMeshes=[],selected=null,runtime=null;
+function clearRoot(){while(root.children.length){const o=root.children.pop();o.traverse?.(x=>{x.geometry?.dispose?.();if(x.material){if(Array.isArray(x.material))x.material.forEach(m=>m.dispose?.());else x.material.dispose?.()}})}}
+function glyphTex(idx){if(glyphCache[idx])return glyphCache[idx];const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');x.font='bold 48px Courier New';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#7fffa0';x.fillText(FPE06.GLYPHS[idx%FPE06.GLYPHS.length],32,35);return glyphCache[idx]=new THREE.CanvasTexture(c)}
+function lineForBud(b,color,opacity){const pts=[];for(const [i,j] of b.edges){const a=b.nodes[i].base,c=b.nodes[j].base;pts.push(new THREE.Vector3(a.x,a.y,a.z),new THREE.Vector3(c.x,c.y,c.z))}return new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color,transparent:true,opacity}))}
+function tag(object,item){object.userData={item};root.add(object);hitMeshes.push(object);return object}
+function renderGeometry(item){const b=item.bud,c=item.cluster,q=c.projection,solid=q.cohesion>=.62&&q.damage_proxy<.42,ascii=!solid&&(q.damage_proxy>.46||q.cohesion<.50),color=b.type==='STRAIGHT'?0xc38b78:0x7fb6d9;if(solid){tag(lineForBud(b,color,.34+.5*q.breakup_resistance),item);return}const visible=b.nodes.filter(n=>n.rnd>q.collapse_bias*.52);if(ascii){for(const n of visible.filter((_,i)=>i%2===0)){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glyphTex(n.glyphIdx),transparent:true,depthWrite:false,opacity:.45+.45*(1-q.damage_proxy)}));sp.position.set(n.base.x,n.base.y,n.base.z);sp.scale.set(.9,.9,1);tag(sp,item)}}else{const g=new THREE.BufferGeometry().setFromPoints(visible.map(n=>new THREE.Vector3(n.base.x,n.base.y,n.base.z))),pts=new THREE.Points(g,new THREE.PointsMaterial({size:.24+.32*q.agitation,color:0x7fd6ff,transparent:true,opacity:.55+.35*q.breakup_resistance,depthWrite:false,blending:THREE.AdditiveBlending}));tag(pts,item)}}
+function renderView(){const h=FPE06.buildHierarchyPlan(projection,viewState);viewState=h.state;clearRoot();hitMeshes=[];for(const item of h.items){if(item.kind==='cluster_proxy'){const q=item.cluster.projection,g=new THREE.BoxGeometry(7.2,1.1+q.cohesion*2.6,7.2),m=new THREE.MeshBasicMaterial({color:item.cluster.source.front_ids.length?0x8a5448:0x355468,wireframe:true,transparent:true,opacity:.45+.3*q.breakup_resistance}),o=new THREE.Mesh(g,m);o.position.set(item.center.x,1.2,item.center.z);tag(o,item)}else if(item.kind==='bud_proxy'){const g=new THREE.IcosahedronGeometry(.7+item.cluster.projection.cohesion*.65,1),m=new THREE.MeshBasicMaterial({color:item.bud.type==='STRAIGHT'?0xc38b78:0x7fb6d9,wireframe:true,transparent:true,opacity:.72}),o=new THREE.Mesh(g,m);o.position.set(item.center.x,item.center.y,item.center.z);tag(o,item)}else renderGeometry(item)}document.getElementById('viewFp').textContent=FPE06.viewStateFingerprint(projection,viewState);document.getElementById('visible').textContent=`C ${h.counts.cluster_proxy} · B ${h.counts.bud_proxy} · G ${h.counts.geometry} · N ${h.counts.nodes}`;if(selected)selectItem(h.items.find(x=>x.id===selected.id)||h.items.find(x=>x.cluster.id===selected.cluster.id)||h.items[0]);}
+function renderProjection(p){
+  const accepted=runtime?runtime.accept(p):{changed:true};
+  if(!runtime)runtime=FPE.create(p);
+  const candidate={changed:accepted.changed,projection:runtime.getProjection(),viewState:runtime.getView()};
+  if(!candidate.changed)return;
+  // Preflight all geometry before replacing the accepted projection.
+  const prepared=FPE06.buildHierarchyPlan(candidate.projection,candidate.viewState);
+  projection=candidate.projection;viewState=candidate.viewState;
+  document.getElementById('src').textContent=`PixelGen ${p.source.pixelgen_generator_version||'?'} → FPE runtime ${FPE.version}`;
+  document.getElementById('world').textContent=`seed ${p.source.seed} · ${p.source.dimensions.join('×')}`;
+  document.getElementById('rev').textContent=p.source.state_revision;
+  document.getElementById('fp').textContent=p.projection_fingerprint.slice(0,16)+'…';
+  renderView();if(!selected)selectItem(prepared.items[0]);
+}
+function selectItem(item){if(!item)return;selected=item;const c=item.cluster,s=c.state,q=c.projection,src=c.source;document.getElementById('item').textContent=`${item.kind}: ${item.id}`;document.getElementById('sector').textContent=`[${c.sector.join(',')}] ${c.id}`;document.getElementById('biome').textContent=`${src.biome} / ${src.subbiome}`;document.getElementById('territory').textContent=src.territory_id||'neutral';document.getElementById('fronts').textContent=src.front_ids.join(', ')||'—';document.getElementById('frontStatus').textContent=s.front_status;for(const [id,val] of [['control',s.control_strength],['stability',s.stability],['alert',s.alert],['cohesion',q.cohesion],['collapse',q.collapse_bias],['agitation',q.agitation]])document.getElementById(id).textContent=val.toFixed(3);const bb=document.getElementById('budBadges');bb.innerHTML='';c.buds.forEach(b=>{const x=document.createElement('span');x.className='badge';x.textContent=`${b.index}: ${b.type}`;bb.appendChild(x)});document.getElementById('toggle').textContent=viewState.expandedClusters.includes(c.id)?'згорнути кластер':'розгорнути кластер'}
+function pick(e){mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(mouse,camera);return ray.intersectObjects(hitMeshes,false)[0]?.object.userData.item}
+renderer.domElement.addEventListener('click',e=>{if(!isDown){const item=pick(e);if(item)selectItem(item)}});renderer.domElement.addEventListener('dblclick',e=>{const item=pick(e);if(!item)return;if(item.kind==='cluster_proxy')viewState=runtime.toggleCluster(item.cluster.id);else viewState=runtime.toggleBud(item.id);selected=item;renderView()});
+document.getElementById('toggle').addEventListener('click',()=>{if(!selected)return;viewState=runtime.toggleCluster(selected.cluster.id);renderView()});document.getElementById('collapseAll').addEventListener('click',()=>{viewState=runtime.setView({expandedClusters:[],expandedBuds:[]});renderView()});document.getElementById('file').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{renderProjection(JSON.parse(await f.text()));const s=document.getElementById('loadStatus');s.textContent=`loaded ${f.name}`;s.className='note ok'}catch(err){const s=document.getElementById('loadStatus');s.textContent=String(err);s.className='note error'}});
+renderProjection(FPE_CANONICAL_PROJECTION);function animate(ms){requestAnimationFrame(animate);root.rotation.y=Math.sin(ms*.00008)*.025;renderer.render(scene,camera)}requestAnimationFrame(animate);addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+<script>
+// Visual pulses only: scheduling never advances PixelGen state or revision.
+const scheduleLabel=document.createElement('div');scheduleLabel.className='note';
+document.querySelector('.left').appendChild(scheduleLabel);
+document.title=`FPE v${FPE.version} — Stable`;
+document.querySelector('.title').textContent=`FPE v${FPE.version} — STABLE`;
+
+function scheduledFrame(ms){
+  
+  const batch=runtime.step(Math.floor(ms/50));
+  if(!batch.repeated){
+    const updates=new Map(batch.updates.map(u=>[u.id,u]));
+    for(const object of hitMeshes){const item=object.userData.item,u=updates.get(item.cluster.id);if(!u)continue;
+      const pulse=0.65+0.15*Math.sin(u.tick*0.15+FPE06.rand01(u.id)*6.28);
+      object.material.opacity=pulse;
+    }
+    scheduleLabel.textContent=`view tick ${batch.tick} · updates ${batch.updates.length}/8 · deferred ${batch.deferred}`;
+  }
+  requestAnimationFrame(scheduledFrame);
+}
+requestAnimationFrame(scheduledFrame);
+</script>
+</body>
+</html>

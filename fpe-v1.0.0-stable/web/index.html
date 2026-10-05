@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FPE v0.6 — Hierarchical View</title>
+<style>
+html,body{margin:0;overflow:hidden;background:#050508;color:#d8d8e6;font-family:"Courier New",monospace}canvas{display:block}.panel{position:fixed;z-index:5;background:rgba(8,8,14,.88);border:1px solid #303643;border-radius:8px;padding:12px 14px;backdrop-filter:blur(4px);box-shadow:0 0 22px #0008}.left{left:12px;top:12px;width:340px;max-height:90vh;overflow:auto}.right{right:12px;top:12px;width:305px}.title{color:#7fd6ff;font-size:13px;letter-spacing:1.5px}.sub{font-size:10px;color:#8a929f;line-height:1.45;margin:5px 0 12px}.kv{display:grid;grid-template-columns:1fr 1.3fr;gap:5px 8px;font-size:10px}.kv span{color:#777}.kv b{color:#cdd9e8;font-weight:normal;word-break:break-all}.sep{border-top:1px solid #252a35;margin:10px 0}.badge{display:inline-block;border:1px solid #3c5060;border-radius:4px;padding:2px 5px;margin:2px;font-size:9px;color:#9bcbe3}.note{font-size:9px;color:#68707d;line-height:1.45}.btn{background:#151b24;border:1px solid #405063;color:#cdd9e8;padding:5px 8px;border-radius:5px;font:10px inherit;cursor:pointer;margin:3px 4px 3px 0}.btn:hover{border-color:#7fd6ff}input[type=file]{width:100%;font-size:9px;color:#999}.bottom{position:fixed;bottom:10px;left:12px;z-index:5;color:#68707d;font-size:10px}.error{color:#ff8a7a}.ok{color:#8fd8a8}
+</style>
+</head>
+<body>
+<div class="panel left">
+  <div class="title">FPE v0.6 — HIERARCHICAL VIEW</div>
+  <div class="sub">World → cluster proxy → 4 bud proxies → geometry. View expansion is local, deterministic and has no semantic effect.</div>
+  <div class="kv"><span>source</span><b id="src">—</b><span>world</span><b id="world">—</b><span>revision</span><b id="rev">—</b><span>projection</span><b id="fp">—</b><span>view</span><b id="viewFp">—</b><span>visible</span><b id="visible">—</b></div>
+  <div class="sep"></div><button id="toggle" class="btn">розгорнути кластер</button><button id="collapseAll" class="btn">згорнути все</button>
+  <div class="note">Подвійний клік: cluster ↔ buds, bud ↔ geometry. Можна відкрити власний projection.json.</div>
+  <input id="file" type="file" accept="application/json,.json"><div id="loadStatus" class="note ok">canonical PixelGen 1.0 fixture</div>
+</div>
+<div class="panel right">
+  <div class="title">SELECTED</div>
+  <div class="kv"><span>item</span><b id="item">—</b><span>sector</span><b id="sector">—</b><span>biome</span><b id="biome">—</b><span>territory</span><b id="territory">—</b><span>fronts</span><b id="fronts">—</b><span>front status</span><b id="frontStatus">—</b><span>control</span><b id="control">—</b><span>stability</span><b id="stability">—</b><span>alert</span><b id="alert">—</b><span>cohesion</span><b id="cohesion">—</b><span>collapse bias</span><b id="collapse">—</b><span>agitation</span><b id="agitation">—</b></div>
+  <div class="sep"></div><div id="budBadges"></div>
+</div>
+<div class="bottom">ЛКМ — вибір · подвійний клік — рівень деталізації · ПКМ / Shift+drag — обертання · колесо — zoom</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="fpe_core.js"></script><script src="fpe_handoff.js"></script><script src="fpe_scheduler.js"></script><script src="fpe.js"></script><script src="canonical_projection.js"></script>
+<script>
+if(typeof THREE==='undefined'){const s=document.getElementById('loadStatus');s.textContent='Three.js не завантажився; для CDN потрібне з’єднання.';s.className='note error';throw new Error('Three.js unavailable');}
+const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x050508,.011);const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,500),renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));document.body.appendChild(renderer.domElement);scene.add(new THREE.AmbientLight(0x334455,1.15));const dl=new THREE.DirectionalLight(0xaabbff,.9);dl.position.set(15,25,10);scene.add(dl);
+let theta=.85,phi=1.05,radius=55,isDown=false,lastX=0,lastY=0;function cam(){camera.position.set(radius*Math.sin(phi)*Math.cos(theta),radius*Math.cos(phi),radius*Math.sin(phi)*Math.sin(theta));camera.lookAt(0,4,0)}cam();renderer.domElement.addEventListener('mousedown',e=>{if(e.button===2||e.shiftKey){isDown=true;lastX=e.clientX;lastY=e.clientY}});addEventListener('mouseup',()=>isDown=false);addEventListener('mousemove',e=>{if(!isDown)return;theta-=(e.clientX-lastX)*.005;phi-=(e.clientY-lastY)*.005;phi=Math.max(.15,Math.min(Math.PI-.15,phi));lastX=e.clientX;lastY=e.clientY;cam()});renderer.domElement.addEventListener('wheel',e=>{radius=Math.max(12,Math.min(180,radius+e.deltaY*.035));cam()});renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
+const root=new THREE.Group();scene.add(root);const ray=new THREE.Raycaster(),mouse=new THREE.Vector2(),glyphCache={};let projection=null,viewState=null,hitMeshes=[],selected=null,runtime=null;
+function clearRoot(){while(root.children.length){const o=root.children.pop();o.traverse?.(x=>{x.geometry?.dispose?.();if(x.material){if(Array.isArray(x.material))x.material.forEach(m=>m.dispose?.());else x.material.dispose?.()}})}}
+function glyphTex(idx){if(glyphCache[idx])return glyphCache[idx];const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');x.font='bold 48px Courier New';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#7fffa0';x.fillText(FPE06.GLYPHS[idx%FPE06.GLYPHS.length],32,35);return glyphCache[idx]=new THREE.CanvasTexture(c)}
+function lineForBud(b,color,opacity){const pts=[];for(const [i,j] of b.edges){const a=b.nodes[i].base,c=b.nodes[j].base;pts.push(new THREE.Vector3(a.x,a.y,a.z),new THREE.Vector3(c.x,c.y,c.z))}return new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color,transparent:true,opacity}))}
+function tag(object,item){object.userData={item};root.add(object);hitMeshes.push(object);return object}
+function renderGeometry(item){const b=item.bud,c=item.cluster,q=c.projection,solid=q.cohesion>=.62&&q.damage_proxy<.42,ascii=!solid&&(q.damage_proxy>.46||q.cohesion<.50),color=b.type==='STRAIGHT'?0xc38b78:0x7fb6d9;if(solid){tag(lineForBud(b,color,.34+.5*q.breakup_resistance),item);return}const visible=b.nodes.filter(n=>n.rnd>q.collapse_bias*.52);if(ascii){for(const n of visible.filter((_,i)=>i%2===0)){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glyphTex(n.glyphIdx),transparent:true,depthWrite:false,opacity:.45+.45*(1-q.damage_proxy)}));sp.position.set(n.base.x,n.base.y,n.base.z);sp.scale.set(.9,.9,1);tag(sp,item)}}else{const g=new THREE.BufferGeometry().setFromPoints(visible.map(n=>new THREE.Vector3(n.base.x,n.base.y,n.base.z))),pts=new THREE.Points(g,new THREE.PointsMaterial({size:.24+.32*q.agitation,color:0x7fd6ff,transparent:true,opacity:.55+.35*q.breakup_resistance,depthWrite:false,blending:THREE.AdditiveBlending}));tag(pts,item)}}
+function renderView(){const h=FPE06.buildHierarchyPlan(projection,viewState);viewState=h.state;clearRoot();hitMeshes=[];for(const item of h.items){if(item.kind==='cluster_proxy'){const q=item.cluster.projection,g=new THREE.BoxGeometry(7.2,1.1+q.cohesion*2.6,7.2),m=new THREE.MeshBasicMaterial({color:item.cluster.source.front_ids.length?0x8a5448:0x355468,wireframe:true,transparent:true,opacity:.45+.3*q.breakup_resistance}),o=new THREE.Mesh(g,m);o.position.set(item.center.x,1.2,item.center.z);tag(o,item)}else if(item.kind==='bud_proxy'){const g=new THREE.IcosahedronGeometry(.7+item.cluster.projection.cohesion*.65,1),m=new THREE.MeshBasicMaterial({color:item.bud.type==='STRAIGHT'?0xc38b78:0x7fb6d9,wireframe:true,transparent:true,opacity:.72}),o=new THREE.Mesh(g,m);o.position.set(item.center.x,item.center.y,item.center.z);tag(o,item)}else renderGeometry(item)}document.getElementById('viewFp').textContent=FPE06.viewStateFingerprint(projection,viewState);document.getElementById('visible').textContent=`C ${h.counts.cluster_proxy} · B ${h.counts.bud_proxy} · G ${h.counts.geometry} · N ${h.counts.nodes}`;if(selected)selectItem(h.items.find(x=>x.id===selected.id)||h.items.find(x=>x.cluster.id===selected.cluster.id)||h.items[0]);}
+function renderProjection(p){
+  const accepted=runtime?runtime.accept(p):{changed:true};
+  if(!runtime)runtime=FPE.create(p);
+  const candidate={changed:accepted.changed,projection:runtime.getProjection(),viewState:runtime.getView()};
+  if(!candidate.changed)return;
+  // Preflight all geometry before replacing the accepted projection.
+  const prepared=FPE06.buildHierarchyPlan(candidate.projection,candidate.viewState);
+  projection=candidate.projection;viewState=candidate.viewState;
+  document.getElementById('src').textContent=`PixelGen ${p.source.pixelgen_generator_version||'?'} → FPE runtime ${FPE.version}`;
+  document.getElementById('world').textContent=`seed ${p.source.seed} · ${p.source.dimensions.join('×')}`;
+  document.getElementById('rev').textContent=p.source.state_revision;
+  document.getElementById('fp').textContent=p.projection_fingerprint.slice(0,16)+'…';
+  renderView();if(!selected)selectItem(prepared.items[0]);
+}
+function selectItem(item){if(!item)return;selected=item;const c=item.cluster,s=c.state,q=c.projection,src=c.source;document.getElementById('item').textContent=`${item.kind}: ${item.id}`;document.getElementById('sector').textContent=`[${c.sector.join(',')}] ${c.id}`;document.getElementById('biome').textContent=`${src.biome} / ${src.subbiome}`;document.getElementById('territory').textContent=src.territory_id||'neutral';document.getElementById('fronts').textContent=src.front_ids.join(', ')||'—';document.getElementById('frontStatus').textContent=s.front_status;for(const [id,val] of [['control',s.control_strength],['stability',s.stability],['alert',s.alert],['cohesion',q.cohesion],['collapse',q.collapse_bias],['agitation',q.agitation]])document.getElementById(id).textContent=val.toFixed(3);const bb=document.getElementById('budBadges');bb.innerHTML='';c.buds.forEach(b=>{const x=document.createElement('span');x.className='badge';x.textContent=`${b.index}: ${b.type}`;bb.appendChild(x)});document.getElementById('toggle').textContent=viewState.expandedClusters.includes(c.id)?'згорнути кластер':'розгорнути кластер'}
+function pick(e){mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(mouse,camera);return ray.intersectObjects(hitMeshes,false)[0]?.object.userData.item}
+renderer.domElement.addEventListener('click',e=>{if(!isDown){const item=pick(e);if(item)selectItem(item)}});renderer.domElement.addEventListener('dblclick',e=>{const item=pick(e);if(!item)return;if(item.kind==='cluster_proxy')viewState=runtime.toggleCluster(item.cluster.id);else viewState=runtime.toggleBud(item.id);selected=item;renderView()});
+document.getElementById('toggle').addEventListener('click',()=>{if(!selected)return;viewState=runtime.toggleCluster(selected.cluster.id);renderView()});document.getElementById('collapseAll').addEventListener('click',()=>{viewState=runtime.setView({expandedClusters:[],expandedBuds:[]});renderView()});document.getElementById('file').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{renderProjection(JSON.parse(await f.text()));const s=document.getElementById('loadStatus');s.textContent=`loaded ${f.name}`;s.className='note ok'}catch(err){const s=document.getElementById('loadStatus');s.textContent=String(err);s.className='note error'}});
+renderProjection(FPE_CANONICAL_PROJECTION);function animate(ms){requestAnimationFrame(animate);root.rotation.y=Math.sin(ms*.00008)*.025;renderer.render(scene,camera)}requestAnimationFrame(animate);addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+<script>
+// Visual pulses only: scheduling never advances PixelGen state or revision.
+const scheduleLabel=document.createElement('div');scheduleLabel.className='note';
+document.querySelector('.left').appendChild(scheduleLabel);
+document.title=`FPE v${FPE.version} — Stable`;
+document.querySelector('.title').textContent=`FPE v${FPE.version} — STABLE`;
+
+function scheduledFrame(ms){
+  
+  const batch=runtime.step(Math.floor(ms/50));
+  if(!batch.repeated){
+    const updates=new Map(batch.updates.map(u=>[u.id,u]));
+    for(const object of hitMeshes){const item=object.userData.item,u=updates.get(item.cluster.id);if(!u)continue;
+      const pulse=0.65+0.15*Math.sin(u.tick*0.15+FPE06.rand01(u.id)*6.28);
+      object.material.opacity=pulse;
+    }
+    scheduleLabel.textContent=`view tick ${batch.tick} · updates ${batch.updates.length}/8 · deferred ${batch.deferred}`;
+  }
+  requestAnimationFrame(scheduledFrame);
+}
+requestAnimationFrame(scheduledFrame);
+</script>
+</body>
+</html>

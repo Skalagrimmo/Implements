@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>FPE v0.4 — Fractal Node Prototype</title>
+<style>
+  html, body { margin:0; padding:0; overflow:hidden; background:#050508; font-family: 'Courier New', monospace; }
+  #ui {
+    position: fixed; top: 12px; left: 12px; z-index: 10;
+    background: rgba(8,8,14,0.82); border: 1px solid #333; border-radius: 8px;
+    padding: 14px 16px; color: #d8d8e6; width: 310px; backdrop-filter: blur(4px);
+    box-shadow: 0 0 20px rgba(0,0,0,0.5); max-height: 92vh; overflow-y: auto;
+  }
+  #ui h1 { font-size: 12px; letter-spacing: 2px; margin: 0 0 4px 0; color: #7fd6ff; text-transform: uppercase; }
+  #ui .sub { font-size: 10px; color: #666; margin-bottom: 10px; line-height:1.4; }
+  .row { margin-bottom: 9px; }
+  .row label { display:flex; justify-content:space-between; font-size: 11px; color:#999; margin-bottom:3px; }
+  .row label span.val { color:#7fd6ff; }
+  .row input[type=range] { width: 100%; }
+  .modes { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+  .mode-btn {
+    flex:1; min-width:70px; background:#141420; border:1px solid #444; color:#ccc; font-size:10px;
+    padding:6px 4px; border-radius:5px; cursor:pointer; font-family: inherit; text-align:center;
+  }
+  .mode-btn.active { background:#2b4a5f; border-color:#7fd6ff; color:#fff; }
+  #legend { margin-top:10px; font-size:10px; color:#777; line-height:1.6; border-top:1px solid #2a2a35; padding-top:8px; }
+  #legend b { color:#aaa; }
+  #stats { position:fixed; bottom:10px; left:12px; color:#5a5a70; font-size:11px; z-index:10; }
+  #hint { position:fixed; bottom:10px; right:12px; color:#4a4a55; font-size:10px; z-index:10; text-align:right; line-height:1.5; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <h1>⧉ FPE v0.4 — Fractal Node</h1>
+  <div class="sub">Один вузол на всіх рівнях. formula_id вирішує: тип гілки (straight/curved) і режим рендеру (polygon/point/ASCII).</div>
+
+  <div class="row">
+    <label>Bud-мода (тип гілки)</label>
+    <div class="modes" id="budModes"></div>
+  </div>
+
+  <div class="row">
+    <label>Weight threshold <span class="val" id="weightVal">0.55</span></label>
+    <input type="range" id="weight" min="0" max="100" value="55">
+  </div>
+  <div class="row">
+    <label>Probability collapse <span class="val" id="probVal">0.85</span></label>
+    <input type="range" id="prob" min="0" max="100" value="85">
+  </div>
+  <div class="row">
+    <label>Радіус локальної дії (клік) <span class="val" id="radiusVal">3.0</span></label>
+    <input type="range" id="radius" min="10" max="80" value="30">
+  </div>
+
+  <div id="legend">
+    <b>Розгалуження (розділ 5):</b><br>
+    WIREFRAME_STRAIGHT → кутасті Bud (куби)<br>
+    WIREFRAME_CURVED → сферичні Bud<br>
+    <b>Еклектика (розділ 16):</b><br>
+    weight високий → polygon<br>
+    weight середній → point-cloud<br>
+    weight низький / damage високий → ASCII<br>
+    <b>Локальна дія (розділ 2):</b><br>
+    ЛКМ по сцені — гравець (PLAYER_AGENT) локально знижує weight сусідніх вузлів. Решта дерева лишається незмінною.
+  </div>
+</div>
+<div id="stats">—</div>
+<div id="hint">ЛКМ по об'єкту — локальна дія (пошкодження)<br>ПКМ / drag фону — обертати · колесо — зум</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ============ Setup ============
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x050508, 0.012);
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 500);
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+
+const ambient = new THREE.AmbientLight(0x334455, 1.1);
+scene.add(ambient);
+const dirLight = new THREE.DirectionalLight(0xaabbff, 0.9);
+dirLight.position.set(15,25,10);
+scene.add(dirLight);
+
+let isDown=false, lastX=0, lastY=0, theta=0.85, phi=1.05, radius=48;
+function updateCam(){
+  camera.position.x = radius*Math.sin(phi)*Math.cos(theta);
+  camera.position.z = radius*Math.sin(phi)*Math.sin(theta);
+  camera.position.y = radius*Math.cos(phi);
+  camera.lookAt(0,6,0);
+}
+renderer.domElement.addEventListener('mousedown', e=>{
+  if(e.button===2 || e.shiftKey){ isDown=true; lastX=e.clientX; lastY=e.clientY; }
+});
+window.addEventListener('mouseup', ()=>isDown=false);
+window.addEventListener('mousemove', e=>{
+  if(!isDown) return;
+  theta -= (e.clientX-lastX)*0.005;
+  phi   -= (e.clientY-lastY)*0.005;
+  phi = Math.max(0.15, Math.min(Math.PI-0.15, phi));
+  lastX=e.clientX; lastY=e.clientY;
+  updateCam();
+});
+renderer.domElement.addEventListener('wheel', e=>{
+  radius += e.deltaY*0.03;
+  radius = Math.max(10, Math.min(150, radius));
+  updateCam();
+});
+renderer.domElement.addEventListener('contextmenu', e=>e.preventDefault());
+updateCam();
+
+// ============ ASCII glyph textures ============
+const GLYPHS = ['#','%','&','8','@','+','=','-',':','.','/','\\'];
+const glyphTexCache = {};
+function getGlyphTex(idx){
+  if(glyphTexCache[idx]) return glyphTexCache[idx];
+  const size=64;
+  const cnv=document.createElement('canvas'); cnv.width=cnv.height=size;
+  const ctx=cnv.getContext('2d');
+  ctx.font='bold 50px Courier New'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle='#7fffa0';
+  ctx.fillText(GLYPHS[idx % GLYPHS.length], size/2, size/2+4);
+  const tex=new THREE.CanvasTexture(cnv); tex.needsUpdate=true;
+  glyphTexCache[idx]=tex;
+  return tex;
+}
+
+// ============ Data model: SVDAGNode-like (flattened for viz) ============
+// Each "node" = a point that belongs to a Bud cluster.
+// formula_id encoded here as: budType ('STRAIGHT'|'CURVED'), used for edge curvature + shape closure.
+let allNodes = [];   // flat list of leaf-level points across all buds
+let budClusters = [];// {type, center, points:[nodeIndex...], edgeList:[[i,j,curvature],...]}
+
+const GRID = 4; // buds per axis (GRID x 1 x GRID layout, some raised)
+const SPACING = 11;
+
+function makeStraightBud(center, size){
+  // cube wireframe: 8 corner points, straight edges
+  const pts = [];
+  const s = size/2;
+  for(let x=-1;x<=1;x+=2) for(let y=-1;y<=1;y+=2) for(let z=-1;z<=1;z+=2){
+    pts.push({ pos:new THREE.Vector3(center.x+x*s, center.y+y*s, center.z+z*s), base:null });
+  }
+  pts.forEach(p=>p.base=p.pos.clone());
+  const edges = [];
+  const idxOf = (x,y,z)=> ((x+1)/2)*4 + ((y+1)/2)*2 + ((z+1)/2);
+  // connect edges of a cube
+  const corners = [];
+  let k=0;
+  for(let x=-1;x<=1;x+=2) for(let y=-1;y<=1;y+=2) for(let z=-1;z<=1;z+=2){ corners.push([x,y,z]); }
+  for(let i=0;i<corners.length;i++){
+    for(let j=i+1;j<corners.length;j++){
+      const [ax,ay,az]=corners[i], [bx,by,bz]=corners[j];
+      const diff = Math.abs(ax-bx)+Math.abs(ay-by)+Math.abs(az-bz);
+      if(diff===2){ edges.push([i,j,0.0]); } // curvature 0 = straight
+    }
+  }
+  return { type:'STRAIGHT', points:pts, edges };
+}
+
+function makeCurvedBud(center, size){
+  // sphere-ish: points on a fibonacci sphere, curved edges to nearest neighbors
+  const n = 14;
+  const pts = [];
+  const r = size/1.8;
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  for(let i=0;i<n;i++){
+    const y = 1 - (i/(n-1))*2;
+    const radiusAtY = Math.sqrt(1-y*y);
+    const t = golden*i;
+    const x = Math.cos(t)*radiusAtY;
+    const z = Math.sin(t)*radiusAtY;
+    const pos = new THREE.Vector3(center.x + x*r, center.y + y*r*0.8 + size*0.4, center.z + z*r);
+    pts.push({ pos, base:pos.clone() });
+  }
+  // connect each point to its 3 nearest neighbors, curvature != 0
+  const edges = [];
+  const seen = new Set();
+  for(let i=0;i<n;i++){
+    const dists = [];
+    for(let j=0;j<n;j++){ if(i===j) continue; dists.push([j, pts[i].base.distanceTo(pts[j].base)]); }
+    dists.sort((a,b)=>a[1]-b[1]);
+    for(let k=0;k<3;k++){
+      const j = dists[k][0];
+      const key = i<j ? i+'_'+j : j+'_'+i;
+      if(seen.has(key)) continue;
+      seen.add(key);
+      edges.push([i,j, 0.35 + Math.random()*0.25]); // curvature != 0
+    }
+  }
+  return { type:'CURVED', points:pts, edges };
+}
+
+let currentBudMode = 'STRAIGHT';
+const budModesEl = document.getElementById('budModes');
+['STRAIGHT','CURVED','MIXED'].forEach(name=>{
+  const b=document.createElement('div');
+  b.className='mode-btn'+(name===currentBudMode?' active':'');
+  b.textContent = name==='STRAIGHT'?'Straight':name==='CURVED'?'Curved':'Mixed';
+  b.onclick=()=>{
+    currentBudMode=name;
+    [...budModesEl.children].forEach(c=>c.classList.remove('active'));
+    b.classList.add('active');
+    rebuild();
+  };
+  budModesEl.appendChild(b);
+});
+
+// ============ Render objects pools ============
+let pointCloud, pointGeom, pointMat;
+let glyphGroup;
+let lineSegs; // wireframe lines for polygon-mode Bud
+let lineGeom, lineMat;
+
+function rebuild(){
+  if(pointCloud) scene.remove(pointCloud);
+  if(glyphGroup) scene.remove(glyphGroup);
+  if(lineSegs) scene.remove(lineSegs);
+
+  allNodes = [];
+  budClusters = [];
+
+  let bi=0;
+  for(let gx=0; gx<GRID; gx++){
+    for(let gz=0; gz<GRID; gz++){
+      const cx = (gx - (GRID-1)/2) * SPACING;
+      const cz = (gz - (GRID-1)/2) * SPACING;
+      const center = new THREE.Vector3(cx, 6, cz);
+      let type = currentBudMode;
+      if(type==='MIXED') type = ((gx+gz)%2===0) ? 'STRAIGHT' : 'CURVED';
+
+      const bud = type==='STRAIGHT' ? makeStraightBud(center, 6) : makeCurvedBud(center, 6);
+
+      // register nodes with per-node state (weight/damage/prob seed)
+      const nodeIdxOffset = allNodes.length;
+      bud.points.forEach(p=>{
+        allNodes.push({
+          pos: p.pos,
+          base: p.base,
+          weight: 0.85 + (Math.random()-0.5)*0.1,
+          damage: 0.05 + Math.random()*0.05,
+          rnd: Math.random(),
+          phase: Math.random()*Math.PI*2,
+          glyphIdx: Math.floor(Math.random()*GLYPHS.length),
+        });
+      });
+      budClusters.push({
+        type: bud.type,
+        nodeOffset: nodeIdxOffset,
+        edges: bud.edges, // [i,j,curvature] local indices
+        center,
+      });
+      bi++;
+    }
+  }
+
+  const total = allNodes.length;
+
+  // point cloud buffers
+  const positions = new Float32Array(total*3);
+  const colors = new Float32Array(total*3);
+  const sizes = new Float32Array(total);
+  pointGeom = new THREE.BufferGeometry();
+  pointGeom.setAttribute('position', new THREE.BufferAttribute(positions,3));
+  pointGeom.setAttribute('color', new THREE.BufferAttribute(colors,3));
+  pointGeom.setAttribute('size', new THREE.BufferAttribute(sizes,1));
+  pointMat = new THREE.PointsMaterial({ size:0.3, vertexColors:true, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending });
+  pointCloud = new THREE.Points(pointGeom, pointMat);
+  scene.add(pointCloud);
+
+  // glyph sprites pool
+  glyphGroup = new THREE.Group();
+  scene.add(glyphGroup);
+  glyphGroup.userData.pool = allNodes.map(nd=>{
+    const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map:getGlyphTex(nd.glyphIdx), transparent:true, depthWrite:false }));
+    spr.scale.set(1.2,1.2,1);
+    spr.visible = false;
+    glyphGroup.add(spr);
+    return spr;
+  });
+
+  // line segments for "polygon" (wireframe) mode
+  const lineMax = budClusters.reduce((acc,b)=>acc+b.edges.length,0)*2;
+  const linePositions = new Float32Array(lineMax*3);
+  lineGeom = new THREE.BufferGeometry();
+  lineGeom.setAttribute('position', new THREE.BufferAttribute(linePositions,3));
+  lineMat = new THREE.LineBasicMaterial({ color:0x8fb3d9, transparent:true, opacity:0.9 });
+  lineSegs = new THREE.LineSegments(lineGeom, lineMat);
+  scene.add(lineSegs);
+
+  classifyAndRender();
+}
+
+// ============ Player local action (click to damage nearby nodes) ============
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+renderer.domElement.addEventListener('click', (e)=>{
+  mouse.x = (e.clientX/window.innerWidth)*2-1;
+  mouse.y = -(e.clientY/window.innerHeight)*2+1;
+  raycaster.setFromCamera(mouse, camera);
+  // intersect against an invisible plane approx at y=6 for simplicity, or against point cloud
+  const intersects = raycaster.intersectObject(pointCloud);
+  let hitPoint = null;
+  if(intersects.length>0){
+    hitPoint = intersects[0].point;
+  } else {
+    // fallback: project onto y=6 plane
+    const dir = raycaster.ray.direction;
+    const t = (6 - raycaster.ray.origin.y) / dir.y;
+    if(t>0) hitPoint = raycaster.ray.origin.clone().add(dir.clone().multiplyScalar(t));
+  }
+  if(!hitPoint) return;
+
+  const r = parseFloat(document.getElementById('radius').value)/10;
+  let affected = 0;
+  allNodes.forEach(nd=>{
+    const d = nd.pos.distanceTo(hitPoint);
+    if(d < r){
+      const falloff = 1 - d/r;
+      nd.weight = Math.max(0, nd.weight - falloff*0.6);
+      nd.damage = Math.min(1, nd.damage + falloff*0.7);
+      affected++;
+    }
+  });
+  document.getElementById('stats').dataset.lastAction = `Локальна дія: змінено ${affected} вузлів (з ${allNodes.length}) — решта дерева незмінна`;
+});
+
+// ============ Frame update: classify render mode + collapse ============
+const weightEl = document.getElementById('weight');
+const probEl = document.getElementById('prob');
+const radiusEl = document.getElementById('radius');
+const weightVal = document.getElementById('weightVal');
+const probVal = document.getElementById('probVal');
+const radiusVal = document.getElementById('radiusVal');
+const statsEl = document.getElementById('stats');
+function fmt(v,d){ return (v/d).toFixed(2); }
+weightEl.addEventListener('input', ()=>weightVal.textContent=fmt(weightEl.value,100));
+probEl.addEventListener('input', ()=>probVal.textContent=fmt(probEl.value,100));
+radiusEl.addEventListener('input', ()=>radiusVal.textContent=fmt(radiusEl.value,10));
+
+function classifyAndRender(){
+  const wThresh = weightEl.value/100;
+  const probThresh = probEl.value/100;
+  const t = performance.now()*0.001;
+
+  const posAttr = pointGeom.attributes.position;
+  const colorAttr = pointGeom.attributes.color;
+  const sizeAttr = pointGeom.attributes.size;
+  const linePosAttr = lineGeom.attributes.position;
+
+  let solidEdges=0, pointCount=0, glyphCount=0;
+  let lineCursor = 0;
+
+  // reset per-node visuals
+  for(let i=0;i<allNodes.length;i++){
+    sizeAttr.array[i] = 0;
+    glyphGroup.userData.pool[i].visible = false;
+  }
+
+  budClusters.forEach(bud=>{
+    // determine average weight/damage of the cluster to decide polygon vs decompose
+    let avgW=0, avgD=0;
+    for(let k=0;k<bud.edges.length;k++){}
+    const nOff = bud.nodeOffset;
+    const clusterSize = countClusterNodes(bud);
+    for(let li=0; li<clusterSize; li++){
+      const nd = allNodes[nOff+li];
+      avgW += nd.weight; avgD += nd.damage;
+    }
+    avgW/=clusterSize; avgD/=clusterSize;
+
+    const clusterSolid = avgW >= wThresh && avgD < 0.4;
+
+    // draw edges only if cluster is "solid enough" (polygon mode)
+    if(clusterSolid){
+      bud.edges.forEach(([i,j,curv])=>{
+        const a = allNodes[nOff+i], b = allNodes[nOff+j];
+        linePosAttr.array[lineCursor*3]=a.pos.x; linePosAttr.array[lineCursor*3+1]=a.pos.y; linePosAttr.array[lineCursor*3+2]=a.pos.z;
+        lineCursor++;
+        linePosAttr.array[lineCursor*3]=b.pos.x; linePosAttr.array[lineCursor*3+1]=b.pos.y; linePosAttr.array[lineCursor*3+2]=b.pos.z;
+        lineCursor++;
+        solidEdges++;
+      });
+    }
+
+    for(let li=0; li<clusterSize; li++){
+      const idx = nOff+li;
+      const nd = allNodes[idx];
+      const noise = 0.5+0.5*Math.sin(t*3 + nd.phase*2);
+      const exists = (nd.rnd < probThresh) || noise > (1-probThresh*0.35);
+
+      if(clusterSolid){
+        // rendered as part of polygon wireframe already; skip point/glyph
+        continue;
+      }
+      if(!exists) continue;
+
+      if(nd.weight < wThresh*0.5 || nd.damage > 0.55){
+        // ASCII glyph mode
+        const spr = glyphGroup.userData.pool[idx];
+        const jitter = 0.4;
+        spr.position.set(
+          nd.pos.x + Math.sin(t*2+nd.phase)*jitter,
+          nd.pos.y + Math.cos(t*1.6+nd.phase)*jitter,
+          nd.pos.z
+        );
+        spr.material.opacity = 0.5+0.5*noise;
+        spr.visible = true;
+        glyphCount++;
+      } else {
+        // point-cloud mode
+        const jitter = 0.12;
+        posAttr.array[idx*3]   = nd.pos.x + Math.sin(t*3+nd.phase)*jitter;
+        posAttr.array[idx*3+1] = nd.pos.y + Math.cos(t*2.4+nd.phase)*jitter;
+        posAttr.array[idx*3+2] = nd.pos.z + Math.sin(t*2.8+nd.phase*1.3)*jitter;
+        colorAttr.array[idx*3]=0.5; colorAttr.array[idx*3+1]=0.84; colorAttr.array[idx*3+2]=1.0;
+        sizeAttr.array[idx] = 0.32;
+        pointCount++;
+      }
+    }
+  });
+
+  lineGeom.setDrawRange(0, lineCursor);
+  linePosAttr.needsUpdate = true;
+  posAttr.needsUpdate = true;
+  colorAttr.needsUpdate = true;
+  sizeAttr.needsUpdate = true;
+
+  const lastAction = statsEl.dataset.lastAction || '';
+  statsEl.textContent = `wireframe-ребра: ${solidEdges/2} · point-cloud: ${pointCount} · ASCII: ${glyphCount}` + (lastAction ? ' | '+lastAction : '');
+}
+
+function countClusterNodes(bud){
+  // STRAIGHT bud = 8 corners, CURVED bud = 14 points
+  return bud.type==='STRAIGHT' ? 8 : 14;
+}
+
+rebuild();
+
+function animate(){
+  requestAnimationFrame(animate);
+  classifyAndRender();
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', ()=>{
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
