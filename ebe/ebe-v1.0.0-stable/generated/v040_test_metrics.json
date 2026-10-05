@@ -1,0 +1,34 @@
+{
+  "release": "0.4.0",
+  "base": "EBE v0.3.0 + recovered v0.2.1 hotfix tree",
+  "validation_runtime": "texlua",
+  "legacy_v021_tests": 3,
+  "combined_v030_v040_tests": 5,
+  "v030_fuzz_simulations": 200,
+  "v040_ecology_fuzz_simulations": 120,
+  "v040_institutional_evidence_memories": 240,
+  "v030_fuzz_elapsed_seconds": 0.4055,
+  "v040_fuzz_elapsed_seconds": 0.5837,
+  "canonical_demo": {
+    "first_institutional_report": {
+      "levko_belief": "tense",
+      "roots": 1,
+      "knowledge": false
+    },
+    "after_echo": {
+      "roots": 1,
+      "knowledge": false
+    },
+    "after_independent_iva_report": {
+      "roots": 2,
+      "knowledge": true,
+      "basis": "corroborated_reports"
+    },
+    "route": [
+      "print_house",
+      "caravan",
+      "levko"
+    ],
+    "route_hops": 3
+  }
+}

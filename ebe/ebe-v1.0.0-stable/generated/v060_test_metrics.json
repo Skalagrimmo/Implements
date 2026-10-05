@@ -1,0 +1,36 @@
+{
+  "release": "0.6.0",
+  "lua_syntax_files": 72,
+  "core_love_dependency_hits": [],
+  "regression": {
+    "tests/smoke.lua": "EBE Lua smoke test passed",
+    "tests/hardening.lua": "EBE Lua v0.2.1 hardening tests passed",
+    "tests/renderer_forwarding.lua": "Renderer forwarding regression test passed",
+    "run_all": "EBE v0.6.0 package API compatibility test passed\nEBE v0.3.0 core cognition tests passed\nEBE v0.3.0 PixelGen v0.8 runtime bridge tests passed\nEBE v0.6.0 PixelGen 1.0 stable-contract compatibility test passed\nEBE v0.3.0 deterministic distortion test passed\nEBE v0.4.0 information ecology / source-lineage tests passed\nEBE v0.5.0 PixelGen automatic information-network synthesis tests passed\nEBE v0.6.0 collective epistemics tests passed\nEBE v0.6.0 all tests: PASS"
+  },
+  "fuzz": {
+    "tests/fuzz_v030.lua": {
+      "seconds": 0.438,
+      "output": "EBE v0.3.0 fuzz passed: 200 simulations, 400 received rumor memories, 44 distorted transmissions"
+    },
+    "tests/fuzz_v040.lua": {
+      "seconds": 0.558,
+      "output": "EBE v0.4.0 ecology fuzz passed: 120 simulations, 240 institutional evidence memories"
+    },
+    "tests/fuzz_v050.lua": {
+      "seconds": 8.249,
+      "output": "EBE v0.5.0 network synthesis fuzz passed: 120 variants, avg institutions 11.04, avg routes 9.75, disconnected forests 48, routing log entries 2015"
+    },
+    "tests/fuzz_v060.lua": {
+      "seconds": 0.252,
+      "output": "EBE v0.6.0 collective fuzz passed: 120 simulations, 120 echo reports, 120 independent consensuses, 120 publications"
+    },
+    "tests/soak_v060.lua": {
+      "seconds": 3.499,
+      "output": "EBE v0.6.0 collective soak passed: 300 simulations, 240 consensus, 60 conflicts, 60 institution publications, 6900 submitted reports"
+    }
+  },
+  "deterministic_demo_runs": 5,
+  "deterministic_demo_sha256": "fce1f250178c3b1fd082682b4fa4acf79872d52622d868d0affd928f8f10cceb",
+  "love_executable_available": false
+}

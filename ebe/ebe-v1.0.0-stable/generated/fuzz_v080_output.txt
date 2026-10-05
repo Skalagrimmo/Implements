@@ -1,0 +1,2 @@
+EBE v0.8.0 action fuzz: 160 simulations PASS
+requests=160 exports=160 rejected=40 applied=120

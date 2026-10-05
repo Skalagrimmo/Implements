@@ -1,0 +1,66 @@
+{
+  "cases": 4,
+  "failures": 0,
+  "results": [
+    {
+      "seed": 0,
+      "seconds": 0.662,
+      "corridors": 10,
+      "covered_sectors": 47,
+      "local_segments": 61,
+      "kind_counts": {
+        "drainage_channel": 2,
+        "old_road": 3,
+        "pilgrim_route": 3,
+        "ridge_chain": 1,
+        "silt_vein": 1
+      },
+      "fingerprint": "b0104c9f97b85aedcad1b1f0a0548f6d725e6e7510befb85174e83a11da35386"
+    },
+    {
+      "seed": 1,
+      "seconds": 0.65,
+      "corridors": 12,
+      "covered_sectors": 52,
+      "local_segments": 67,
+      "kind_counts": {
+        "drainage_channel": 2,
+        "old_road": 3,
+        "pilgrim_route": 3,
+        "ridge_chain": 1,
+        "silt_vein": 3
+      },
+      "fingerprint": "6eabd15fddec60e484d3afc1104192bb8a47ee3eb6b0f87949c5fd803b916686"
+    },
+    {
+      "seed": 6060,
+      "seconds": 0.641,
+      "corridors": 9,
+      "covered_sectors": 48,
+      "local_segments": 56,
+      "kind_counts": {
+        "drainage_channel": 2,
+        "old_road": 3,
+        "pilgrim_route": 1,
+        "ridge_chain": 1,
+        "silt_vein": 2
+      },
+      "fingerprint": "22e4aa35f52322bea5c0d980a79faa7b6526b89ac7ad7da78b5757e1c49e684d"
+    },
+    {
+      "seed": 7301,
+      "seconds": 0.601,
+      "corridors": 11,
+      "covered_sectors": 53,
+      "local_segments": 63,
+      "kind_counts": {
+        "drainage_channel": 2,
+        "old_road": 3,
+        "pilgrim_route": 4,
+        "ridge_chain": 1,
+        "silt_vein": 1
+      },
+      "fingerprint": "e4edb22d22f2fb2ca50bb7312e9415da3a0d6505134e2f75abcdfe90b80565c9"
+    }
+  ]
+}

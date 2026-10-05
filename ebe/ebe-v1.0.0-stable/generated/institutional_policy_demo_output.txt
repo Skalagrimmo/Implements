@@ -1,0 +1,6 @@
+Submitted: institution_report_1 roots=1
+Policy target=levko action=publish priority=0.80 rule=prioritize_levko
+Policy target=outsider action=suppress priority=0.40 rule=censor_outsider
+Levko: tense roots=1
+Outsider: no belief
+Press archive reports: 1

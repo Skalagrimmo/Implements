@@ -1,0 +1,2803 @@
+{
+  "schema": "fpe.runtime_snapshot/0.11.0",
+  "runtime_version": "0.11.0",
+  "projection_schema": "fpe.pixelgen_hierarchy/0.6.0",
+  "action_request_schema": "fpe.action_request/0.10.0",
+  "options": {
+    "budget": 3
+  },
+  "projection": {
+    "authority": {
+      "geometry_owner": "FPE",
+      "objective_state_owner": "PixelGen",
+      "writeback": "disabled_in_v0.6"
+    },
+    "bridge_version": "0.6.0",
+    "clusters": [
+      {
+        "buds": [
+          {
+            "id": "sector_0_0_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:0:0:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_0_0_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:0:0:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_0_0_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:0:0:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_0_0_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:0:0:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_0_0",
+        "projection": {
+          "agitation": 0.20808,
+          "breakup_resistance": 0.551277,
+          "cohesion": 0.639124,
+          "collapse_bias": 0.206412,
+          "damage_proxy": 0.241406,
+          "update_rate": 0.18
+        },
+        "sector": [
+          0,
+          0
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [
+            {
+              "id": "corridor_01_old_road",
+              "kind": "old_road",
+              "role": "source"
+            },
+            {
+              "id": "corridor_05_silt_vein",
+              "kind": "silt_vein",
+              "role": "target"
+            }
+          ],
+          "front_ids": [],
+          "geography_zone": "margin",
+          "region_id": 0,
+          "subbiome": "scrub_march",
+          "territory_alignment": "nano_signal",
+          "territory_id": "territory_0",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.289,
+          "control_strength": 0.3975,
+          "front_activity": 0,
+          "front_status": "quiet",
+          "front_tension": 0,
+          "stability": 0.6427
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_1_0_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:1:0:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_1_0_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:1:0:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_1_0_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:1:0:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_1_0_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:1:0:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_1_0",
+        "projection": {
+          "agitation": 0.20808,
+          "breakup_resistance": 0.551277,
+          "cohesion": 0.639124,
+          "collapse_bias": 0.206412,
+          "damage_proxy": 0.241406,
+          "update_rate": 0.18
+        },
+        "sector": [
+          1,
+          0
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [
+            {
+              "id": "corridor_05_silt_vein",
+              "kind": "silt_vein",
+              "role": "source"
+            },
+            {
+              "id": "corridor_06_silt_vein",
+              "kind": "silt_vein",
+              "role": "target"
+            }
+          ],
+          "front_ids": [],
+          "geography_zone": "mid",
+          "region_id": 0,
+          "subbiome": "wet_pine",
+          "territory_alignment": "nano_signal",
+          "territory_id": "territory_0",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.289,
+          "control_strength": 0.3975,
+          "front_activity": 0,
+          "front_status": "quiet",
+          "front_tension": 0,
+          "stability": 0.6427
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_2_0_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:2:0:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_2_0_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:2:0:bud:1",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_2_0_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:2:0:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_2_0_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:2:0:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_2_0",
+        "projection": {
+          "agitation": 0.331126,
+          "breakup_resistance": 0.551277,
+          "cohesion": 0.583828,
+          "collapse_bias": 0.40686,
+          "damage_proxy": 0.393193,
+          "update_rate": 0.476758
+        },
+        "sector": [
+          2,
+          0
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [
+            {
+              "id": "corridor_06_silt_vein",
+              "kind": "silt_vein",
+              "role": "through"
+            }
+          ],
+          "front_ids": [
+            "front_1"
+          ],
+          "geography_zone": "core",
+          "region_id": 0,
+          "subbiome": "root_maze",
+          "territory_alignment": "nano_signal",
+          "territory_id": "territory_0",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.289,
+          "control_strength": 0.3975,
+          "front_activity": 0.3619,
+          "front_status": "active",
+          "front_tension": 0.3456,
+          "stability": 0.6427
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_3_0_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:3:0:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_3_0_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:3:0:bud:1",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_3_0_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:3:0:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_3_0_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:3:0:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_3_0",
+        "projection": {
+          "agitation": 0.209446,
+          "breakup_resistance": 0.548971,
+          "cohesion": 0.603618,
+          "collapse_bias": 0.407921,
+          "damage_proxy": 0.388373,
+          "update_rate": 0.476758
+        },
+        "sector": [
+          3,
+          0
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [
+            {
+              "id": "corridor_06_silt_vein",
+              "kind": "silt_vein",
+              "role": "through"
+            }
+          ],
+          "front_ids": [
+            "front_1"
+          ],
+          "geography_zone": "mid",
+          "region_id": 0,
+          "subbiome": "wet_pine",
+          "territory_alignment": null,
+          "territory_id": null,
+          "territory_status": "neutral",
+          "topology_status": "contested"
+        },
+        "state": {
+          "alert": 0.12,
+          "control_strength": 0.52,
+          "front_activity": 0.3619,
+          "front_status": "active",
+          "front_tension": 0.3456,
+          "stability": 0.62
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_4_0_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:4:0:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_4_0_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:4:0:bud:1",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_4_0_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:4:0:bud:2",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_4_0_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:4:0:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_4_0",
+        "projection": {
+          "agitation": 0.305206,
+          "breakup_resistance": 0.605916,
+          "cohesion": 0.626364,
+          "collapse_bias": 0.381727,
+          "damage_proxy": 0.364192,
+          "update_rate": 0.476758
+        },
+        "sector": [
+          4,
+          0
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [
+            {
+              "id": "corridor_06_silt_vein",
+              "kind": "silt_vein",
+              "role": "through"
+            }
+          ],
+          "front_ids": [
+            "front_1"
+          ],
+          "geography_zone": "margin",
+          "region_id": 0,
+          "subbiome": "forest_edge",
+          "territory_alignment": "nano_signal",
+          "territory_id": "territory_4",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.253,
+          "control_strength": 0.525,
+          "front_activity": 0.3619,
+          "front_status": "active",
+          "front_tension": 0.3456,
+          "stability": 0.6922
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_5_0_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:5:0:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_5_0_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:5:0:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_5_0_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:5:0:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_5_0_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:5:0:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_5_0",
+        "projection": {
+          "agitation": 0.18216,
+          "breakup_resistance": 0.605916,
+          "cohesion": 0.68166,
+          "collapse_bias": 0.181279,
+          "damage_proxy": 0.212405,
+          "update_rate": 0.18
+        },
+        "sector": [
+          5,
+          0
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [
+            {
+              "id": "corridor_06_silt_vein",
+              "kind": "silt_vein",
+              "role": "source"
+            }
+          ],
+          "front_ids": [],
+          "geography_zone": "margin",
+          "region_id": 0,
+          "subbiome": "forest_edge",
+          "territory_alignment": "nano_signal",
+          "territory_id": "territory_4",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.253,
+          "control_strength": 0.525,
+          "front_activity": 0,
+          "front_status": "quiet",
+          "front_tension": 0,
+          "stability": 0.6922
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_0_1_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:0:1:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_0_1_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:0:1:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_0_1_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:0:1:bud:2",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_0_1_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:0:1:bud:3",
+            "type": "STRAIGHT"
+          }
+        ],
+        "id": "sector_0_1",
+        "projection": {
+          "agitation": 0.0864,
+          "breakup_resistance": 0.548971,
+          "cohesion": 0.658914,
+          "collapse_bias": 0.207473,
+          "damage_proxy": 0.236586,
+          "update_rate": 0.18
+        },
+        "sector": [
+          0,
+          1
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [
+            {
+              "id": "corridor_01_old_road",
+              "kind": "old_road",
+              "role": "through"
+            }
+          ],
+          "front_ids": [],
+          "geography_zone": "mid",
+          "region_id": 0,
+          "subbiome": "chapel_wood",
+          "territory_alignment": null,
+          "territory_id": null,
+          "territory_status": "neutral",
+          "topology_status": "neutral"
+        },
+        "state": {
+          "alert": 0.12,
+          "control_strength": 0.52,
+          "front_activity": 0,
+          "front_status": "quiet",
+          "front_tension": 0,
+          "stability": 0.62
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_1_1_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:1:1:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_1_1_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:1:1:bud:1",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_1_1_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:1:1:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_1_1_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:1:1:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_1_1",
+        "projection": {
+          "agitation": 0.331126,
+          "breakup_resistance": 0.551277,
+          "cohesion": 0.583828,
+          "collapse_bias": 0.40686,
+          "damage_proxy": 0.393193,
+          "update_rate": 0.476758
+        },
+        "sector": [
+          1,
+          1
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [],
+          "front_ids": [
+            "front_1"
+          ],
+          "geography_zone": "core",
+          "region_id": 0,
+          "subbiome": "root_maze",
+          "territory_alignment": "nano_signal",
+          "territory_id": "territory_0",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.289,
+          "control_strength": 0.3975,
+          "front_activity": 0.3619,
+          "front_status": "active",
+          "front_tension": 0.3456,
+          "stability": 0.6427
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_2_1_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:2:1:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_2_1_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:2:1:bud:1",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_2_1_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:2:1:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_2_1_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:2:1:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_2_1",
+        "projection": {
+          "agitation": 0.209446,
+          "breakup_resistance": 0.548971,
+          "cohesion": 0.603618,
+          "collapse_bias": 0.407921,
+          "damage_proxy": 0.388373,
+          "update_rate": 0.476758
+        },
+        "sector": [
+          2,
+          1
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [
+            {
+              "id": "corridor_02_old_road",
+              "kind": "old_road",
+              "role": "source"
+            }
+          ],
+          "front_ids": [
+            "front_1"
+          ],
+          "geography_zone": "core",
+          "region_id": 0,
+          "subbiome": "root_maze",
+          "territory_alignment": null,
+          "territory_id": null,
+          "territory_status": "neutral",
+          "topology_status": "contested"
+        },
+        "state": {
+          "alert": 0.12,
+          "control_strength": 0.52,
+          "front_activity": 0.3619,
+          "front_status": "active",
+          "front_tension": 0.3456,
+          "stability": 0.62
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_3_1_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:3:1:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_3_1_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:3:1:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_3_1_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:3:1:bud:2",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_3_1_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:3:1:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_3_1",
+        "projection": {
+          "agitation": 0.39816,
+          "breakup_resistance": 0.631859,
+          "cohesion": 0.707201,
+          "collapse_bias": 0.169345,
+          "damage_proxy": 0.197138,
+          "update_rate": 0.18
+        },
+        "sector": [
+          3,
+          1
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [],
+          "front_ids": [],
+          "geography_zone": "core",
+          "region_id": 0,
+          "subbiome": "redwood_core",
+          "territory_alignment": "silt_contamination",
+          "territory_id": "territory_3",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.553,
+          "control_strength": 0.6172,
+          "front_activity": 0,
+          "front_status": "quiet",
+          "front_tension": 0,
+          "stability": 0.7106
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_4_1_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:4:1:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_4_1_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:4:1:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_4_1_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:4:1:bud:2",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_4_1_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:4:1:bud:3",
+            "type": "STRAIGHT"
+          }
+        ],
+        "id": "sector_4_1",
+        "projection": {
+          "agitation": 0.521206,
+          "breakup_resistance": 0.631859,
+          "cohesion": 0.651905,
+          "collapse_bias": 0.369793,
+          "damage_proxy": 0.348926,
+          "update_rate": 0.476758
+        },
+        "sector": [
+          4,
+          1
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [],
+          "front_ids": [
+            "front_1"
+          ],
+          "geography_zone": "mid",
+          "region_id": 0,
+          "subbiome": "overgrown_ruins",
+          "territory_alignment": "silt_contamination",
+          "territory_id": "territory_3",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.553,
+          "control_strength": 0.6172,
+          "front_activity": 0.3619,
+          "front_status": "active",
+          "front_tension": 0.3456,
+          "stability": 0.7106
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_5_1_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:5:1:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_5_1_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:5:1:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_5_1_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:5:1:bud:2",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_5_1_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:5:1:bud:3",
+            "type": "STRAIGHT"
+          }
+        ],
+        "id": "sector_5_1",
+        "projection": {
+          "agitation": 0.305206,
+          "breakup_resistance": 0.605916,
+          "cohesion": 0.626364,
+          "collapse_bias": 0.381727,
+          "damage_proxy": 0.364192,
+          "update_rate": 0.476758
+        },
+        "sector": [
+          5,
+          1
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [],
+          "front_ids": [
+            "front_1"
+          ],
+          "geography_zone": "margin",
+          "region_id": 0,
+          "subbiome": "overgrown_ruins",
+          "territory_alignment": "nano_signal",
+          "territory_id": "territory_4",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.253,
+          "control_strength": 0.525,
+          "front_activity": 0.3619,
+          "front_status": "active",
+          "front_tension": 0.3456,
+          "stability": 0.6922
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_0_2_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:0:2:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_0_2_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:0:2:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_0_2_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:0:2:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_0_2_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:0:2:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_0_2",
+        "projection": {
+          "agitation": 0.0864,
+          "breakup_resistance": 0.548971,
+          "cohesion": 0.658914,
+          "collapse_bias": 0.207473,
+          "damage_proxy": 0.236586,
+          "update_rate": 0.18
+        },
+        "sector": [
+          0,
+          2
+        ],
+        "source": {
+          "biome": "reformed_chapel",
+          "corridors": [
+            {
+              "id": "corridor_01_old_road",
+              "kind": "old_road",
+              "role": "through"
+            },
+            {
+              "id": "corridor_04_pilgrim_route",
+              "kind": "pilgrim_route",
+              "role": "target"
+            }
+          ],
+          "front_ids": [],
+          "geography_zone": "margin",
+          "region_id": 2,
+          "subbiome": "chapel_wood",
+          "territory_alignment": null,
+          "territory_id": null,
+          "territory_status": "neutral",
+          "topology_status": "neutral"
+        },
+        "state": {
+          "alert": 0.12,
+          "control_strength": 0.52,
+          "front_activity": 0,
+          "front_status": "quiet",
+          "front_tension": 0,
+          "stability": 0.62
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_1_2_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:1:2:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_1_2_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:1:2:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_1_2_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:1:2:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_1_2_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:1:2:bud:3",
+            "type": "STRAIGHT"
+          }
+        ],
+        "id": "sector_1_2",
+        "projection": {
+          "agitation": 0.209446,
+          "breakup_resistance": 0.548971,
+          "cohesion": 0.603618,
+          "collapse_bias": 0.407921,
+          "damage_proxy": 0.388373,
+          "update_rate": 0.476758
+        },
+        "sector": [
+          1,
+          2
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [
+            {
+              "id": "corridor_01_old_road",
+              "kind": "old_road",
+              "role": "through"
+            }
+          ],
+          "front_ids": [
+            "front_1"
+          ],
+          "geography_zone": "mid",
+          "region_id": 0,
+          "subbiome": "chapel_wood",
+          "territory_alignment": null,
+          "territory_id": null,
+          "territory_status": "neutral",
+          "topology_status": "contested"
+        },
+        "state": {
+          "alert": 0.12,
+          "control_strength": 0.52,
+          "front_activity": 0.3619,
+          "front_status": "active",
+          "front_tension": 0.3456,
+          "stability": 0.62
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_2_2_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:2:2:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_2_2_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:2:2:bud:1",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_2_2_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:2:2:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_2_2_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:2:2:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_2_2",
+        "projection": {
+          "agitation": 0.590804,
+          "breakup_resistance": 0.631859,
+          "cohesion": 0.596097,
+          "collapse_bias": 0.572097,
+          "damage_proxy": 0.502119,
+          "update_rate": 0.644612
+        },
+        "sector": [
+          2,
+          2
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [
+            {
+              "id": "corridor_01_old_road",
+              "kind": "old_road",
+              "role": "through"
+            },
+            {
+              "id": "corridor_02_old_road",
+              "kind": "old_road",
+              "role": "target"
+            },
+            {
+              "id": "corridor_07_silt_vein",
+              "kind": "silt_vein",
+              "role": "target"
+            }
+          ],
+          "front_ids": [
+            "front_2"
+          ],
+          "geography_zone": "core",
+          "region_id": 0,
+          "subbiome": "redwood_core",
+          "territory_alignment": "silt_contamination",
+          "territory_id": "territory_3",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.553,
+          "control_strength": 0.6172,
+          "front_activity": 0.5666,
+          "front_status": "tense",
+          "front_tension": 0.6944,
+          "stability": 0.7106
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_3_2_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:3:2:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_3_2_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:3:2:bud:1",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_3_2_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:3:2:bud:2",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_3_2_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:3:2:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_3_2",
+        "projection": {
+          "agitation": 0.39816,
+          "breakup_resistance": 0.631859,
+          "cohesion": 0.707201,
+          "collapse_bias": 0.169345,
+          "damage_proxy": 0.197138,
+          "update_rate": 0.18
+        },
+        "sector": [
+          3,
+          2
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [
+            {
+              "id": "corridor_01_old_road",
+              "kind": "old_road",
+              "role": "target"
+            },
+            {
+              "id": "corridor_03_old_road",
+              "kind": "old_road",
+              "role": "target"
+            }
+          ],
+          "front_ids": [],
+          "geography_zone": "mid",
+          "region_id": 0,
+          "subbiome": "overgrown_ruins",
+          "territory_alignment": "silt_contamination",
+          "territory_id": "territory_3",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.553,
+          "control_strength": 0.6172,
+          "front_activity": 0,
+          "front_status": "quiet",
+          "front_tension": 0,
+          "stability": 0.7106
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_4_2_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:4:2:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_4_2_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:4:2:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_4_2_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:4:2:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_4_2_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:4:2:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_4_2",
+        "projection": {
+          "agitation": 0.39816,
+          "breakup_resistance": 0.631859,
+          "cohesion": 0.707201,
+          "collapse_bias": 0.169345,
+          "damage_proxy": 0.197138,
+          "update_rate": 0.18
+        },
+        "sector": [
+          4,
+          2
+        ],
+        "source": {
+          "biome": "ruined_settlement",
+          "corridors": [],
+          "front_ids": [],
+          "geography_zone": "margin",
+          "region_id": 1,
+          "subbiome": "overgrown_ruins",
+          "territory_alignment": "silt_contamination",
+          "territory_id": "territory_3",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.553,
+          "control_strength": 0.6172,
+          "front_activity": 0,
+          "front_status": "quiet",
+          "front_tension": 0,
+          "stability": 0.7106
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_5_2_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:5:2:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_5_2_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:5:2:bud:1",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_5_2_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:5:2:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_5_2_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:5:2:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_5_2",
+        "projection": {
+          "agitation": 0.53178,
+          "breakup_resistance": 0.631859,
+          "cohesion": 0.642401,
+          "collapse_bias": 0.404245,
+          "damage_proxy": 0.375014,
+          "update_rate": 0.50226
+        },
+        "sector": [
+          5,
+          2
+        ],
+        "source": {
+          "biome": "ruined_settlement",
+          "corridors": [],
+          "front_ids": [
+            "front_1",
+            "front_4"
+          ],
+          "geography_zone": "mid",
+          "region_id": 1,
+          "subbiome": "overgrown_ruins",
+          "territory_alignment": "silt_contamination",
+          "territory_id": "territory_3",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.553,
+          "control_strength": 0.6172,
+          "front_activity": 0.393,
+          "front_status": "active",
+          "front_tension": 0.405,
+          "stability": 0.7106
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_0_3_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:0:3:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_0_3_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:0:3:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_0_3_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:0:3:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_0_3_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:0:3:bud:3",
+            "type": "STRAIGHT"
+          }
+        ],
+        "id": "sector_0_3",
+        "projection": {
+          "agitation": 0.44762,
+          "breakup_resistance": 0.577354,
+          "cohesion": 0.571343,
+          "collapse_bias": 0.545317,
+          "damage_proxy": 0.49084,
+          "update_rate": 0.61706
+        },
+        "sector": [
+          0,
+          3
+        ],
+        "source": {
+          "biome": "reformed_chapel",
+          "corridors": [
+            {
+              "id": "corridor_04_pilgrim_route",
+              "kind": "pilgrim_route",
+              "role": "through"
+            }
+          ],
+          "front_ids": [
+            "front_0"
+          ],
+          "geography_zone": "mid",
+          "region_id": 2,
+          "subbiome": "wax_yard",
+          "territory_alignment": "print_civic",
+          "territory_id": "territory_1",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.37,
+          "control_strength": 0.51,
+          "front_activity": 0.533,
+          "front_status": "tense",
+          "front_tension": 0.605,
+          "stability": 0.658
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_1_3_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:1:3:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_1_3_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:1:3:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_1_3_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:1:3:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_1_3_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:1:3:bud:3",
+            "type": "STRAIGHT"
+          }
+        ],
+        "id": "sector_1_3",
+        "projection": {
+          "agitation": 0.64418,
+          "breakup_resistance": 0.587196,
+          "cohesion": 0.57766,
+          "collapse_bias": 0.54079,
+          "damage_proxy": 0.485992,
+          "update_rate": 0.61706
+        },
+        "sector": [
+          1,
+          3
+        ],
+        "source": {
+          "biome": "reformed_chapel",
+          "corridors": [],
+          "front_ids": [
+            "front_0",
+            "front_1"
+          ],
+          "geography_zone": "margin",
+          "region_id": 2,
+          "subbiome": "chapel_wood",
+          "territory_alignment": "nano_signal",
+          "territory_id": "territory_2",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.643,
+          "control_strength": 0.525,
+          "front_activity": 0.533,
+          "front_status": "tense",
+          "front_tension": 0.605,
+          "stability": 0.6682
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_2_3_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:2:3:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_2_3_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:2:3:bud:1",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_2_3_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:2:3:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_2_3_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:2:3:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_2_3",
+        "projection": {
+          "agitation": 0.655604,
+          "breakup_resistance": 0.587196,
+          "cohesion": 0.563356,
+          "collapse_bias": 0.592642,
+          "damage_proxy": 0.525257,
+          "update_rate": 0.644612
+        },
+        "sector": [
+          2,
+          3
+        ],
+        "source": {
+          "biome": "dark_forest",
+          "corridors": [
+            {
+              "id": "corridor_07_silt_vein",
+              "kind": "silt_vein",
+              "role": "source"
+            }
+          ],
+          "front_ids": [
+            "front_2"
+          ],
+          "geography_zone": "mid",
+          "region_id": 0,
+          "subbiome": "chapel_wood",
+          "territory_alignment": "nano_signal",
+          "territory_id": "territory_2",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.643,
+          "control_strength": 0.525,
+          "front_activity": 0.5666,
+          "front_status": "tense",
+          "front_tension": 0.6944,
+          "stability": 0.6682
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_3_3_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:3:3:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_3_3_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:3:3:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_3_3_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:3:3:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_3_3_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:3:3:bud:3",
+            "type": "STRAIGHT"
+          }
+        ],
+        "id": "sector_3_3",
+        "projection": {
+          "agitation": 0.590804,
+          "breakup_resistance": 0.631859,
+          "cohesion": 0.596097,
+          "collapse_bias": 0.572097,
+          "damage_proxy": 0.502119,
+          "update_rate": 0.644612
+        },
+        "sector": [
+          3,
+          3
+        ],
+        "source": {
+          "biome": "ruined_settlement",
+          "corridors": [
+            {
+              "id": "corridor_03_old_road",
+              "kind": "old_road",
+              "role": "through"
+            }
+          ],
+          "front_ids": [
+            "front_2"
+          ],
+          "geography_zone": "margin",
+          "region_id": 1,
+          "subbiome": "overgrown_ruins",
+          "territory_alignment": "silt_contamination",
+          "territory_id": "territory_3",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.553,
+          "control_strength": 0.6172,
+          "front_activity": 0.5666,
+          "front_status": "tense",
+          "front_tension": 0.6944,
+          "stability": 0.7106
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_4_3_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:4:3:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_4_3_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:4:3:bud:1",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_4_3_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:4:3:bud:2",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_4_3_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:4:3:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_4_3",
+        "projection": {
+          "agitation": 0.53178,
+          "breakup_resistance": 0.631859,
+          "cohesion": 0.642401,
+          "collapse_bias": 0.404245,
+          "damage_proxy": 0.375014,
+          "update_rate": 0.50226
+        },
+        "sector": [
+          4,
+          3
+        ],
+        "source": {
+          "biome": "ruined_settlement",
+          "corridors": [
+            {
+              "id": "corridor_03_old_road",
+              "kind": "old_road",
+              "role": "through"
+            }
+          ],
+          "front_ids": [
+            "front_4"
+          ],
+          "geography_zone": "mid",
+          "region_id": 1,
+          "subbiome": "ash_courtyards",
+          "territory_alignment": "silt_contamination",
+          "territory_id": "territory_3",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.553,
+          "control_strength": 0.6172,
+          "front_activity": 0.393,
+          "front_status": "active",
+          "front_tension": 0.405,
+          "stability": 0.7106
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_5_3_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:5:3:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_5_3_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:5:3:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_5_3_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:5:3:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_5_3_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:5:3:bud:3",
+            "type": "STRAIGHT"
+          }
+        ],
+        "id": "sector_5_3",
+        "projection": {
+          "agitation": 0.33522,
+          "breakup_resistance": 0.596074,
+          "cohesion": 0.610543,
+          "collapse_bias": 0.420706,
+          "damage_proxy": 0.395128,
+          "update_rate": 0.50226
+        },
+        "sector": [
+          5,
+          3
+        ],
+        "source": {
+          "biome": "ruined_settlement",
+          "corridors": [],
+          "front_ids": [
+            "front_4"
+          ],
+          "geography_zone": "core",
+          "region_id": 1,
+          "subbiome": "collapsed_market",
+          "territory_alignment": "print_civic",
+          "territory_id": "territory_5",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.28,
+          "control_strength": 0.51,
+          "front_activity": 0.393,
+          "front_status": "active",
+          "front_tension": 0.405,
+          "stability": 0.682
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_0_4_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:0:4:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_0_4_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:0:4:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_0_4_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:0:4:bud:2",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_0_4_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:0:4:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_0_4",
+        "projection": {
+          "agitation": 0.2664,
+          "breakup_resistance": 0.577354,
+          "cohesion": 0.668143,
+          "collapse_bias": 0.194417,
+          "damage_proxy": 0.225124,
+          "update_rate": 0.18
+        },
+        "sector": [
+          0,
+          4
+        ],
+        "source": {
+          "biome": "reformed_chapel",
+          "corridors": [
+            {
+              "id": "corridor_04_pilgrim_route",
+              "kind": "pilgrim_route",
+              "role": "source"
+            }
+          ],
+          "front_ids": [],
+          "geography_zone": "core",
+          "region_id": 2,
+          "subbiome": "print_cloister",
+          "territory_alignment": "print_civic",
+          "territory_id": "territory_1",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.37,
+          "control_strength": 0.51,
+          "front_activity": 0,
+          "front_status": "quiet",
+          "front_tension": 0,
+          "stability": 0.658
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_1_4_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:1:4:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_1_4_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:1:4:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_1_4_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:1:4:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_1_4_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:1:4:bud:3",
+            "type": "STRAIGHT"
+          }
+        ],
+        "id": "sector_1_4",
+        "projection": {
+          "agitation": 0.44762,
+          "breakup_resistance": 0.577354,
+          "cohesion": 0.571343,
+          "collapse_bias": 0.545317,
+          "damage_proxy": 0.49084,
+          "update_rate": 0.61706
+        },
+        "sector": [
+          1,
+          4
+        ],
+        "source": {
+          "biome": "reformed_chapel",
+          "corridors": [],
+          "front_ids": [
+            "front_0"
+          ],
+          "geography_zone": "mid",
+          "region_id": 2,
+          "subbiome": "wax_yard",
+          "territory_alignment": "print_civic",
+          "territory_id": "territory_1",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.37,
+          "control_strength": 0.51,
+          "front_activity": 0.533,
+          "front_status": "tense",
+          "front_tension": 0.605,
+          "stability": 0.658
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_2_4_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:2:4:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_2_4_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:2:4:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_2_4_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:2:4:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_2_4_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:2:4:bud:3",
+            "type": "STRAIGHT"
+          }
+        ],
+        "id": "sector_2_4",
+        "projection": {
+          "agitation": 0.64418,
+          "breakup_resistance": 0.587196,
+          "cohesion": 0.57766,
+          "collapse_bias": 0.54079,
+          "damage_proxy": 0.485992,
+          "update_rate": 0.61706
+        },
+        "sector": [
+          2,
+          4
+        ],
+        "source": {
+          "biome": "reformed_chapel",
+          "corridors": [],
+          "front_ids": [
+            "front_0",
+            "front_3"
+          ],
+          "geography_zone": "margin",
+          "region_id": 2,
+          "subbiome": "chapel_wood",
+          "territory_alignment": "nano_signal",
+          "territory_id": "territory_2",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.643,
+          "control_strength": 0.525,
+          "front_activity": 0.533,
+          "front_status": "tense",
+          "front_tension": 0.605,
+          "stability": 0.6682
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_3_4_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:3:4:bud:0",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_3_4_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:3:4:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_3_4_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:3:4:bud:2",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_3_4_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:3:4:bud:3",
+            "type": "STRAIGHT"
+          }
+        ],
+        "id": "sector_3_4",
+        "projection": {
+          "agitation": 0.53178,
+          "breakup_resistance": 0.631859,
+          "cohesion": 0.642401,
+          "collapse_bias": 0.404245,
+          "damage_proxy": 0.375014,
+          "update_rate": 0.50226
+        },
+        "sector": [
+          3,
+          4
+        ],
+        "source": {
+          "biome": "ruined_settlement",
+          "corridors": [],
+          "front_ids": [
+            "front_3",
+            "front_4"
+          ],
+          "geography_zone": "mid",
+          "region_id": 1,
+          "subbiome": "print_district_ruins",
+          "territory_alignment": "silt_contamination",
+          "territory_id": "territory_3",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.553,
+          "control_strength": 0.6172,
+          "front_activity": 0.393,
+          "front_status": "active",
+          "front_tension": 0.405,
+          "stability": 0.7106
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_4_4_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:4:4:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_4_4_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:4:4:bud:1",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_4_4_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:4:4:bud:2",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_4_4_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:4:4:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_4_4",
+        "projection": {
+          "agitation": 0.33522,
+          "breakup_resistance": 0.596074,
+          "cohesion": 0.610543,
+          "collapse_bias": 0.420706,
+          "damage_proxy": 0.395128,
+          "update_rate": 0.50226
+        },
+        "sector": [
+          4,
+          4
+        ],
+        "source": {
+          "biome": "ruined_settlement",
+          "corridors": [
+            {
+              "id": "corridor_03_old_road",
+              "kind": "old_road",
+              "role": "through"
+            }
+          ],
+          "front_ids": [
+            "front_4"
+          ],
+          "geography_zone": "core",
+          "region_id": 1,
+          "subbiome": "collapsed_market",
+          "territory_alignment": "print_civic",
+          "territory_id": "territory_5",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.28,
+          "control_strength": 0.51,
+          "front_activity": 0.393,
+          "front_status": "active",
+          "front_tension": 0.405,
+          "stability": 0.682
+        }
+      },
+      {
+        "buds": [
+          {
+            "id": "sector_5_4_bud_0",
+            "index": 0,
+            "offset": [
+              -1,
+              -1
+            ],
+            "seed_key": "7301:5:4:bud:0",
+            "type": "STRAIGHT"
+          },
+          {
+            "id": "sector_5_4_bud_1",
+            "index": 1,
+            "offset": [
+              1,
+              -1
+            ],
+            "seed_key": "7301:5:4:bud:1",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_5_4_bud_2",
+            "index": 2,
+            "offset": [
+              -1,
+              1
+            ],
+            "seed_key": "7301:5:4:bud:2",
+            "type": "CURVED"
+          },
+          {
+            "id": "sector_5_4_bud_3",
+            "index": 3,
+            "offset": [
+              1,
+              1
+            ],
+            "seed_key": "7301:5:4:bud:3",
+            "type": "CURVED"
+          }
+        ],
+        "id": "sector_5_4",
+        "projection": {
+          "agitation": 0.2016,
+          "breakup_resistance": 0.596074,
+          "cohesion": 0.675343,
+          "collapse_bias": 0.185806,
+          "damage_proxy": 0.217252,
+          "update_rate": 0.18
+        },
+        "sector": [
+          5,
+          4
+        ],
+        "source": {
+          "biome": "ruined_settlement",
+          "corridors": [
+            {
+              "id": "corridor_03_old_road",
+              "kind": "old_road",
+              "role": "source"
+            }
+          ],
+          "front_ids": [],
+          "geography_zone": "core",
+          "region_id": 1,
+          "subbiome": "charred_blocks",
+          "territory_alignment": "print_civic",
+          "territory_id": "territory_5",
+          "territory_status": "stable",
+          "topology_status": "dominated"
+        },
+        "state": {
+          "alert": 0.28,
+          "control_strength": 0.51,
+          "front_activity": 0,
+          "front_status": "quiet",
+          "front_tension": 0,
+          "stability": 0.682
+        }
+      }
+    ],
+    "fpe_version": "0.6.0",
+    "hierarchy": {
+      "expansion_state_owner": "viewer",
+      "initial_detail": "cluster_proxy",
+      "levels": [
+        "world",
+        "cluster",
+        "bud",
+        "geometry"
+      ],
+      "schema": "fpe.view_hierarchy/0.6.0",
+      "semantic_effect": "none"
+    },
+    "layout": {
+      "buds_per_sector": 4,
+      "cluster_kind": "pixelgen_sector",
+      "local_bud_offset": 2.15,
+      "sector_spacing": 10
+    },
+    "mode": "read_only_hierarchical_projection",
+    "projection_fingerprint": "678c6027a279ceeade30c7f0284554bdc47dfe94507a6aa1d4276dc4f69750c1",
+    "schema": "fpe.pixelgen_hierarchy/0.6.0",
+    "source": {
+      "dimensions": [
+        6,
+        5
+      ],
+      "pixelgen_generator_version": "1.0.0",
+      "pixelgen_state_version": "0.8.0",
+      "pixelgen_world_fingerprint": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+      "seed": 7301,
+      "state_revision": 3,
+      "state_tick": 3
+    },
+    "summary": {
+      "bud_count": 120,
+      "cluster_count": 30,
+      "curved_bud_count": 63,
+      "front_cluster_count": 20,
+      "straight_bud_count": 57,
+      "territory_cluster_count": 25
+    }
+  },
+  "view": {
+    "expandedClusters": [
+      "sector_0_0"
+    ],
+    "expandedBuds": [
+      "sector_0_0_bud_0"
+    ]
+  },
+  "clock": {
+    "last_tick": 13
+  },
+  "scheduler": {
+    "schema": "fpe.scheduler_state/0.11.0",
+    "budget": 3,
+    "projection_fingerprint": "678c6027a279ceeade30c7f0284554bdc47dfe94507a6aa1d4276dc4f69750c1",
+    "source_revision": 3,
+    "source_tick": 3,
+    "last_tick": -1,
+    "entries": [
+      {
+        "id": "sector_0_0",
+        "rate": 0.18,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_0_1",
+        "rate": 0.18,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_0_2",
+        "rate": 0.18,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_0_3",
+        "rate": 0.61706,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_0_4",
+        "rate": 0.18,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_1_0",
+        "rate": 0.18,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_1_1",
+        "rate": 0.476758,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_1_2",
+        "rate": 0.476758,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_1_3",
+        "rate": 0.61706,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_1_4",
+        "rate": 0.61706,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_2_0",
+        "rate": 0.476758,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_2_1",
+        "rate": 0.476758,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_2_2",
+        "rate": 0.644612,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_2_3",
+        "rate": 0.644612,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_2_4",
+        "rate": 0.61706,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_3_0",
+        "rate": 0.476758,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_3_1",
+        "rate": 0.18,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_3_2",
+        "rate": 0.18,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_3_3",
+        "rate": 0.644612,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_3_4",
+        "rate": 0.50226,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_4_0",
+        "rate": 0.476758,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_4_1",
+        "rate": 0.476758,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_4_2",
+        "rate": 0.18,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_4_3",
+        "rate": 0.50226,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_4_4",
+        "rate": 0.50226,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_5_0",
+        "rate": 0.18,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_5_1",
+        "rate": 0.476758,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_5_2",
+        "rate": 0.50226,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_5_3",
+        "rate": 0.50226,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      },
+      {
+        "id": "sector_5_4",
+        "rate": 0.18,
+        "next": 0,
+        "last": null,
+        "detail": "cluster_proxy"
+      }
+    ]
+  },
+  "request_context": {
+    "action_request_schema": "fpe.action_request/0.10.0",
+    "source": {
+      "seed": 7301,
+      "pixelgen_world_fingerprint": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+      "dimensions": [
+        6,
+        5
+      ],
+      "state_revision": 3,
+      "state_tick": 3
+    }
+  }
+}

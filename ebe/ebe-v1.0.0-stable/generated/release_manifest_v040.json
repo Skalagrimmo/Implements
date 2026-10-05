@@ -1,0 +1,55 @@
+{
+  "release": "0.4.0",
+  "archive": "ebe-v0.4.0-information-ecology.zip",
+  "archive_sha256": "c314047c490680e9f2ac927ebf9dcd93d15ef38d8680684a75d343f74cd025f3",
+  "love_archive": "ebe-v0.4.0-information-ecology.love",
+  "love_sha256": "7ba06fe6ee2a306c5960502a6ef3dc782aa7ee0e66c484a0f807845139e51627",
+  "source_files": 80,
+  "lua_files": 57,
+  "core_love_dependency_hits": [],
+  "package_verification": "pass",
+  "verification_outputs": [
+    {
+      "command": "texlua tests/smoke.lua",
+      "returncode": 0,
+      "stdout": "EBE Lua smoke test passed",
+      "stderr": ""
+    },
+    {
+      "command": "texlua tests/hardening.lua",
+      "returncode": 0,
+      "stdout": "EBE Lua v0.2.1 hardening tests passed",
+      "stderr": ""
+    },
+    {
+      "command": "texlua tests/renderer_forwarding.lua",
+      "returncode": 0,
+      "stdout": "Renderer forwarding regression test passed",
+      "stderr": ""
+    },
+    {
+      "command": "texlua tests/run_all.lua /mnt/data/_ebe_v040_package_verify/ebe-v0.4.0-information-ecology",
+      "returncode": 0,
+      "stdout": "EBE v0.4.0 package API compatibility test passed\nEBE v0.3.0 core cognition tests passed\nEBE v0.3.0 PixelGen v0.8 runtime bridge tests passed\nEBE v0.3.0 deterministic distortion test passed\nEBE v0.4.0 information ecology / source-lineage tests passed\nEBE v0.4.0 all tests: PASS",
+      "stderr": ""
+    },
+    {
+      "command": "texlua tests/fuzz_v030.lua /mnt/data/_ebe_v040_package_verify/ebe-v0.4.0-information-ecology",
+      "returncode": 0,
+      "stdout": "EBE v0.3.0 fuzz passed: 200 simulations, 400 received rumor memories, 44 distorted transmissions",
+      "stderr": ""
+    },
+    {
+      "command": "texlua tests/fuzz_v040.lua /mnt/data/_ebe_v040_package_verify/ebe-v0.4.0-information-ecology",
+      "returncode": 0,
+      "stdout": "EBE v0.4.0 ecology fuzz passed: 120 simulations, 240 institutional evidence memories",
+      "stderr": ""
+    },
+    {
+      "command": "texlua demo/information_ecology_demo.lua /mnt/data/_ebe_v040_package_verify/ebe-v0.4.0-information-ecology",
+      "returncode": 0,
+      "stdout": "=== EBE v0.4.0 — Information Ecology / Institutional Networks ===\n\nInitial epistemic state:\n  mara: belief=tense conf=0.960 roots=1 reporters=1 knowledge=tense [direct_evidence]\n  iva: belief=tense conf=0.960 roots=1 reporters=1 knowledge=tense [direct_evidence]\n  levko: no belief / no knowledge\n\nNetwork:\n  Mara -> Printing House -> Caravan Exchange -> Levko\n  Iva  -> Printing House -> Caravan Exchange -> Levko\n\nMara submits institution_report_1 to Printing House\n[t=0.50] Printing House receives and archives Mara's report\n[t=1.25] Printing House dispatches toward Caravan\n[t=2.75] Caravan receives and archives\n[t=5.25] Caravan delivers to Levko\n  levko: belief=tense conf=0.443 roots=1 reporters=1 knowledge=no\n\nAfter echo loop Levko -> Oles -> Levko:\n  levko: belief=tense conf=0.662 roots=1 reporters=2 knowledge=no\n  source roots stay at 1: relaying one origin does not manufacture corroboration\n\nIva independently submits institution_report_5\n[t=5.75] Printing House receives Iva's independent report\n[t=6.50] Printing House forwards it\n[t=8.00] Caravan receives it\n[t=10.50] Caravan delivers second root to Levko\n  levko: belief=tense conf=1.000 roots=2 reporters=2 knowledge=tense [corroborated_reports]\n\nInstitution archives:\n  print_house: 2\n  caravan:     2\nRouting log entries: 8\nQueued institutional messages: 0\n\nLevko memory institution_obs_caravan_institution_report_1->caravan_levko roots=1 hops=3 route=print_house -> caravan -> levko\nLevko memory institution_obs_caravan_institution_report_5->caravan_levko roots=1 hops=3 route=print_house -> caravan -> levko\n\nSummary: tick=10.50 agents=4 institutions=2 beliefs=8 knowledge=7 ecology_queue=0",
+      "stderr": ""
+    }
+  ]
+}

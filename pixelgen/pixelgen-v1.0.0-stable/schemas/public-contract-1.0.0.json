@@ -1,0 +1,73 @@
+{
+  "artifacts": {
+    "contract_manifest": {
+      "payload_schema": "1.0.0",
+      "readable_payload_schemas": [
+        "0.9.3",
+        "1.0.0"
+      ]
+    },
+    "ebe_runtime": {
+      "payload_schema": "0.8.0",
+      "readable_payload_schemas": [
+        "0.8.0"
+      ]
+    },
+    "ebe_seed_bundle": {
+      "payload_schema": "0.7.5",
+      "readable_payload_schemas": [
+        "0.7.5"
+      ]
+    },
+    "regional_corridors": {
+      "payload_schema": "0.9.0",
+      "readable_payload_schemas": [
+        "0.9.0"
+      ]
+    },
+    "runtime_events": {
+      "payload_schema": "0.8.0",
+      "readable_payload_schemas": [
+        "0.8.0"
+      ]
+    },
+    "world": {
+      "current_generator": "1.0.0",
+      "metadata_migration_from_generators": [
+        "0.9.0",
+        "0.9.1",
+        "0.9.2",
+        "0.9.3"
+      ],
+      "payload_schema": "0.7",
+      "readable_payload_schemas": [
+        "0.7"
+      ],
+      "required_features_for_current": {
+        "dynamic_world_state": "0.8.0",
+        "regional_corridors": "0.9.0",
+        "territory_graph": "0.7.5"
+      }
+    },
+    "world_state": {
+      "payload_schema": "0.8.0",
+      "readable_payload_schemas": [
+        "0.8.0"
+      ]
+    }
+  },
+  "contract_fingerprint": "eb2deceb5913231addf4d9ddb323843c0832f25ee1f0b737378f53cbc892727c",
+  "contract_version": "1.0.0",
+  "policies": {
+    "ebe_knowledge": "local_evidence_only_global_knowledge_forbidden",
+    "hostile_json": "validators_must_reject_cleanly_never_raise_for_json_values",
+    "migration": "never_invent_missing_world_features_or_assume_unknown_future_generators",
+    "missing_optional_fields": "allowed",
+    "missing_required_fields": "reject",
+    "public_bundle": "current_feature_world_required_transactional_stage_then_commit",
+    "semantic_fingerprint": "generator_and_schema_labels_are_not_semantic",
+    "state_authority": "world_state_overlay_never_rewrites_static_world",
+    "unknown_fields": "preserve_and_ignore_unless_semantically_invalid"
+  },
+  "status": "stable"
+}

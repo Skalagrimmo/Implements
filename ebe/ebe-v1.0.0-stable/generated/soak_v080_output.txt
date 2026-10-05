@@ -1,0 +1,2 @@
+EBE v0.8.0 action soak: 1200 requests PASS
+bounded_action_log=512

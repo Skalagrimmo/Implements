@@ -1,0 +1,11 @@
+EBE v0.8.0 package API compatibility test passed
+EBE v0.3.0 core cognition tests passed
+EBE v0.3.0 PixelGen v0.8 runtime bridge tests passed
+EBE v0.6.0 PixelGen 1.0 stable-contract compatibility test passed
+EBE v0.3.0 deterministic distortion test passed
+EBE v0.4.0 information ecology / source-lineage tests passed
+EBE v0.5.0 PixelGen automatic information-network synthesis tests passed
+EBE v0.6.0 collective epistemics tests passed
+EBE v0.7.0 institutional policy / censorship / agenda tests passed
+EBE v0.8.0 semantic action request tests passed
+EBE v0.8.0 all tests: PASS

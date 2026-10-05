@@ -1,0 +1,126 @@
+return {
+  clock = {
+    revision = 0,
+    tick = 0,
+  },
+  contract = {
+    dynamic_state_model = "overlay",
+    knowledge_model = "observations are local evidence, not global NPC knowledge",
+    static_world_mutation = "forbidden",
+  },
+  derived_events = {},
+  event_log = {},
+  fronts = {
+    front_0 = {
+      activity = 0.393,
+      pair = {
+        "nano_signal",
+        "print_civic",
+      },
+      revision = 0,
+      status = "active",
+      tension = 0.405,
+    },
+    front_1 = {
+      activity = 0.4114,
+      pair = {
+        "nano_signal",
+        "silt_contamination",
+      },
+      revision = 0,
+      status = "active",
+      tension = 0.4356,
+    },
+    front_2 = {
+      activity = 0.5666,
+      pair = {
+        "nano_signal",
+        "silt_contamination",
+      },
+      revision = 0,
+      status = "tense",
+      tension = 0.6944,
+    },
+    front_3 = {
+      activity = 0.393,
+      pair = {
+        "nano_signal",
+        "silt_contamination",
+      },
+      revision = 0,
+      status = "active",
+      tension = 0.405,
+    },
+    front_4 = {
+      activity = 0.393,
+      pair = {
+        "print_civic",
+        "silt_contamination",
+      },
+      revision = 0,
+      status = "active",
+      tension = 0.405,
+    },
+  },
+  mutations = {},
+  observations = {},
+  source_world = {
+    dimensions = {
+      6,
+      5,
+    },
+    fingerprint = "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+    seed = 7301,
+  },
+  territories = {
+    territory_0 = {
+      alert = 0.28,
+      alignment = "nano_signal",
+      control_strength = 0.5175,
+      revision = 0,
+      stability = 0.6835,
+      status = "stable",
+    },
+    territory_1 = {
+      alert = 0.28,
+      alignment = "print_civic",
+      control_strength = 0.51,
+      revision = 0,
+      stability = 0.682,
+      status = "stable",
+    },
+    territory_2 = {
+      alert = 0.58,
+      alignment = "nano_signal",
+      control_strength = 0.525,
+      revision = 0,
+      stability = 0.685,
+      status = "stable",
+    },
+    territory_3 = {
+      alert = 0.58,
+      alignment = "silt_contamination",
+      control_strength = 0.6172,
+      revision = 0,
+      stability = 0.7034,
+      status = "stable",
+    },
+    territory_4 = {
+      alert = 0.28,
+      alignment = "nano_signal",
+      control_strength = 0.525,
+      revision = 0,
+      stability = 0.685,
+      status = "stable",
+    },
+    territory_5 = {
+      alert = 0.28,
+      alignment = "print_civic",
+      control_strength = 0.51,
+      revision = 0,
+      stability = 0.682,
+      status = "stable",
+    },
+  },
+  version = "0.8.0",
+}

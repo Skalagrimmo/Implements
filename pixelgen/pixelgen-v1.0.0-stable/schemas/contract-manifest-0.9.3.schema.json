@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pixelgen.local/schemas/contract-manifest-0.9.3.schema.json",
+  "title": "PixelGen Contract Manifest 0.9.3",
+  "type": "object",
+  "required": [
+    "manifest_version",
+    "contract_status",
+    "contract_fingerprint",
+    "artifact_count",
+    "artifacts",
+    "relationships"
+  ],
+  "properties": {
+    "manifest_version": {
+      "const": "0.9.3"
+    },
+    "contract_status": {
+      "const": "release_candidate"
+    },
+    "contract_fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "artifact_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "role",
+          "artifact_type",
+          "path",
+          "payload_version",
+          "bytes",
+          "sha256",
+          "canonical_sha256"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifact_type": {
+            "enum": [
+              "world",
+              "world_state",
+              "runtime_events",
+              "ebe_runtime"
+            ]
+          },
+          "path": {
+            "enum": [
+              "world.json",
+              "state.json",
+              "events.json",
+              "ebe-runtime.json"
+            ]
+          },
+          "payload_version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "canonical_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "relationships": {
+      "type": "object",
+      "required": [
+        "world_semantic_fingerprint",
+        "state_matches_world",
+        "events_match_state_log",
+        "ebe_matches_state_revision",
+        "ebe_matches_world_identity"
+      ],
+      "properties": {
+        "world_semantic_fingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "state_matches_world": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "events_match_state_log": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ebe_matches_state_revision": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ebe_matches_world_identity": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

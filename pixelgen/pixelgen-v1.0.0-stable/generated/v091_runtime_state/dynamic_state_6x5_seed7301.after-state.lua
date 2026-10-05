@@ -1,0 +1,858 @@
+return {
+  clock = {
+    revision = 3,
+    tick = 3,
+  },
+  contract = {
+    dynamic_state_model = "overlay",
+    knowledge_model = "observations are local evidence, not global NPC knowledge",
+    static_world_mutation = "forbidden",
+  },
+  derived_events = {
+    {
+      cause_event_id = "runtime_event_1",
+      changes = {
+        activity = {
+          after = 0.533,
+          before = 0.393,
+        },
+        status = {
+          after = "tense",
+          before = "active",
+        },
+        tension = {
+          after = 0.605,
+          before = 0.405,
+        },
+      },
+      event_type = "front_state_changed",
+      id = "derived_event_1",
+      observability = "local_or_transmitted",
+      revision = 1,
+      sector = {
+        0,
+        3,
+      },
+      subject_id = "front_0",
+      subject_type = "front",
+    },
+    {
+      cause_event_id = "runtime_event_2",
+      changes = {
+        alert = {
+          after = 0.316,
+          before = 0.28,
+        },
+        control_strength = {
+          after = 0.3975,
+          before = 0.5175,
+        },
+        stability = {
+          after = 0.6355,
+          before = 0.6835,
+        },
+      },
+      event_type = "territory_state_changed",
+      id = "derived_event_2",
+      observability = "local_or_transmitted",
+      revision = 2,
+      sector = {
+        1,
+        0,
+      },
+      subject_id = "territory_0",
+      subject_type = "territory",
+    },
+    {
+      cause_event_id = "runtime_event_3",
+      changes = {
+        activity = {
+          after = 0.3619,
+          before = 0.4114,
+        },
+        tension = {
+          after = 0.3456,
+          before = 0.4356,
+        },
+      },
+      event_type = "front_state_changed",
+      id = "derived_event_3",
+      observability = "local_or_transmitted",
+      revision = 3,
+      sector = {
+        1,
+        1,
+      },
+      subject_id = "front_1",
+      subject_type = "front",
+    },
+  },
+  event_log = {
+    {
+      amount = 0.2,
+      event_type = "front_escalation",
+      id = "runtime_event_1",
+      sector = {
+        0,
+        3,
+      },
+      source = "runtime_cli",
+      target_id = "front_0",
+      target_type = "front",
+    },
+    {
+      amount = 0.12,
+      event_type = "territory_weaken",
+      id = "runtime_event_2",
+      sector = {
+        1,
+        0,
+      },
+      source = "runtime_cli",
+      target_id = "territory_0",
+      target_type = "territory",
+    },
+    {
+      amount = 0.09,
+      event_type = "front_deescalation",
+      id = "runtime_event_3",
+      sector = {
+        1,
+        1,
+      },
+      source = "runtime_cli",
+      target_id = "front_1",
+      target_type = "front",
+    },
+  },
+  fronts = {
+    front_0 = {
+      activity = 0.533,
+      pair = {
+        "nano_signal",
+        "print_civic",
+      },
+      revision = 1,
+      status = "tense",
+      tension = 0.605,
+    },
+    front_1 = {
+      activity = 0.3619,
+      pair = {
+        "nano_signal",
+        "silt_contamination",
+      },
+      revision = 1,
+      status = "active",
+      tension = 0.3456,
+    },
+    front_2 = {
+      activity = 0.5666,
+      pair = {
+        "nano_signal",
+        "silt_contamination",
+      },
+      revision = 0,
+      status = "tense",
+      tension = 0.6944,
+    },
+    front_3 = {
+      activity = 0.393,
+      pair = {
+        "nano_signal",
+        "silt_contamination",
+      },
+      revision = 0,
+      status = "active",
+      tension = 0.405,
+    },
+    front_4 = {
+      activity = 0.393,
+      pair = {
+        "print_civic",
+        "silt_contamination",
+      },
+      revision = 0,
+      status = "active",
+      tension = 0.405,
+    },
+  },
+  mutations = {
+    {
+      after = {
+        activity = 0.533,
+        pair = {
+          "nano_signal",
+          "print_civic",
+        },
+        revision = 1,
+        status = "tense",
+        tension = 0.605,
+      },
+      before = {
+        activity = 0.393,
+        pair = {
+          "nano_signal",
+          "print_civic",
+        },
+        revision = 0,
+        status = "active",
+        tension = 0.405,
+      },
+      cause_event_id = "runtime_event_1",
+      id = "mutation_1",
+      provenance = {
+        origin_sector = {
+          0,
+          3,
+        },
+        source = "runtime_cli",
+      },
+      revision = 1,
+      secondary_mutations = {
+        {
+          after = {
+            alert = 0.37,
+            alignment = "print_civic",
+            control_strength = 0.51,
+            revision = 1,
+            stability = 0.658,
+            status = "stable",
+          },
+          before = {
+            alert = 0.28,
+            alignment = "print_civic",
+            control_strength = 0.51,
+            revision = 0,
+            stability = 0.682,
+            status = "stable",
+          },
+          relation = "adjacent_to_front",
+          target_id = "territory_1",
+          target_type = "territory",
+        },
+        {
+          after = {
+            alert = 0.67,
+            alignment = "nano_signal",
+            control_strength = 0.525,
+            revision = 1,
+            stability = 0.661,
+            status = "pressured",
+          },
+          before = {
+            alert = 0.58,
+            alignment = "nano_signal",
+            control_strength = 0.525,
+            revision = 0,
+            stability = 0.685,
+            status = "stable",
+          },
+          relation = "adjacent_to_front",
+          target_id = "territory_2",
+          target_type = "territory",
+        },
+      },
+      target_id = "front_0",
+      target_type = "front",
+      tick = 1,
+    },
+    {
+      after = {
+        alert = 0.316,
+        alignment = "nano_signal",
+        control_strength = 0.3975,
+        revision = 1,
+        stability = 0.6355,
+        status = "stable",
+      },
+      before = {
+        alert = 0.28,
+        alignment = "nano_signal",
+        control_strength = 0.5175,
+        revision = 0,
+        stability = 0.6835,
+        status = "stable",
+      },
+      cause_event_id = "runtime_event_2",
+      id = "mutation_2",
+      provenance = {
+        origin_sector = {
+          1,
+          0,
+        },
+        source = "runtime_cli",
+      },
+      revision = 2,
+      secondary_mutations = {},
+      target_id = "territory_0",
+      target_type = "territory",
+      tick = 2,
+    },
+    {
+      after = {
+        activity = 0.3619,
+        pair = {
+          "nano_signal",
+          "silt_contamination",
+        },
+        revision = 1,
+        status = "active",
+        tension = 0.3456,
+      },
+      before = {
+        activity = 0.4114,
+        pair = {
+          "nano_signal",
+          "silt_contamination",
+        },
+        revision = 0,
+        status = "active",
+        tension = 0.4356,
+      },
+      cause_event_id = "runtime_event_3",
+      id = "mutation_3",
+      provenance = {
+        origin_sector = {
+          1,
+          1,
+        },
+        source = "runtime_cli",
+      },
+      revision = 3,
+      secondary_mutations = {
+        {
+          after = {
+            alert = 0.289,
+            alignment = "nano_signal",
+            control_strength = 0.3975,
+            revision = 2,
+            stability = 0.6427,
+            status = "stable",
+          },
+          before = {
+            alert = 0.316,
+            alignment = "nano_signal",
+            control_strength = 0.3975,
+            revision = 1,
+            stability = 0.6355,
+            status = "stable",
+          },
+          relation = "adjacent_to_front",
+          target_id = "territory_0",
+          target_type = "territory",
+        },
+        {
+          after = {
+            alert = 0.643,
+            alignment = "nano_signal",
+            control_strength = 0.525,
+            revision = 2,
+            stability = 0.6682,
+            status = "stable",
+          },
+          before = {
+            alert = 0.67,
+            alignment = "nano_signal",
+            control_strength = 0.525,
+            revision = 1,
+            stability = 0.661,
+            status = "pressured",
+          },
+          relation = "adjacent_to_front",
+          target_id = "territory_2",
+          target_type = "territory",
+        },
+        {
+          after = {
+            alert = 0.553,
+            alignment = "silt_contamination",
+            control_strength = 0.6172,
+            revision = 1,
+            stability = 0.7106,
+            status = "stable",
+          },
+          before = {
+            alert = 0.58,
+            alignment = "silt_contamination",
+            control_strength = 0.6172,
+            revision = 0,
+            stability = 0.7034,
+            status = "stable",
+          },
+          relation = "adjacent_to_front",
+          target_id = "territory_3",
+          target_type = "territory",
+        },
+        {
+          after = {
+            alert = 0.253,
+            alignment = "nano_signal",
+            control_strength = 0.525,
+            revision = 1,
+            stability = 0.6922,
+            status = "stable",
+          },
+          before = {
+            alert = 0.28,
+            alignment = "nano_signal",
+            control_strength = 0.525,
+            revision = 0,
+            stability = 0.685,
+            status = "stable",
+          },
+          relation = "adjacent_to_front",
+          target_id = "territory_4",
+          target_type = "territory",
+        },
+      },
+      target_id = "front_1",
+      target_type = "front",
+      tick = 3,
+    },
+  },
+  observations = {
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          activity = {
+            after = 0.533,
+            before = 0.393,
+          },
+          status = {
+            after = "tense",
+            before = "active",
+          },
+          tension = {
+            after = 0.605,
+            before = 0.405,
+          },
+        },
+        event_type = "front_state_changed",
+      },
+      id = "observation_1_0",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 1,
+      sector = {
+        0,
+        2,
+      },
+      source_event_id = "derived_event_1",
+      subject_id = "front_0",
+      subject_type = "front",
+    },
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          activity = {
+            after = 0.533,
+            before = 0.393,
+          },
+          status = {
+            after = "tense",
+            before = "active",
+          },
+          tension = {
+            after = 0.605,
+            before = 0.405,
+          },
+        },
+        event_type = "front_state_changed",
+      },
+      id = "observation_1_1",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 1,
+      sector = {
+        0,
+        3,
+      },
+      source_event_id = "derived_event_1",
+      subject_id = "front_0",
+      subject_type = "front",
+    },
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          activity = {
+            after = 0.533,
+            before = 0.393,
+          },
+          status = {
+            after = "tense",
+            before = "active",
+          },
+          tension = {
+            after = 0.605,
+            before = 0.405,
+          },
+        },
+        event_type = "front_state_changed",
+      },
+      id = "observation_1_2",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 1,
+      sector = {
+        1,
+        3,
+      },
+      source_event_id = "derived_event_1",
+      subject_id = "front_0",
+      subject_type = "front",
+    },
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          activity = {
+            after = 0.533,
+            before = 0.393,
+          },
+          status = {
+            after = "tense",
+            before = "active",
+          },
+          tension = {
+            after = 0.605,
+            before = 0.405,
+          },
+        },
+        event_type = "front_state_changed",
+      },
+      id = "observation_1_3",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 1,
+      sector = {
+        0,
+        4,
+      },
+      source_event_id = "derived_event_1",
+      subject_id = "front_0",
+      subject_type = "front",
+    },
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          alert = {
+            after = 0.316,
+            before = 0.28,
+          },
+          control_strength = {
+            after = 0.3975,
+            before = 0.5175,
+          },
+          stability = {
+            after = 0.6355,
+            before = 0.6835,
+          },
+        },
+        event_type = "territory_state_changed",
+      },
+      id = "observation_2_0",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 2,
+      sector = {
+        0,
+        0,
+      },
+      source_event_id = "derived_event_2",
+      subject_id = "territory_0",
+      subject_type = "territory",
+    },
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          alert = {
+            after = 0.316,
+            before = 0.28,
+          },
+          control_strength = {
+            after = 0.3975,
+            before = 0.5175,
+          },
+          stability = {
+            after = 0.6355,
+            before = 0.6835,
+          },
+        },
+        event_type = "territory_state_changed",
+      },
+      id = "observation_2_1",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 2,
+      sector = {
+        1,
+        0,
+      },
+      source_event_id = "derived_event_2",
+      subject_id = "territory_0",
+      subject_type = "territory",
+    },
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          alert = {
+            after = 0.316,
+            before = 0.28,
+          },
+          control_strength = {
+            after = 0.3975,
+            before = 0.5175,
+          },
+          stability = {
+            after = 0.6355,
+            before = 0.6835,
+          },
+        },
+        event_type = "territory_state_changed",
+      },
+      id = "observation_2_2",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 2,
+      sector = {
+        2,
+        0,
+      },
+      source_event_id = "derived_event_2",
+      subject_id = "territory_0",
+      subject_type = "territory",
+    },
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          alert = {
+            after = 0.316,
+            before = 0.28,
+          },
+          control_strength = {
+            after = 0.3975,
+            before = 0.5175,
+          },
+          stability = {
+            after = 0.6355,
+            before = 0.6835,
+          },
+        },
+        event_type = "territory_state_changed",
+      },
+      id = "observation_2_3",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 2,
+      sector = {
+        1,
+        1,
+      },
+      source_event_id = "derived_event_2",
+      subject_id = "territory_0",
+      subject_type = "territory",
+    },
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          activity = {
+            after = 0.3619,
+            before = 0.4114,
+          },
+          tension = {
+            after = 0.3456,
+            before = 0.4356,
+          },
+        },
+        event_type = "front_state_changed",
+      },
+      id = "observation_3_0",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 3,
+      sector = {
+        1,
+        0,
+      },
+      source_event_id = "derived_event_3",
+      subject_id = "front_1",
+      subject_type = "front",
+    },
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          activity = {
+            after = 0.3619,
+            before = 0.4114,
+          },
+          tension = {
+            after = 0.3456,
+            before = 0.4356,
+          },
+        },
+        event_type = "front_state_changed",
+      },
+      id = "observation_3_1",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 3,
+      sector = {
+        0,
+        1,
+      },
+      source_event_id = "derived_event_3",
+      subject_id = "front_1",
+      subject_type = "front",
+    },
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          activity = {
+            after = 0.3619,
+            before = 0.4114,
+          },
+          tension = {
+            after = 0.3456,
+            before = 0.4356,
+          },
+        },
+        event_type = "front_state_changed",
+      },
+      id = "observation_3_2",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 3,
+      sector = {
+        1,
+        1,
+      },
+      source_event_id = "derived_event_3",
+      subject_id = "front_1",
+      subject_type = "front",
+    },
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          activity = {
+            after = 0.3619,
+            before = 0.4114,
+          },
+          tension = {
+            after = 0.3456,
+            before = 0.4356,
+          },
+        },
+        event_type = "front_state_changed",
+      },
+      id = "observation_3_3",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 3,
+      sector = {
+        2,
+        1,
+      },
+      source_event_id = "derived_event_3",
+      subject_id = "front_1",
+      subject_type = "front",
+    },
+    {
+      delivery_state = "available_to_local_observers",
+      evidence = "direct_local",
+      fact = {
+        changes = {
+          activity = {
+            after = 0.3619,
+            before = 0.4114,
+          },
+          tension = {
+            after = 0.3456,
+            before = 0.4356,
+          },
+        },
+        event_type = "front_state_changed",
+      },
+      id = "observation_3_4",
+      knowledge_state = "not_yet_assigned_to_any_agent",
+      revision = 3,
+      sector = {
+        1,
+        2,
+      },
+      source_event_id = "derived_event_3",
+      subject_id = "front_1",
+      subject_type = "front",
+    },
+  },
+  source_world = {
+    dimensions = {
+      6,
+      5,
+    },
+    fingerprint = "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+    seed = 7301,
+  },
+  territories = {
+    territory_0 = {
+      alert = 0.289,
+      alignment = "nano_signal",
+      control_strength = 0.3975,
+      revision = 2,
+      stability = 0.6427,
+      status = "stable",
+    },
+    territory_1 = {
+      alert = 0.37,
+      alignment = "print_civic",
+      control_strength = 0.51,
+      revision = 1,
+      stability = 0.658,
+      status = "stable",
+    },
+    territory_2 = {
+      alert = 0.643,
+      alignment = "nano_signal",
+      control_strength = 0.525,
+      revision = 2,
+      stability = 0.6682,
+      status = "stable",
+    },
+    territory_3 = {
+      alert = 0.553,
+      alignment = "silt_contamination",
+      control_strength = 0.6172,
+      revision = 1,
+      stability = 0.7106,
+      status = "stable",
+    },
+    territory_4 = {
+      alert = 0.253,
+      alignment = "nano_signal",
+      control_strength = 0.525,
+      revision = 1,
+      stability = 0.6922,
+      status = "stable",
+    },
+    territory_5 = {
+      alert = 0.28,
+      alignment = "print_civic",
+      control_strength = 0.51,
+      revision = 0,
+      stability = 0.682,
+      status = "stable",
+    },
+  },
+  version = "0.8.0",
+}

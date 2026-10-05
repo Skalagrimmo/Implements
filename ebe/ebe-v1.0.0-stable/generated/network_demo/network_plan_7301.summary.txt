@@ -1,0 +1,3 @@
+Network plan: institutions=14 routes=16 components=1 accessible=30/30 fingerprint=1314574499
+Lua plan -> /tmp/ebe-v0.5.0-pixelgen-network-synthesis/generated/network_demo/network_plan_7301.lua
+Graphviz  -> /tmp/ebe-v0.5.0-pixelgen-network-synthesis/generated/network_demo/network_plan_7301.dot

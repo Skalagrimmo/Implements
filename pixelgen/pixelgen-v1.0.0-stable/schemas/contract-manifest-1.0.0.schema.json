@@ -1,0 +1,129 @@
+{
+  "$id": "https://pixelgen.local/schemas/contract-manifest-1.0.0.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "artifact_count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "artifacts": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "artifact_type": {
+            "enum": [
+              "world",
+              "world_state",
+              "runtime_events",
+              "ebe_runtime"
+            ]
+          },
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "canonical_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "path": {
+            "enum": [
+              "world.json",
+              "state.json",
+              "events.json",
+              "ebe-runtime.json"
+            ]
+          },
+          "payload_version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "artifact_type",
+          "path",
+          "payload_version",
+          "bytes",
+          "sha256",
+          "canonical_sha256"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "contract_fingerprint": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "contract_status": {
+      "const": "stable"
+    },
+    "manifest_version": {
+      "const": "1.0.0"
+    },
+    "relationships": {
+      "additionalProperties": true,
+      "properties": {
+        "ebe_matches_state_revision": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ebe_matches_world_identity": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "events_match_state_log": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "state_matches_world": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "world_semantic_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "world_semantic_fingerprint",
+        "state_matches_world",
+        "events_match_state_log",
+        "ebe_matches_state_revision",
+        "ebe_matches_world_identity"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "manifest_version",
+    "contract_status",
+    "contract_fingerprint",
+    "artifact_count",
+    "artifacts",
+    "relationships"
+  ],
+  "title": "PixelGen Contract Manifest 1.0.0",
+  "type": "object"
+}

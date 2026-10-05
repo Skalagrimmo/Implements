@@ -1,0 +1,34 @@
+graph EBE_InfoNetwork {
+  graph [overlap=false,splines=true,label="EBE v0.5.0 PixelGen Information Network"];
+  node [shape=box,fontname="Arial"];
+  "auto_caravan_01" [label="auto_caravan_01\ncaravan_exchange\n(3,4)"];
+  "auto_front_01" [label="auto_front_01\nfront_watch\n(0,3)"];
+  "auto_front_02" [label="auto_front_02\nfront_watch\n(1,1)"];
+  "auto_front_03" [label="auto_front_03\nfront_watch\n(2,2)"];
+  "auto_front_04" [label="auto_front_04\nfront_watch\n(2,4)"];
+  "auto_landmark_01" [label="auto_landmark_01\nshrine_circle\n(3,2)"];
+  "auto_landmark_02" [label="auto_landmark_02\nprinting_house\n(0,4)"];
+  "auto_landmark_03" [label="auto_landmark_03\nshrine_circle\n(1,0)"];
+  "auto_landmark_04" [label="auto_landmark_04\nshrine_circle\n(5,0)"];
+  "auto_landmark_05" [label="auto_landmark_05\nprinting_house\n(5,4)"];
+  "auto_landmark_06" [label="auto_landmark_06\nshrine_circle\n(2,3)"];
+  "auto_landmark_07" [label="auto_landmark_07\nroadside_relay\n(0,0)"];
+  "auto_landmark_08" [label="auto_landmark_08\nroadside_relay\n(4,3)"];
+  "auto_region_01" [label="auto_region_01\nshrine_circle\n(2,1)"];
+  "auto_caravan_01" -- "auto_front_04" [label="auto_route_01 c=1.00 d=0.64 t=0.88 F=1"];
+  "auto_caravan_01" -- "auto_landmark_01" [label="auto_route_02 c=2.03 d=0.77 t=0.89 F=0"];
+  "auto_caravan_01" -- "auto_landmark_08" [label="auto_route_03 c=1.56 d=0.97 t=0.80 F=2"];
+  "auto_front_01" -- "auto_front_03" [label="auto_route_04 c=5.00 d=2.38 t=0.69 F=2"];
+  "auto_front_01" -- "auto_landmark_02" [label="auto_route_05 c=1.00 d=0.34 t=0.95 F=0"];
+  "auto_front_01" -- "auto_landmark_06" [label="auto_route_06 c=4.00 d=1.82 t=0.79 F=1"];
+  "auto_front_02" -- "auto_landmark_03" [label="auto_route_07 c=0.78 d=0.27 t=0.95 F=0"];
+  "auto_front_02" -- "auto_landmark_07" [label="auto_route_08 c=1.56 d=0.53 t=0.93 F=0"];
+  "auto_front_03" -- "auto_landmark_06" [label="auto_route_09 c=1.00 d=0.56 t=0.88 F=1"];
+  "auto_front_04" -- "auto_landmark_02" [label="auto_route_10 c=2.00 d=0.90 t=0.85 F=1"];
+  "auto_landmark_01" -- "auto_region_01" [label="auto_route_11 c=1.56 d=0.53 t=0.93 F=0"];
+  "auto_landmark_03" -- "auto_landmark_07" [label="auto_route_12 c=2.34 d=0.80 t=0.91 F=0"];
+  "auto_landmark_03" -- "auto_region_01" [label="auto_route_13 c=2.03 d=0.91 t=0.83 F=1"];
+  "auto_landmark_04" -- "auto_landmark_05" [label="auto_route_14 c=3.81 d=1.81 t=0.70 F=2"];
+  "auto_landmark_04" -- "auto_landmark_08" [label="auto_route_15 c=4.06 d=2.12 t=0.61 F=3"];
+  "auto_landmark_05" -- "auto_landmark_08" [label="auto_route_16 c=2.25 d=0.98 t=0.82 F=1"];
+}

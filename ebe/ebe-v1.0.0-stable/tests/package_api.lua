@@ -1,0 +1,26 @@
+package.path="./?.lua;./?/init.lua;"..package.path
+
+local EBE=require("ebe")
+
+assert(EBE.version=="1.0.0","wrong package version")
+assert(type(EBE.create)=="function","legacy EBE.create missing")
+assert(type(EBE.Runtime)=="table" and type(EBE.Runtime.new)=="function","new Runtime missing")
+assert(type(EBE.StateStore)=="table","legacy StateStore missing")
+assert(type(EBE.SpatialGrid)=="table","legacy SpatialGrid missing")
+assert(type(EBE.PixelGenV080)=="table","PixelGen bridge missing")
+assert(type(EBE.Belief)=="table","Belief module missing")
+assert(type(EBE.Snapshot)=="table","Snapshot module missing")
+assert(type(EBE.SourceLineage)=="table","SourceLineage module missing")
+assert(type(EBE.Institution)=="table","Institution module missing")
+assert(type(EBE.InstitutionalPolicy)=="table","InstitutionalPolicy module missing")
+assert(type(EBE.InformationEcology)=="table","InformationEcology module missing")
+assert(type(EBE.Collective)=="table","Collective module missing")
+assert(type(EBE.PixelGenNetworkSynth)=="table","PixelGenNetworkSynth module missing")
+assert(type(EBE.ActionRequest)=="table","ActionRequest module missing")
+assert(type(EBE.ActionGateway)=="table","ActionGateway module missing")
+assert(type(EBE.Json)=="table","Json module missing")
+assert(type(EBE.PersistenceContract)=="table","PersistenceContract module missing")
+assert(type(EBE.PublicContract)=="table","PublicContract module missing")
+assert(EBE.PublicContract.assert_package(EBE),"public contract freeze failed")
+
+print("EBE v1.0.0 package API compatibility test passed")

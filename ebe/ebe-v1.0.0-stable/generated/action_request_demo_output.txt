@@ -1,0 +1,5 @@
+EBE v0.8.0 semantic action request demo
+belief: front:front_0:status=tense confidence=0.960 roots=1
+request: ebe_action_1 front_deescalation front_0 amount=0.12 status=exported
+PixelGen event: id=ebe_action_1 event_type=front_deescalation target=front_0 actor=mara cause=reaction_2
+No world mutation happened inside EBE; authority handoff is explicit.

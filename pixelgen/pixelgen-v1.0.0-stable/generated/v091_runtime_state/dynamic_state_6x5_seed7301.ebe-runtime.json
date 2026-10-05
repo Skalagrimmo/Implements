@@ -1,0 +1,729 @@
+{
+  "contract": {
+    "dynamic_state_role": "store deterministic mutable overlay and provenance",
+    "ebe_role": "assign observations to agents, form memory/belief, propagate and react",
+    "global_knowledge": "forbidden",
+    "observation_semantics": "local evidence only",
+    "pixelgen_static_role": "generate semantic world entities and seed hooks"
+  },
+  "dynamic_entities": [
+    {
+      "alert": 0.289,
+      "alignment": "nano_signal",
+      "control_strength": 0.3975,
+      "entity_type": "territory_state",
+      "id": "territory_0",
+      "revision": 2,
+      "stability": 0.6427,
+      "status": "stable"
+    },
+    {
+      "alert": 0.37,
+      "alignment": "print_civic",
+      "control_strength": 0.51,
+      "entity_type": "territory_state",
+      "id": "territory_1",
+      "revision": 1,
+      "stability": 0.658,
+      "status": "stable"
+    },
+    {
+      "alert": 0.643,
+      "alignment": "nano_signal",
+      "control_strength": 0.525,
+      "entity_type": "territory_state",
+      "id": "territory_2",
+      "revision": 2,
+      "stability": 0.6682,
+      "status": "stable"
+    },
+    {
+      "alert": 0.553,
+      "alignment": "silt_contamination",
+      "control_strength": 0.6172,
+      "entity_type": "territory_state",
+      "id": "territory_3",
+      "revision": 1,
+      "stability": 0.7106,
+      "status": "stable"
+    },
+    {
+      "alert": 0.253,
+      "alignment": "nano_signal",
+      "control_strength": 0.525,
+      "entity_type": "territory_state",
+      "id": "territory_4",
+      "revision": 1,
+      "stability": 0.6922,
+      "status": "stable"
+    },
+    {
+      "alert": 0.28,
+      "alignment": "print_civic",
+      "control_strength": 0.51,
+      "entity_type": "territory_state",
+      "id": "territory_5",
+      "revision": 0,
+      "stability": 0.682,
+      "status": "stable"
+    },
+    {
+      "activity": 0.533,
+      "entity_type": "front_state",
+      "id": "front_0",
+      "pair": [
+        "nano_signal",
+        "print_civic"
+      ],
+      "revision": 1,
+      "status": "tense",
+      "tension": 0.605
+    },
+    {
+      "activity": 0.3619,
+      "entity_type": "front_state",
+      "id": "front_1",
+      "pair": [
+        "nano_signal",
+        "silt_contamination"
+      ],
+      "revision": 1,
+      "status": "active",
+      "tension": 0.3456
+    },
+    {
+      "activity": 0.5666,
+      "entity_type": "front_state",
+      "id": "front_2",
+      "pair": [
+        "nano_signal",
+        "silt_contamination"
+      ],
+      "revision": 0,
+      "status": "tense",
+      "tension": 0.6944
+    },
+    {
+      "activity": 0.393,
+      "entity_type": "front_state",
+      "id": "front_3",
+      "pair": [
+        "nano_signal",
+        "silt_contamination"
+      ],
+      "revision": 0,
+      "status": "active",
+      "tension": 0.405
+    },
+    {
+      "activity": 0.393,
+      "entity_type": "front_state",
+      "id": "front_4",
+      "pair": [
+        "print_civic",
+        "silt_contamination"
+      ],
+      "revision": 0,
+      "status": "active",
+      "tension": 0.405
+    }
+  ],
+  "events": [
+    {
+      "cause_event_id": "runtime_event_1",
+      "changes": {
+        "activity": {
+          "after": 0.533,
+          "before": 0.393
+        },
+        "status": {
+          "after": "tense",
+          "before": "active"
+        },
+        "tension": {
+          "after": 0.605,
+          "before": 0.405
+        }
+      },
+      "event_type": "front_state_changed",
+      "id": "derived_event_1",
+      "observability": "local_or_transmitted",
+      "revision": 1,
+      "sector": [
+        0,
+        3
+      ],
+      "subject_id": "front_0",
+      "subject_type": "front"
+    },
+    {
+      "cause_event_id": "runtime_event_2",
+      "changes": {
+        "alert": {
+          "after": 0.316,
+          "before": 0.28
+        },
+        "control_strength": {
+          "after": 0.3975,
+          "before": 0.5175
+        },
+        "stability": {
+          "after": 0.6355,
+          "before": 0.6835
+        }
+      },
+      "event_type": "territory_state_changed",
+      "id": "derived_event_2",
+      "observability": "local_or_transmitted",
+      "revision": 2,
+      "sector": [
+        1,
+        0
+      ],
+      "subject_id": "territory_0",
+      "subject_type": "territory"
+    },
+    {
+      "cause_event_id": "runtime_event_3",
+      "changes": {
+        "activity": {
+          "after": 0.3619,
+          "before": 0.4114
+        },
+        "tension": {
+          "after": 0.3456,
+          "before": 0.4356
+        }
+      },
+      "event_type": "front_state_changed",
+      "id": "derived_event_3",
+      "observability": "local_or_transmitted",
+      "revision": 3,
+      "sector": [
+        1,
+        1
+      ],
+      "subject_id": "front_1",
+      "subject_type": "front"
+    }
+  ],
+  "observations": [
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "activity": {
+            "after": 0.533,
+            "before": 0.393
+          },
+          "status": {
+            "after": "tense",
+            "before": "active"
+          },
+          "tension": {
+            "after": 0.605,
+            "before": 0.405
+          }
+        },
+        "event_type": "front_state_changed"
+      },
+      "id": "observation_1_0",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 1,
+      "sector": [
+        0,
+        2
+      ],
+      "source_event_id": "derived_event_1",
+      "subject_id": "front_0",
+      "subject_type": "front"
+    },
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "activity": {
+            "after": 0.533,
+            "before": 0.393
+          },
+          "status": {
+            "after": "tense",
+            "before": "active"
+          },
+          "tension": {
+            "after": 0.605,
+            "before": 0.405
+          }
+        },
+        "event_type": "front_state_changed"
+      },
+      "id": "observation_1_1",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 1,
+      "sector": [
+        0,
+        3
+      ],
+      "source_event_id": "derived_event_1",
+      "subject_id": "front_0",
+      "subject_type": "front"
+    },
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "activity": {
+            "after": 0.533,
+            "before": 0.393
+          },
+          "status": {
+            "after": "tense",
+            "before": "active"
+          },
+          "tension": {
+            "after": 0.605,
+            "before": 0.405
+          }
+        },
+        "event_type": "front_state_changed"
+      },
+      "id": "observation_1_2",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 1,
+      "sector": [
+        1,
+        3
+      ],
+      "source_event_id": "derived_event_1",
+      "subject_id": "front_0",
+      "subject_type": "front"
+    },
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "activity": {
+            "after": 0.533,
+            "before": 0.393
+          },
+          "status": {
+            "after": "tense",
+            "before": "active"
+          },
+          "tension": {
+            "after": 0.605,
+            "before": 0.405
+          }
+        },
+        "event_type": "front_state_changed"
+      },
+      "id": "observation_1_3",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 1,
+      "sector": [
+        0,
+        4
+      ],
+      "source_event_id": "derived_event_1",
+      "subject_id": "front_0",
+      "subject_type": "front"
+    },
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "alert": {
+            "after": 0.316,
+            "before": 0.28
+          },
+          "control_strength": {
+            "after": 0.3975,
+            "before": 0.5175
+          },
+          "stability": {
+            "after": 0.6355,
+            "before": 0.6835
+          }
+        },
+        "event_type": "territory_state_changed"
+      },
+      "id": "observation_2_0",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 2,
+      "sector": [
+        0,
+        0
+      ],
+      "source_event_id": "derived_event_2",
+      "subject_id": "territory_0",
+      "subject_type": "territory"
+    },
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "alert": {
+            "after": 0.316,
+            "before": 0.28
+          },
+          "control_strength": {
+            "after": 0.3975,
+            "before": 0.5175
+          },
+          "stability": {
+            "after": 0.6355,
+            "before": 0.6835
+          }
+        },
+        "event_type": "territory_state_changed"
+      },
+      "id": "observation_2_1",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 2,
+      "sector": [
+        1,
+        0
+      ],
+      "source_event_id": "derived_event_2",
+      "subject_id": "territory_0",
+      "subject_type": "territory"
+    },
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "alert": {
+            "after": 0.316,
+            "before": 0.28
+          },
+          "control_strength": {
+            "after": 0.3975,
+            "before": 0.5175
+          },
+          "stability": {
+            "after": 0.6355,
+            "before": 0.6835
+          }
+        },
+        "event_type": "territory_state_changed"
+      },
+      "id": "observation_2_2",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 2,
+      "sector": [
+        2,
+        0
+      ],
+      "source_event_id": "derived_event_2",
+      "subject_id": "territory_0",
+      "subject_type": "territory"
+    },
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "alert": {
+            "after": 0.316,
+            "before": 0.28
+          },
+          "control_strength": {
+            "after": 0.3975,
+            "before": 0.5175
+          },
+          "stability": {
+            "after": 0.6355,
+            "before": 0.6835
+          }
+        },
+        "event_type": "territory_state_changed"
+      },
+      "id": "observation_2_3",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 2,
+      "sector": [
+        1,
+        1
+      ],
+      "source_event_id": "derived_event_2",
+      "subject_id": "territory_0",
+      "subject_type": "territory"
+    },
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "activity": {
+            "after": 0.3619,
+            "before": 0.4114
+          },
+          "tension": {
+            "after": 0.3456,
+            "before": 0.4356
+          }
+        },
+        "event_type": "front_state_changed"
+      },
+      "id": "observation_3_0",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 3,
+      "sector": [
+        1,
+        0
+      ],
+      "source_event_id": "derived_event_3",
+      "subject_id": "front_1",
+      "subject_type": "front"
+    },
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "activity": {
+            "after": 0.3619,
+            "before": 0.4114
+          },
+          "tension": {
+            "after": 0.3456,
+            "before": 0.4356
+          }
+        },
+        "event_type": "front_state_changed"
+      },
+      "id": "observation_3_1",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 3,
+      "sector": [
+        0,
+        1
+      ],
+      "source_event_id": "derived_event_3",
+      "subject_id": "front_1",
+      "subject_type": "front"
+    },
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "activity": {
+            "after": 0.3619,
+            "before": 0.4114
+          },
+          "tension": {
+            "after": 0.3456,
+            "before": 0.4356
+          }
+        },
+        "event_type": "front_state_changed"
+      },
+      "id": "observation_3_2",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 3,
+      "sector": [
+        1,
+        1
+      ],
+      "source_event_id": "derived_event_3",
+      "subject_id": "front_1",
+      "subject_type": "front"
+    },
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "activity": {
+            "after": 0.3619,
+            "before": 0.4114
+          },
+          "tension": {
+            "after": 0.3456,
+            "before": 0.4356
+          }
+        },
+        "event_type": "front_state_changed"
+      },
+      "id": "observation_3_3",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 3,
+      "sector": [
+        2,
+        1
+      ],
+      "source_event_id": "derived_event_3",
+      "subject_id": "front_1",
+      "subject_type": "front"
+    },
+    {
+      "delivery_state": "available_to_local_observers",
+      "evidence": "direct_local",
+      "fact": {
+        "changes": {
+          "activity": {
+            "after": 0.3619,
+            "before": 0.4114
+          },
+          "tension": {
+            "after": 0.3456,
+            "before": 0.4356
+          }
+        },
+        "event_type": "front_state_changed"
+      },
+      "id": "observation_3_4",
+      "knowledge_state": "not_yet_assigned_to_any_agent",
+      "revision": 3,
+      "sector": [
+        1,
+        2
+      ],
+      "source_event_id": "derived_event_3",
+      "subject_id": "front_1",
+      "subject_type": "front"
+    }
+  ],
+  "source": {
+    "since_revision": 0,
+    "state_revision": 3,
+    "world": {
+      "dimensions": [
+        6,
+        5
+      ],
+      "generator": {
+        "name": "PixelGen",
+        "version": "0.9.1"
+      },
+      "world_seed": 7301
+    }
+  },
+  "static_entities": [
+    {
+      "alignment": "nano_signal",
+      "center": [
+        1,
+        0
+      ],
+      "entity_type": "territory",
+      "id": "territory_0",
+      "mean_strength": 0.5175,
+      "sector_count": 4
+    },
+    {
+      "alignment": "print_civic",
+      "center": [
+        0,
+        4
+      ],
+      "entity_type": "territory",
+      "id": "territory_1",
+      "mean_strength": 0.51,
+      "sector_count": 3
+    },
+    {
+      "alignment": "nano_signal",
+      "center": [
+        2,
+        3
+      ],
+      "entity_type": "territory",
+      "id": "territory_2",
+      "mean_strength": 0.525,
+      "sector_count": 3
+    },
+    {
+      "alignment": "silt_contamination",
+      "center": [
+        3,
+        2
+      ],
+      "entity_type": "territory",
+      "id": "territory_3",
+      "mean_strength": 0.6172,
+      "sector_count": 9
+    },
+    {
+      "alignment": "nano_signal",
+      "center": [
+        5,
+        0
+      ],
+      "entity_type": "territory",
+      "id": "territory_4",
+      "mean_strength": 0.525,
+      "sector_count": 3
+    },
+    {
+      "alignment": "print_civic",
+      "center": [
+        5,
+        4
+      ],
+      "entity_type": "territory",
+      "id": "territory_5",
+      "mean_strength": 0.51,
+      "sector_count": 3
+    },
+    {
+      "entity_type": "influence_front",
+      "id": "front_0",
+      "mean_pressure": 0.405,
+      "pair": [
+        "nano_signal",
+        "print_civic"
+      ],
+      "sector_count": 4
+    },
+    {
+      "entity_type": "influence_front",
+      "id": "front_1",
+      "mean_pressure": 0.4356,
+      "pair": [
+        "nano_signal",
+        "silt_contamination"
+      ],
+      "sector_count": 10
+    },
+    {
+      "entity_type": "influence_front",
+      "id": "front_2",
+      "mean_pressure": 0.6944,
+      "pair": [
+        "nano_signal",
+        "silt_contamination"
+      ],
+      "sector_count": 3
+    },
+    {
+      "entity_type": "influence_front",
+      "id": "front_3",
+      "mean_pressure": 0.405,
+      "pair": [
+        "nano_signal",
+        "silt_contamination"
+      ],
+      "sector_count": 2
+    },
+    {
+      "entity_type": "influence_front",
+      "id": "front_4",
+      "mean_pressure": 0.405,
+      "pair": [
+        "print_civic",
+        "silt_contamination"
+      ],
+      "sector_count": 5
+    }
+  ],
+  "version": "0.8.0"
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "seed": 7301,
+    "dims": [
+      6,
+      5
+    ],
+    "091": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+    "092": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+    "equal": true
+  },
+  {
+    "seed": 6060,
+    "dims": [
+      4,
+      3
+    ],
+    "091": "1dda98af5f8512af698139cb3b70bbdba5a557863cd008bf8a5bd4965b105c50",
+    "092": "1dda98af5f8512af698139cb3b70bbdba5a557863cd008bf8a5bd4965b105c50",
+    "equal": true
+  },
+  {
+    "seed": 42,
+    "dims": [
+      8,
+      6
+    ],
+    "091": "0b9cf5159c72b32f0d7509826471f32852b9938b05cad42712006124d7ed5ac1",
+    "092": "0b9cf5159c72b32f0d7509826471f32852b9938b05cad42712006124d7ed5ac1",
+    "equal": true
+  },
+  {
+    "seed": -777,
+    "dims": [
+      1,
+      1
+    ],
+    "091": "926324556c14011b53b07292ffb9c791a4f9dab67fcb4c9fb11f5857e1e8283f",
+    "092": "926324556c14011b53b07292ffb9c791a4f9dab67fcb4c9fb11f5857e1e8283f",
+    "equal": true
+  },
+  {
+    "seed": 0,
+    "dims": [
+      12,
+      12
+    ],
+    "091": "b0104c9f97b85aedcad1b1f0a0548f6d725e6e7510befb85174e83a11da35386",
+    "092": "b0104c9f97b85aedcad1b1f0a0548f6d725e6e7510befb85174e83a11da35386",
+    "equal": true
+  },
+  {
+    "seed": 7301,
+    "dims": [
+      12,
+      12
+    ],
+    "091": "e4edb22d22f2fb2ca50bb7312e9415da3a0d6505134e2f75abcdfe90b80565c9",
+    "092": "e4edb22d22f2fb2ca50bb7312e9415da3a0d6505134e2f75abcdfe90b80565c9",
+    "equal": true
+  }
+]

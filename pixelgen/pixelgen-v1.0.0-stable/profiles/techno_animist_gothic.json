@@ -1,0 +1,32 @@
+{
+  "name": "techno_animist_gothic",
+  "tile_size": 16,
+  "lighting": {
+    "direction": "top_left"
+  },
+  "rules": {
+    "floor_max_contrast": 0.22,
+    "nano_glow_max_coverage": 0.1,
+    "anti_aliasing": false
+  },
+  "palette": {
+    "peat_dark": "#2C1E18",
+    "peat_mid": "#5A3A28",
+    "peat_light": "#8C5E3C",
+    "moss_dark": "#1B2E1B",
+    "moss_mid": "#3B5A2B",
+    "moss_light": "#7A8C3B",
+    "basalt_dark": "#23282D",
+    "basalt_mid": "#384048",
+    "basalt_light": "#525E68",
+    "vellum": "#F2E3C6",
+    "wax": "#8A1C1C",
+    "silt_deep": "#0D1211",
+    "silt_oil": "#1E3B37",
+    "silt_mid": "#2D5E58",
+    "nano_glow": "#52E5C5",
+    "ice_dark": "#35494A",
+    "ice_mid": "#607A78",
+    "ice_light": "#93AAA5"
+  }
+}

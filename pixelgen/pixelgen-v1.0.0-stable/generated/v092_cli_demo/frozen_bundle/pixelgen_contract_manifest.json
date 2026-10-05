@@ -1,0 +1,59 @@
+{
+  "artifact_count": 4,
+  "artifacts": [
+    {
+      "artifact_type": "world",
+      "bytes": 1254861,
+      "canonical_sha256": "44cd758e6ce4c374f501a4cd35a737d59b702b7edffbfe20dd9e01671887f93e",
+      "path": "world.json",
+      "payload_version": "0.7",
+      "role": "world",
+      "semantic_fingerprint": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+      "sha256": "118e19f9b18e93eaa53636cfed2e61d1a35664fcf865f7fbc387bca181494078"
+    },
+    {
+      "artifact_type": "world_state",
+      "bytes": 20675,
+      "canonical_sha256": "e8a7f0e995bba2186b462bff00484aee13c02702bab43e7c6f9816d566ac259e",
+      "path": "state.json",
+      "payload_version": "0.8.0",
+      "revision": 3,
+      "role": "world_state",
+      "sha256": "6ed4560f56ff494d190cb01a6fbb1c3fc1c487c7700f46d0560bf66ea2424671",
+      "source_world_fingerprint": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+      "state_fingerprint": "e8a7f0e995bba2186b462bff00484aee13c02702bab43e7c6f9816d566ac259e"
+    },
+    {
+      "artifact_type": "runtime_events",
+      "bytes": 803,
+      "canonical_sha256": "1e07a6ad29b26e8e3f4309c3b4167ba465744d0a60c9588da5e4d31ef47b969e",
+      "event_count": 3,
+      "path": "events.json",
+      "payload_version": "0.8.0",
+      "role": "runtime_events",
+      "sha256": "8951f7aa2066ae047b04cc25b89d913900322700779f133811f651151fc42802"
+    },
+    {
+      "artifact_type": "ebe_runtime",
+      "bytes": 16734,
+      "canonical_sha256": "69aa271b8cc89f4c5bd87758f33e3360a229c19c3882ee13ea76686e00569893",
+      "event_count": 3,
+      "observation_count": 13,
+      "path": "ebe-runtime.json",
+      "payload_version": "0.8.0",
+      "role": "ebe_runtime",
+      "sha256": "62ec3358e8f44f43047ee85ffb818f1bd894a7420d14e41d98bda608708b3810",
+      "state_revision": 3
+    }
+  ],
+  "contract_fingerprint": "ce2324e2c472162f39dbe0ee460e847dca97edfd0634215ea671da2b4f3b7bb9",
+  "contract_status": "freeze_candidate",
+  "manifest_version": "0.9.2",
+  "relationships": {
+    "ebe_matches_state_revision": true,
+    "ebe_matches_world_identity": true,
+    "events_match_state_log": true,
+    "state_matches_world": true,
+    "world_semantic_fingerprint": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a"
+  }
+}

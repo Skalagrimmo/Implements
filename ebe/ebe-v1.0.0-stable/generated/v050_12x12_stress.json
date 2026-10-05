@@ -1,0 +1,85 @@
+{
+  "release": "0.5.0",
+  "test": "fresh_pixelgen_v080_12x12_to_ebe_v050_network_synthesis",
+  "cases": 4,
+  "status": "pass",
+  "results": [
+    {
+      "seed": 0,
+      "dimensions": [
+        12,
+        12
+      ],
+      "sectors": 144,
+      "pixelgen_generation_seconds": 0.6777,
+      "landmarks": 28,
+      "front_sites": 0,
+      "main_path_nodes": 89,
+      "ebe_institutions": 38,
+      "ebe_routes": 44,
+      "components": 1,
+      "accessible_sectors": 144,
+      "total_sectors": -1,
+      "network_fingerprint": "1715882726",
+      "ebe_synthesis_seconds": 1.5271
+    },
+    {
+      "seed": 1,
+      "dimensions": [
+        12,
+        12
+      ],
+      "sectors": 144,
+      "pixelgen_generation_seconds": 0.6946,
+      "landmarks": 37,
+      "front_sites": 0,
+      "main_path_nodes": 91,
+      "ebe_institutions": 47,
+      "ebe_routes": 54,
+      "components": 1,
+      "accessible_sectors": 144,
+      "total_sectors": -1,
+      "network_fingerprint": "91977271",
+      "ebe_synthesis_seconds": 1.7802
+    },
+    {
+      "seed": 6060,
+      "dimensions": [
+        12,
+        12
+      ],
+      "sectors": 144,
+      "pixelgen_generation_seconds": 0.7341,
+      "landmarks": 45,
+      "front_sites": 0,
+      "main_path_nodes": 97,
+      "ebe_institutions": 55,
+      "ebe_routes": 64,
+      "components": 1,
+      "accessible_sectors": 144,
+      "total_sectors": -1,
+      "network_fingerprint": "1980580132",
+      "ebe_synthesis_seconds": 2.0297
+    },
+    {
+      "seed": 7301,
+      "dimensions": [
+        12,
+        12
+      ],
+      "sectors": 144,
+      "pixelgen_generation_seconds": 0.7174,
+      "landmarks": 35,
+      "front_sites": 0,
+      "main_path_nodes": 101,
+      "ebe_institutions": 48,
+      "ebe_routes": 56,
+      "components": 1,
+      "accessible_sectors": 144,
+      "total_sectors": -1,
+      "network_fingerprint": "1060458703",
+      "ebe_synthesis_seconds": 1.8391
+    }
+  ],
+  "timing_note": "Timing values are specific to the assistant validation environment and are not device benchmarks."
+}

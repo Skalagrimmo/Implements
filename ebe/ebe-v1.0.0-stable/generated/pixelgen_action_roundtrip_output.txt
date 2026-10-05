@@ -1,0 +1,3 @@
+EBE v0.8.0 <-> PixelGen 1.0 real action roundtrip: PASS
+request=ebe_action_1 front_deescalation front_0 amount=0.120000
+pixelgen_revision=2 derived_event=derived_event_2

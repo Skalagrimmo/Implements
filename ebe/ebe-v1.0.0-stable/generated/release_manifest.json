@@ -1,0 +1,40 @@
+{
+  "release": "0.3.0",
+  "archive": "ebe-v0.3.0-information-locality.zip",
+  "sha256": "947ded6b0ab0b2dfb8a5c899c684e23dae8e46317ce6281efaa98cdc134d1867",
+  "file_count": 65,
+  "archive_bytes": 71986,
+  "package_verification": "pass",
+  "verification_outputs": [
+    {
+      "cmd": "texlua tests/smoke.lua",
+      "returncode": 0,
+      "stdout": "EBE Lua smoke test passed",
+      "stderr": ""
+    },
+    {
+      "cmd": "texlua tests/hardening.lua",
+      "returncode": 0,
+      "stdout": "EBE Lua v0.2.1 hardening tests passed",
+      "stderr": ""
+    },
+    {
+      "cmd": "texlua tests/renderer_forwarding.lua",
+      "returncode": 0,
+      "stdout": "Renderer forwarding regression test passed",
+      "stderr": ""
+    },
+    {
+      "cmd": "texlua tests/run_all.lua /mnt/data/_ebe_v030_package_verify/ebe-v0.3.0-information-locality",
+      "returncode": 0,
+      "stdout": "EBE v0.3.0 package API compatibility test passed\nEBE v0.3.0 core cognition tests passed\nEBE v0.3.0 PixelGen v0.8 runtime bridge tests passed\nEBE v0.3.0 deterministic distortion test passed\nEBE v0.3.0 all tests: PASS",
+      "stderr": ""
+    },
+    {
+      "cmd": "texlua tests/fuzz_v030.lua /mnt/data/_ebe_v030_package_verify/ebe-v0.3.0-information-locality",
+      "returncode": 0,
+      "stdout": "EBE v0.3.0 fuzz passed: 200 simulations, 400 received rumor memories, 44 distorted transmissions",
+      "stderr": ""
+    }
+  ]
+}

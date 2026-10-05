@@ -1,0 +1,168 @@
+{
+  "release": "0.9.2",
+  "contract_version": "0.9.2",
+  "contract_fingerprint": "ce2324e2c472162f39dbe0ee460e847dca97edfd0634215ea671da2b4f3b7bb9",
+  "canonical_world_fingerprint": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+  "active_regression_scripts": 22,
+  "active_regression_status": "pass",
+  "excluded_historical_test": "tests/test_v05.py",
+  "fuzz": {
+    "v090": "240 worlds, 982 corridors, 3440 local segments PASS",
+    "v091": "40 worlds, 22 mutated PASS",
+    "v092": "60 worlds, 36 front-mutated, 60 metadata migrations PASS"
+  },
+  "semantic_parity": {
+    "cases": 6,
+    "status": "pass",
+    "results": [
+      {
+        "seed": 7301,
+        "dims": [
+          6,
+          5
+        ],
+        "091": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+        "092": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+        "equal": true
+      },
+      {
+        "seed": 6060,
+        "dims": [
+          4,
+          3
+        ],
+        "091": "1dda98af5f8512af698139cb3b70bbdba5a557863cd008bf8a5bd4965b105c50",
+        "092": "1dda98af5f8512af698139cb3b70bbdba5a557863cd008bf8a5bd4965b105c50",
+        "equal": true
+      },
+      {
+        "seed": 42,
+        "dims": [
+          8,
+          6
+        ],
+        "091": "0b9cf5159c72b32f0d7509826471f32852b9938b05cad42712006124d7ed5ac1",
+        "092": "0b9cf5159c72b32f0d7509826471f32852b9938b05cad42712006124d7ed5ac1",
+        "equal": true
+      },
+      {
+        "seed": -777,
+        "dims": [
+          1,
+          1
+        ],
+        "091": "926324556c14011b53b07292ffb9c791a4f9dab67fcb4c9fb11f5857e1e8283f",
+        "092": "926324556c14011b53b07292ffb9c791a4f9dab67fcb4c9fb11f5857e1e8283f",
+        "equal": true
+      },
+      {
+        "seed": 0,
+        "dims": [
+          12,
+          12
+        ],
+        "091": "b0104c9f97b85aedcad1b1f0a0548f6d725e6e7510befb85174e83a11da35386",
+        "092": "b0104c9f97b85aedcad1b1f0a0548f6d725e6e7510befb85174e83a11da35386",
+        "equal": true
+      },
+      {
+        "seed": 7301,
+        "dims": [
+          12,
+          12
+        ],
+        "091": "e4edb22d22f2fb2ca50bb7312e9415da3a0d6505134e2f75abcdfe90b80565c9",
+        "092": "e4edb22d22f2fb2ca50bb7312e9415da3a0d6505134e2f75abcdfe90b80565c9",
+        "equal": true
+      }
+    ]
+  },
+  "stress_12x12": {
+    "release": "0.9.2",
+    "test": "12x12 contract bundle stress",
+    "cases": 4,
+    "status": "pass",
+    "results": [
+      {
+        "seed": 0,
+        "dimensions": [
+          12,
+          12
+        ],
+        "sectors": 144,
+        "world_fingerprint": "b0104c9f97b85aedcad1b1f0a0548f6d725e6e7510befb85174e83a11da35386",
+        "state_revision": 1,
+        "events": 1,
+        "derived_events": 1,
+        "observations": 4,
+        "bundle_artifacts": 4,
+        "contract_fingerprint": "ce2324e2c472162f39dbe0ee460e847dca97edfd0634215ea671da2b4f3b7bb9",
+        "generation_seconds": 0.6991,
+        "bundle_write_seconds": 0.5809,
+        "bundle_verify_seconds": 0.4715,
+        "verify_status": "pass"
+      },
+      {
+        "seed": 1,
+        "dimensions": [
+          12,
+          12
+        ],
+        "sectors": 144,
+        "world_fingerprint": "6eabd15fddec60e484d3afc1104192bb8a47ee3eb6b0f87949c5fd803b916686",
+        "state_revision": 1,
+        "events": 1,
+        "derived_events": 1,
+        "observations": 4,
+        "bundle_artifacts": 4,
+        "contract_fingerprint": "ce2324e2c472162f39dbe0ee460e847dca97edfd0634215ea671da2b4f3b7bb9",
+        "generation_seconds": 0.6657,
+        "bundle_write_seconds": 0.6058,
+        "bundle_verify_seconds": 0.3768,
+        "verify_status": "pass"
+      },
+      {
+        "seed": 6060,
+        "dimensions": [
+          12,
+          12
+        ],
+        "sectors": 144,
+        "world_fingerprint": "22e4aa35f52322bea5c0d980a79faa7b6526b89ac7ad7da78b5757e1c49e684d",
+        "state_revision": 1,
+        "events": 1,
+        "derived_events": 1,
+        "observations": 4,
+        "bundle_artifacts": 4,
+        "contract_fingerprint": "ce2324e2c472162f39dbe0ee460e847dca97edfd0634215ea671da2b4f3b7bb9",
+        "generation_seconds": 0.6467,
+        "bundle_write_seconds": 0.5275,
+        "bundle_verify_seconds": 0.4638,
+        "verify_status": "pass"
+      },
+      {
+        "seed": 7301,
+        "dimensions": [
+          12,
+          12
+        ],
+        "sectors": 144,
+        "world_fingerprint": "e4edb22d22f2fb2ca50bb7312e9415da3a0d6505134e2f75abcdfe90b80565c9",
+        "state_revision": 1,
+        "events": 1,
+        "derived_events": 1,
+        "observations": 4,
+        "bundle_artifacts": 4,
+        "contract_fingerprint": "ce2324e2c472162f39dbe0ee460e847dca97edfd0634215ea671da2b4f3b7bb9",
+        "generation_seconds": 0.6188,
+        "bundle_write_seconds": 0.6415,
+        "bundle_verify_seconds": 0.3826,
+        "verify_status": "pass"
+      }
+    ],
+    "timing_note": "Environment-specific validation timings; not user-device benchmarks."
+  },
+  "cli_contract_bundle": "pass",
+  "cli_real_v091_migration": "pass",
+  "renderer_free_contract_import": "pass"
+}

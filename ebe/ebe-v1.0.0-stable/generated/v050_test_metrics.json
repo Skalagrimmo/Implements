@@ -1,0 +1,153 @@
+{
+  "release": "0.5.0",
+  "base": "EBE v0.4.0 information ecology + preserved v0.2.1/v0.3 APIs",
+  "validation_runtime": "texlua",
+  "love_executable_available": false,
+  "lua_syntax_files": 64,
+  "core_love_dependency_hits": [],
+  "legacy_v021_regression": {
+    "tests": 3,
+    "status": "pass",
+    "outputs": {
+      "tests/smoke.lua": "EBE Lua smoke test passed",
+      "tests/hardening.lua": "EBE Lua v0.2.1 hardening tests passed",
+      "tests/renderer_forwarding.lua": "Renderer forwarding regression test passed"
+    }
+  },
+  "combined_regression": {
+    "status": "pass",
+    "output": "EBE v0.5.0 package API compatibility test passed\nEBE v0.3.0 core cognition tests passed\nEBE v0.3.0 PixelGen v0.8 runtime bridge tests passed\nEBE v0.3.0 deterministic distortion test passed\nEBE v0.4.0 information ecology / source-lineage tests passed\nEBE v0.5.0 PixelGen automatic information-network synthesis tests passed\nEBE v0.5.0 all tests: PASS"
+  },
+  "fuzz": {
+    "v030": {
+      "output": "EBE v0.3.0 fuzz passed: 200 simulations, 400 received rumor memories, 44 distorted transmissions",
+      "seconds": 0.4347
+    },
+    "v040": {
+      "output": "EBE v0.4.0 ecology fuzz passed: 120 simulations, 240 institutional evidence memories",
+      "seconds": 0.5517
+    },
+    "v050": {
+      "output": "EBE v0.5.0 network synthesis fuzz passed: 120 variants, avg institutions 11.04, avg routes 9.75, disconnected forests 48, routing log entries 2015",
+      "seconds": 8.2525
+    }
+  },
+  "canonical_network": {
+    "seed": 7301,
+    "dimensions": [
+      6,
+      5
+    ],
+    "institutions": 14,
+    "routes": 16,
+    "components": 1,
+    "accessible_sectors": 30,
+    "total_sectors": 30,
+    "fingerprint": "1314574499",
+    "cross_process_runs": 5,
+    "cross_process_fingerprints": [
+      "1314574499",
+      "1314574499",
+      "1314574499",
+      "1314574499",
+      "1314574499"
+    ],
+    "kind_counts": {
+      "printing_house": 2,
+      "shrine_circle": 5,
+      "front_watch": 4,
+      "roadside_relay": 2,
+      "caravan_exchange": 1
+    },
+    "role_counts": {
+      "front_watch": 5,
+      "regional_hub": 3,
+      "road_corridor": 1
+    }
+  },
+  "stress_12x12": {
+    "release": "0.5.0",
+    "test": "fresh_pixelgen_v080_12x12_to_ebe_v050_network_synthesis",
+    "cases": 4,
+    "status": "pass",
+    "results": [
+      {
+        "seed": 0,
+        "dimensions": [
+          12,
+          12
+        ],
+        "sectors": 144,
+        "pixelgen_generation_seconds": 0.6777,
+        "landmarks": 28,
+        "front_sites": 0,
+        "main_path_nodes": 89,
+        "ebe_institutions": 38,
+        "ebe_routes": 44,
+        "components": 1,
+        "accessible_sectors": 144,
+        "total_sectors": -1,
+        "network_fingerprint": "1715882726",
+        "ebe_synthesis_seconds": 1.5271
+      },
+      {
+        "seed": 1,
+        "dimensions": [
+          12,
+          12
+        ],
+        "sectors": 144,
+        "pixelgen_generation_seconds": 0.6946,
+        "landmarks": 37,
+        "front_sites": 0,
+        "main_path_nodes": 91,
+        "ebe_institutions": 47,
+        "ebe_routes": 54,
+        "components": 1,
+        "accessible_sectors": 144,
+        "total_sectors": -1,
+        "network_fingerprint": "91977271",
+        "ebe_synthesis_seconds": 1.7802
+      },
+      {
+        "seed": 6060,
+        "dimensions": [
+          12,
+          12
+        ],
+        "sectors": 144,
+        "pixelgen_generation_seconds": 0.7341,
+        "landmarks": 45,
+        "front_sites": 0,
+        "main_path_nodes": 97,
+        "ebe_institutions": 55,
+        "ebe_routes": 64,
+        "components": 1,
+        "accessible_sectors": 144,
+        "total_sectors": -1,
+        "network_fingerprint": "1980580132",
+        "ebe_synthesis_seconds": 2.0297
+      },
+      {
+        "seed": 7301,
+        "dimensions": [
+          12,
+          12
+        ],
+        "sectors": 144,
+        "pixelgen_generation_seconds": 0.7174,
+        "landmarks": 35,
+        "front_sites": 0,
+        "main_path_nodes": 101,
+        "ebe_institutions": 48,
+        "ebe_routes": 56,
+        "components": 1,
+        "accessible_sectors": 144,
+        "total_sectors": -1,
+        "network_fingerprint": "1060458703",
+        "ebe_synthesis_seconds": 1.8391
+      }
+    ],
+    "timing_note": "Timing values are specific to the assistant validation environment and are not device benchmarks."
+  }
+}

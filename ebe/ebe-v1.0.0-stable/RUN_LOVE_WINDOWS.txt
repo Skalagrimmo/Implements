@@ -1,0 +1,22 @@
+EBE v1.0.0 — Windows / LÖVE2D
+
+Preferred:
+    start_love_windows.bat
+
+The launcher only accepts a complete LÖVE2D runtime where love.exe and lua51.dll are together.
+
+Alternative:
+    drag the PROJECT FOLDER onto love.exe
+
+or run:
+    "C:\\Program Files\\LOVE\\love.exe" "C:\\path\\to\\ebe-v1.0.0-stable"
+
+Do not run ebe/ebe.lua directly as a LÖVE game.
+
+The v0.9 visual demo shows:
+- the PixelGen-derived institutional network,
+- individual agent epistemic state,
+- the explicit watch_council collective aggregate,
+- the semantic-action boundary retained from v0.8.
+
+Controls are documented in README.md.

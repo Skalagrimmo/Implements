@@ -1,0 +1,12 @@
+{
+  "release": "0.8.0",
+  "package_verification": "pass",
+  "zip_sha256": "452963f635c8302aa8bd3e6fefaa48306287aed515440a5e907adc9fb41aa9a6",
+  "love_sha256": "6cedfbf0db24d393ba7be340eda275e22605346fd3f1d657ec0309d79b354bca",
+  "zip_bytes": 349574,
+  "love_bytes": 338414,
+  "lua_files": 85,
+  "love_structure_verified": true,
+  "love_runtime_executed_in_validation_environment": false,
+  "pixelgen_1_0_real_roundtrip": "pass"
+}

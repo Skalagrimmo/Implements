@@ -1,0 +1,33 @@
+graph PixelGenProgression {
+  graph [label="PixelGen v0.7 Progression Graph", labelloc=t];
+  node [shape=box];
+  "s0_0" [label="0,0\nreformed_chapel",style="filled"];
+  "s1_0" [label="1,0\nreformed_chapel"];
+  "s2_0" [label="2,0\nreformed_chapel"];
+  "s3_0" [label="3,0\nreformed_chapel"];
+  "s0_1" [label="0,1\nreformed_chapel"];
+  "s1_1" [label="1,1\nsilt_marsh"];
+  "s2_1" [label="2,1\nsilt_marsh"];
+  "s3_1" [label="3,1\nsilt_marsh"];
+  "s0_2" [label="0,2\nreformed_chapel\nFINAL"];
+  "s1_2" [label="1,2\nsilt_marsh"];
+  "s2_2" [label="2,2\nsilt_marsh"];
+  "s3_2" [label="3,2\nsilt_marsh"];
+  "s0_0" -- "s1_0" [label="open", style="solid"];
+  "s0_0" -- "s0_1" [label="secret: nano_bridge", style="dashed"];
+  "s1_0" -- "s2_0" [label="open", style="solid"];
+  "s1_0" -- "s1_1" [label="secret: high_jump", style="dashed"];
+  "s2_0" -- "s3_0" [label="gated: freeze_water", style="solid"];
+  "s2_0" -- "s2_1" [label="secret: wall_run", style="dashed"];
+  "s3_0" -- "s3_1" [label="open", style="solid"];
+  "s0_1" -- "s1_1" [label="gated: nano_bridge", style="solid"];
+  "s0_1" -- "s0_2" [label="open", style="solid"];
+  "s1_1" -- "s2_1" [label="secret: high_jump", style="dashed"];
+  "s1_1" -- "s1_2" [label="open", style="solid"];
+  "s2_1" -- "s3_1" [label="gated: wall_run", style="solid"];
+  "s2_1" -- "s2_2" [label="open", style="solid"];
+  "s3_1" -- "s3_2" [label="secret: wall_run", style="dashed"];
+  "s0_2" -- "s1_2" [label="secret: nano_bridge", style="dashed"];
+  "s1_2" -- "s2_2" [label="gated: high_jump", style="solid"];
+  "s2_2" -- "s3_2" [label="open", style="solid"];
+}

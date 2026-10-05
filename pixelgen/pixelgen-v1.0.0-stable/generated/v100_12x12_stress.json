@@ -1,0 +1,16 @@
+{
+  "release": "1.0.0",
+  "status": "pass",
+  "seed": 7301,
+  "dimensions": [
+    12,
+    12
+  ],
+  "events": 30,
+  "revision": 30,
+  "territories": 7,
+  "fronts": 0,
+  "world_fingerprint": "e4edb22d22f2fb2ca50bb7312e9415da3a0d6505134e2f75abcdfe90b80565c9",
+  "state_fingerprint": "c1d595916f975e4822cebecd1efc7f5aed5bdffb8cddd61ba6210d8fbfd8c9be",
+  "replay_exact": true
+}

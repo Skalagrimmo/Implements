@@ -1,0 +1,39 @@
+=== EBE v0.4.0 — Information Ecology / Institutional Networks ===
+
+Initial epistemic state:
+  mara: belief=tense conf=0.960 roots=1 reporters=1 knowledge=tense [direct_evidence]
+  iva: belief=tense conf=0.960 roots=1 reporters=1 knowledge=tense [direct_evidence]
+  levko: no belief / no knowledge
+
+Network:
+  Mara -> Printing House -> Caravan Exchange -> Levko
+  Iva  -> Printing House -> Caravan Exchange -> Levko
+
+Mara submits institution_report_1 to Printing House
+[t=0.50] Printing House receives and archives Mara's report
+[t=1.25] Printing House dispatches toward Caravan
+[t=2.75] Caravan receives and archives
+[t=5.25] Caravan delivers to Levko
+  levko: belief=tense conf=0.443 roots=1 reporters=1 knowledge=no
+
+After echo loop Levko -> Oles -> Levko:
+  levko: belief=tense conf=0.662 roots=1 reporters=2 knowledge=no
+  source roots stay at 1: relaying one origin does not manufacture corroboration
+
+Iva independently submits institution_report_5
+[t=5.75] Printing House receives Iva's independent report
+[t=6.50] Printing House forwards it
+[t=8.00] Caravan receives it
+[t=10.50] Caravan delivers second root to Levko
+  levko: belief=tense conf=1.000 roots=2 reporters=2 knowledge=tense [corroborated_reports]
+
+Institution archives:
+  print_house: 2
+  caravan:     2
+Routing log entries: 8
+Queued institutional messages: 0
+
+Levko memory institution_obs_caravan_institution_report_1->caravan_levko roots=1 hops=3 route=print_house -> caravan -> levko
+Levko memory institution_obs_caravan_institution_report_5->caravan_levko roots=1 hops=3 route=print_house -> caravan -> levko
+
+Summary: tick=10.50 agents=4 institutions=2 beliefs=8 knowledge=7 ecology_queue=0

@@ -1,0 +1,9 @@
+{
+  "checked": 4,
+  "contract_fingerprint": "ce2324e2c472162f39dbe0ee460e847dca97edfd0634215ea671da2b4f3b7bb9",
+  "contract_version": "0.9.2",
+  "errors": [],
+  "expected": 4,
+  "status": "pass",
+  "world_fingerprint": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a"
+}

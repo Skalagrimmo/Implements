@@ -1,0 +1,61 @@
+{
+  "release": "0.9.1",
+  "canonical_seed": 7301,
+  "canonical_6x5_fingerprint": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+  "active_regression_scripts": 21,
+  "active_regression_status": "PASS",
+  "renderer_free_fuzz": {
+    "worlds": 40,
+    "mutated": 22,
+    "status": "PASS"
+  },
+  "runtime_12x12": {
+    "dimensions": [
+      12,
+      12
+    ],
+    "fingerprint": "e4edb22d22f2fb2ca50bb7312e9415da3a0d6505134e2f75abcdfe90b80565c9",
+    "generation_seconds": [
+      0.6588030540001455,
+      0.6110875919998762,
+      0.6105600549999508
+    ],
+    "mean_generation_seconds": 0.6268169003333242,
+    "runs": 3,
+    "runtime_api_version": "0.9.1",
+    "sectors": 144,
+    "seed": 7301
+  },
+  "render_12x12": {
+    "results": [
+      {
+        "mean_seconds": 6.376728214000195,
+        "quality": "exact",
+        "runs": [
+          6.376728214000195
+        ],
+        "size": [
+          3884,
+          2924
+        ]
+      },
+      {
+        "mean_seconds": 0.5339746039999227,
+        "quality": "fast",
+        "runs": [
+          0.5339746039999227
+        ],
+        "size": [
+          3884,
+          2924
+        ]
+      }
+    ],
+    "speedup": 11.942006541571626
+  },
+  "state_demo_replay": true,
+  "pillow_blocked_runtime": "PASS",
+  "pillow_blocked_runtime_cli_import": "PASS",
+  "fast_render_byte_determinism": "PASS",
+  "timing_note": "Environment-specific validation measurements; not device benchmarks."
+}

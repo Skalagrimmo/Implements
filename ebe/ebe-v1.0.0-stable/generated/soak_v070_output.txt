@@ -1,0 +1,1 @@
+EBE v0.7.0 policy soak passed: 300 simulations, 1500 decisions, 1200 delivered, 300 suppressed, 300 held

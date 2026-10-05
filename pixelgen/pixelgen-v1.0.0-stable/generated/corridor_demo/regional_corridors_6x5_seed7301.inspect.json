@@ -1,0 +1,317 @@
+{
+  "name": "Techno-Animist Regional World",
+  "generator": {
+    "name": "PixelGen",
+    "version": "0.9.0"
+  },
+  "fingerprint": "ff06afa542ab7ddc1f8d142cb979e2f8f2fa78023ce3bd049bc5b36615ba072a",
+  "dimensions": {
+    "cols": 6,
+    "rows": 5,
+    "sectors": 30,
+    "sector_width": 20,
+    "sector_height": 15
+  },
+  "biomes": {
+    "dark_forest": 16,
+    "reformed_chapel": 6,
+    "ruined_settlement": 8
+  },
+  "geography": {
+    "version": "0.7.0",
+    "regions": 3,
+    "transitions": 3,
+    "subbiomes": {
+      "ash_courtyards": 1,
+      "chapel_wood": 6,
+      "charred_blocks": 1,
+      "collapsed_market": 2,
+      "forest_edge": 2,
+      "overgrown_ruins": 6,
+      "print_cloister": 1,
+      "print_district_ruins": 1,
+      "redwood_core": 2,
+      "root_maze": 3,
+      "scrub_march": 1,
+      "wax_yard": 2,
+      "wet_pine": 2
+    },
+    "zones": {
+      "core": 9,
+      "margin": 9,
+      "mid": 12
+    }
+  },
+  "objects": {
+    "total": 983,
+    "by_kind": {
+      "biogel_barrel": 143,
+      "mask_cross": 2,
+      "nanolith_shrine": 3,
+      "paper_stack": 186,
+      "printing_press_altar": 2,
+      "silt_growth": 212,
+      "silt_spire": 1,
+      "skull_stake_a": 116,
+      "skull_stake_b": 119,
+      "warning_board": 199
+    }
+  },
+  "landmarks": {
+    "total": 8,
+    "by_scope": {
+      "local": 2,
+      "regional": 5,
+      "world": 1
+    }
+  },
+  "encounters": {
+    "total": 480,
+    "by_kind": {
+      "larva": 129,
+      "silt_construct": 88,
+      "striga": 139,
+      "zealot": 124
+    }
+  },
+  "finds": {
+    "total": 150,
+    "by_kind": {
+      "bio_gel": 7,
+      "bone_charm": 41,
+      "printed_anathema": 61,
+      "silt_fragment": 16,
+      "vellum_bundle": 15,
+      "wax_seal_cache": 10
+    }
+  },
+  "navigation": {
+    "gates_by_state": {
+      "gated": 8,
+      "open": 58,
+      "sealed": 40,
+      "secret": 26
+    },
+    "abilities": {
+      "freeze_water": 1,
+      "high_jump": 1,
+      "nano_bridge": 1,
+      "wall_run": 1
+    },
+    "main_path_nodes": 19,
+    "final_sector": [
+      4,
+      2
+    ]
+  },
+  "visual": {
+    "score": 100,
+    "grade": "A",
+    "quadrant_entropy": 0.0
+  },
+  "influence": {
+    "version": "0.7.3",
+    "sources": 6,
+    "dominant_channels": {
+      "nano_signal": 11,
+      "print_civic": 6,
+      "silt_contamination": 13
+    },
+    "affected_sectors": 30
+  },
+  "topology": {
+    "version": "0.7.4",
+    "status_counts": {
+      "contested": 3,
+      "dominated": 25,
+      "neutral": 2
+    },
+    "front_count": 5,
+    "front_pair_counts": {
+      "nano_signal + print_civic": 1,
+      "nano_signal + silt_contamination": 3,
+      "print_civic + silt_contamination": 1
+    },
+    "boundary_edges": 19,
+    "neutral_sectors": 2,
+    "contested_sectors": 3,
+    "dominated_sectors": 25
+  },
+  "regional_corridors": {
+    "version": "0.9.0",
+    "count": 7,
+    "covered_sectors": 19,
+    "local_segments": 25,
+    "by_kind": {
+      "old_road": 3,
+      "pilgrim_route": 1,
+      "silt_vein": 3
+    }
+  },
+  "territory_graph": {
+    "version": "0.7.5",
+    "territories": 6,
+    "by_alignment": {
+      "nano_signal": 3,
+      "print_civic": 2,
+      "silt_contamination": 1
+    },
+    "front_sites": 5,
+    "event_seeds": 24,
+    "event_kinds": {
+      "border_encounter": 5,
+      "contested_observation": 3,
+      "front_observation": 5,
+      "front_rumor": 5,
+      "territory_presence": 6
+    }
+  },
+  "structural": {
+    "version": "0.7.2",
+    "status": "pass",
+    "score": 100,
+    "distinct_grammar_ids": 3,
+    "distinct_path_visuals": 2,
+    "grammar_counts": {
+      "axial_cloister": 6,
+      "root_branch_network": 16,
+      "street_grid": 8
+    },
+    "distinct_variant_ids": 17,
+    "ecotone_adapters": 22,
+    "biomes": {
+      "dark_forest": {
+        "sectors": 16,
+        "grammar_ids": [
+          "root_branch_network"
+        ],
+        "path_visuals": [
+          "pine"
+        ],
+        "variant_ids": [
+          "dark_forest:chapel_wood:mid",
+          "dark_forest:forest_edge:margin",
+          "dark_forest:overgrown_ruins:margin",
+          "dark_forest:overgrown_ruins:mid",
+          "dark_forest:redwood_core:core",
+          "dark_forest:root_maze:core",
+          "dark_forest:scrub_march:margin",
+          "dark_forest:wet_pine:mid"
+        ],
+        "subbiomes": [
+          "chapel_wood",
+          "forest_edge",
+          "overgrown_ruins",
+          "redwood_core",
+          "root_maze",
+          "scrub_march",
+          "wet_pine"
+        ],
+        "zones": [
+          "core",
+          "margin",
+          "mid"
+        ],
+        "ecotone_adapters": 10,
+        "ecotone_pressure": 0.625,
+        "operator_counts": {
+          "edge_bias": 7,
+          "extra_spurs": 9,
+          "intensify": 5,
+          "large_platform": 2,
+          "prune_leaves": 4,
+          "widen": 2
+        },
+        "morphology_sample_reliable": true,
+        "avg_path_cells": 54.12,
+        "avg_endpoints": 5.75,
+        "avg_junctions": 15.19,
+        "avg_turn_like_cells": 10.69,
+        "avg_loop_rank": 7.25
+      },
+      "reformed_chapel": {
+        "sectors": 6,
+        "grammar_ids": [
+          "axial_cloister"
+        ],
+        "path_visuals": [
+          "chapel"
+        ],
+        "variant_ids": [
+          "reformed_chapel:chapel_wood:margin",
+          "reformed_chapel:print_cloister:core",
+          "reformed_chapel:wax_yard:mid"
+        ],
+        "subbiomes": [
+          "chapel_wood",
+          "print_cloister",
+          "wax_yard"
+        ],
+        "zones": [
+          "core",
+          "margin",
+          "mid"
+        ],
+        "ecotone_adapters": 6,
+        "ecotone_pressure": 1.0,
+        "operator_counts": {
+          "edge_bias": 3,
+          "intensify": 1,
+          "large_platform": 2,
+          "side_loop": 1
+        },
+        "morphology_sample_reliable": true,
+        "avg_path_cells": 69.83,
+        "avg_endpoints": 5.0,
+        "avg_junctions": 16.0,
+        "avg_turn_like_cells": 6.83,
+        "avg_loop_rank": 10.83
+      },
+      "ruined_settlement": {
+        "sectors": 8,
+        "grammar_ids": [
+          "street_grid"
+        ],
+        "path_visuals": [
+          "chapel"
+        ],
+        "variant_ids": [
+          "ruined_settlement:ash_courtyards:mid",
+          "ruined_settlement:charred_blocks:core",
+          "ruined_settlement:collapsed_market:core",
+          "ruined_settlement:overgrown_ruins:margin",
+          "ruined_settlement:overgrown_ruins:mid",
+          "ruined_settlement:print_district_ruins:mid"
+        ],
+        "subbiomes": [
+          "ash_courtyards",
+          "charred_blocks",
+          "collapsed_market",
+          "overgrown_ruins",
+          "print_district_ruins"
+        ],
+        "zones": [
+          "core",
+          "margin",
+          "mid"
+        ],
+        "ecotone_adapters": 6,
+        "ecotone_pressure": 0.75,
+        "operator_counts": {
+          "crossing": 2,
+          "edge_bias": 2,
+          "intensify": 3,
+          "large_platform": 2,
+          "side_loop": 2,
+          "small_platform": 1
+        },
+        "morphology_sample_reliable": true,
+        "avg_path_cells": 86.12,
+        "avg_endpoints": 9.0,
+        "avg_junctions": 29.12,
+        "avg_turn_like_cells": 3.12,
+        "avg_loop_rank": 16.38
+      }
+    }
+  }
+}

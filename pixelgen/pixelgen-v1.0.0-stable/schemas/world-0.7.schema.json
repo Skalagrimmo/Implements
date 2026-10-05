@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pixelgen.local/schemas/world-0.7.schema.json",
+  "title": "PixelGen World 0.7",
+  "type": "object",
+  "required": ["generator", "schema_versions", "seed", "cols", "rows", "sectors"],
+  "properties": {
+    "generator": {"type": "object", "required": ["name", "version"]},
+    "schema_versions": {
+      "type": "object",
+      "required": ["world"],
+      "properties": {"world": {"const": "0.7"}}
+    },
+    "seed": {"type": "integer"},
+    "cols": {"type": "integer", "minimum": 1},
+    "rows": {"type": "integer", "minimum": 1},
+    "sectors": {"type": "array"}
+  },
+  "additionalProperties": true
+}

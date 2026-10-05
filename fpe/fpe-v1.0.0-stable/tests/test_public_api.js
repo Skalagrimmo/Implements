@@ -1,0 +1,36 @@
+'use strict';
+const A=require('assert'),fs=require('fs'),path=require('path'),vm=require('vm'),F=require('../web/fpe'),C=require('../web/fpe_core');
+const root=path.resolve(__dirname,'..'),load=n=>JSON.parse(fs.readFileSync(path.join(root,'data/projections',n)));
+A.deepStrictEqual(F.describe().methods,['accept','setView','toggleCluster','toggleBud','step','request','serialize','getProjection','getView','getPlan']);
+A.deepStrictEqual(F.describe().errors,['INVALID_OPTIONS','INVALID_PROJECTION','FOREIGN_WORLD','STALE_REVISION','REVISION_CONFLICT','INVALID_VIEW','UNKNOWN_ID','PARENT_COLLAPSED','INVALID_TICK','INVALID_REQUEST','INVALID_SNAPSHOT']);
+A.equal(F.version,'1.0.0');A.equal(F.describe().snapshotSchema,'fpe.runtime_snapshot/0.11.0');
+A.deepStrictEqual(Object.keys(F).sort(),['FPEError','create','describe','restore','version']);
+const p=load('canonical_initial.json'),q=load('canonical_after.json');
+const error=(fn,code)=>A.throws(fn,e=>e instanceof F.FPEError&&e.code===code);
+const r=F.create(p,{budget:2}),id=p.clusters[0].id,bid=p.clusters[0].buds[0].id;
+A.deepStrictEqual(Object.keys(r).sort(),F.describe().methods.sort());
+error(()=>F.create(null),'INVALID_PROJECTION');error(()=>F.create(p,{budget:0}),'INVALID_OPTIONS');error(()=>F.restore(null),'INVALID_SNAPSHOT');
+error(()=>r.toggleCluster('missing'),'UNKNOWN_ID');error(()=>r.toggleBud('missing'),'UNKNOWN_ID');
+error(()=>r.toggleBud(bid),'PARENT_COLLAPSED');error(()=>r.setView({}),'INVALID_VIEW');
+r.toggleCluster(id);r.toggleBud(bid);r.step(10);
+const before=r.getProjection(),v=r.getView(),snap=r.serialize();
+before.clusters.length=0;v.expandedClusters.length=0;snap.projection.clusters.length=0;snap.view.expandedClusters.length=0;
+const plan=r.getPlan();plan.items[0].cluster.source.front_ids.push('fake');
+A(!r.getProjection().clusters[0].source.front_ids.includes('fake'));
+A.equal(r.getProjection().clusters.length,30);A.equal(r.getView().expandedClusters.length,1);A.equal(r.serialize().projection.clusters.length,30);
+A.deepStrictEqual(r.accept(q),{changed:true,revision:3});A.equal(r.getView().expandedBuds[0],bid);
+error(()=>r.step(9),'INVALID_TICK');A.equal(r.step(10).updates.length,2);
+A(!r.accept(q).changed);A(r.step(10).repeated);
+error(()=>r.accept(p),'STALE_REVISION');
+let bad=JSON.parse(JSON.stringify(q));bad.source.seed++;bad.projection_fingerprint=C.projectionFingerprint(bad);error(()=>r.accept(bad),'FOREIGN_WORLD');
+bad=JSON.parse(JSON.stringify(q));bad.clusters[0].projection.agitation=.99;bad.projection_fingerprint=C.projectionFingerprint(bad);error(()=>r.accept(bad),'REVISION_CONFLICT');
+bad=JSON.parse(JSON.stringify(q));bad.clusters[0].projection.agitation=.98;error(()=>r.accept(bad),'INVALID_PROJECTION');
+error(()=>r.accept({}),'INVALID_PROJECTION');A.deepStrictEqual(r.getProjection(),q);
+const altered=F.describe();altered.methods.length=0;A.equal(F.describe().methods.length,10);
+// Execute browser globals without WebGL: real dependency order, same public API including persistence.
+const context=vm.createContext({});for(const name of ['fpe_core','fpe_handoff','fpe_scheduler','fpe'])vm.runInContext(fs.readFileSync(path.join(root,'web',name+'.js'),'utf8'),context);
+context.fixture=JSON.stringify(p);A.equal(vm.runInContext('FPE.create(JSON.parse(fixture)).getPlan().counts.cluster_proxy',context),30);
+A.equal(vm.runInContext('(()=>{const r=FPE.create(JSON.parse(fixture));r.step(0);const s=r.serialize();return FPE.restore(JSON.parse(JSON.stringify(s))).step(0).repeated})()',context),true);
+function replay(){const rt=F.create(p);const log=[];for(let t=0;t<100;t++){if(t===20)rt.toggleCluster(id);if(t===40)rt.accept(q);log.push(rt.step(t));}return log;}
+A.deepStrictEqual(replay(),replay());
+console.log('public API PASS: 10 runtime methods, 11 error codes, isolation, handoff, persistence surface, clock continuity, replay, browser-global loading');

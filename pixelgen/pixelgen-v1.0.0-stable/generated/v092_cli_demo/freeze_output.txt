@@ -1,0 +1,4 @@
+Contract bundle -> /mnt/data/pixelgen-v0.9.2-schema-migration-freeze/generated/v092_cli_demo/frozen_bundle
+Manifest -> /mnt/data/pixelgen-v0.9.2-schema-migration-freeze/generated/v092_cli_demo/frozen_bundle/pixelgen_contract_manifest.json
+Artifacts: 4
+Contract: 0.9.2 ce2324e2c472162f39dbe0ee460e847dca97edfd0634215ea671da2b4f3b7bb9

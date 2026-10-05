@@ -1,0 +1,24 @@
+# PixelGen v0.5 — Termux quick commands
+
+pkg update
+pkg install python
+python -m pip install pillow
+
+cd pixelgen-v0.5-biome-encounter-grammar
+
+# All biome examples
+python cli.py biome-demo --seed 5050
+
+# Single biome
+python cli.py biome-scene silt_marsh --seed 5100
+python cli.py biome-scene dark_forest --seed 5200
+python cli.py biome-scene frozen_pass --seed 5300
+
+# Stitched worlds
+python cli.py world-demo --seed 5050
+python cli.py world --cols 4 --rows 3 --seed 7000
+
+# Previous layers are still available
+python cli.py scene-demo --seed 4040
+python cli.py structure-demo --seed 3030
+python cli.py autotile47 peat water --seed 60

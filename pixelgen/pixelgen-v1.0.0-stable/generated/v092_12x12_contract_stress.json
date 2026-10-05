@@ -1,0 +1,85 @@
+{
+  "release": "0.9.2",
+  "test": "12x12 contract bundle stress",
+  "cases": 4,
+  "status": "pass",
+  "results": [
+    {
+      "seed": 0,
+      "dimensions": [
+        12,
+        12
+      ],
+      "sectors": 144,
+      "world_fingerprint": "b0104c9f97b85aedcad1b1f0a0548f6d725e6e7510befb85174e83a11da35386",
+      "state_revision": 1,
+      "events": 1,
+      "derived_events": 1,
+      "observations": 4,
+      "bundle_artifacts": 4,
+      "contract_fingerprint": "ce2324e2c472162f39dbe0ee460e847dca97edfd0634215ea671da2b4f3b7bb9",
+      "generation_seconds": 0.6991,
+      "bundle_write_seconds": 0.5809,
+      "bundle_verify_seconds": 0.4715,
+      "verify_status": "pass"
+    },
+    {
+      "seed": 1,
+      "dimensions": [
+        12,
+        12
+      ],
+      "sectors": 144,
+      "world_fingerprint": "6eabd15fddec60e484d3afc1104192bb8a47ee3eb6b0f87949c5fd803b916686",
+      "state_revision": 1,
+      "events": 1,
+      "derived_events": 1,
+      "observations": 4,
+      "bundle_artifacts": 4,
+      "contract_fingerprint": "ce2324e2c472162f39dbe0ee460e847dca97edfd0634215ea671da2b4f3b7bb9",
+      "generation_seconds": 0.6657,
+      "bundle_write_seconds": 0.6058,
+      "bundle_verify_seconds": 0.3768,
+      "verify_status": "pass"
+    },
+    {
+      "seed": 6060,
+      "dimensions": [
+        12,
+        12
+      ],
+      "sectors": 144,
+      "world_fingerprint": "22e4aa35f52322bea5c0d980a79faa7b6526b89ac7ad7da78b5757e1c49e684d",
+      "state_revision": 1,
+      "events": 1,
+      "derived_events": 1,
+      "observations": 4,
+      "bundle_artifacts": 4,
+      "contract_fingerprint": "ce2324e2c472162f39dbe0ee460e847dca97edfd0634215ea671da2b4f3b7bb9",
+      "generation_seconds": 0.6467,
+      "bundle_write_seconds": 0.5275,
+      "bundle_verify_seconds": 0.4638,
+      "verify_status": "pass"
+    },
+    {
+      "seed": 7301,
+      "dimensions": [
+        12,
+        12
+      ],
+      "sectors": 144,
+      "world_fingerprint": "e4edb22d22f2fb2ca50bb7312e9415da3a0d6505134e2f75abcdfe90b80565c9",
+      "state_revision": 1,
+      "events": 1,
+      "derived_events": 1,
+      "observations": 4,
+      "bundle_artifacts": 4,
+      "contract_fingerprint": "ce2324e2c472162f39dbe0ee460e847dca97edfd0634215ea671da2b4f3b7bb9",
+      "generation_seconds": 0.6188,
+      "bundle_write_seconds": 0.6415,
+      "bundle_verify_seconds": 0.3826,
+      "verify_status": "pass"
+    }
+  ],
+  "timing_note": "Environment-specific validation timings; not user-device benchmarks."
+}

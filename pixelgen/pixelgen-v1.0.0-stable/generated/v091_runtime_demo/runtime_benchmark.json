@@ -1,0 +1,17 @@
+{
+  "dimensions": [
+    12,
+    12
+  ],
+  "fingerprint": "e4edb22d22f2fb2ca50bb7312e9415da3a0d6505134e2f75abcdfe90b80565c9",
+  "generation_seconds": [
+    0.6588030540001455,
+    0.6110875919998762,
+    0.6105600549999508
+  ],
+  "mean_generation_seconds": 0.6268169003333242,
+  "runs": 3,
+  "runtime_api_version": "0.9.1",
+  "sectors": 144,
+  "seed": 7301
+}

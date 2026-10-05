@@ -1,0 +1,1 @@
+EBE v0.3.0 fuzz passed: 200 simulations, 400 received rumor memories, 44 distorted transmissions

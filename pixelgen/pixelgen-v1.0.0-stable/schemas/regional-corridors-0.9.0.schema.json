@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pixelgen.local/schemas/regional-corridors-0.9.0.schema.json",
+  "title": "PixelGen Regional Corridors 0.9.0",
+  "type": "object",
+  "required": ["version", "policy", "corridors", "local_realization", "summary"],
+  "properties": {
+    "version": {"const": "0.9.0"},
+    "policy": {"type": "object"},
+    "corridors": {"type": "array"},
+    "local_realization": {"type": "array"},
+    "summary": {"type": "object"}
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,37 @@
+{
+  "release": "0.3.0",
+  "base": "ebe-lua-v0.2.1-love-hotfix1",
+  "validation_runtime": "texlua",
+  "love2d_execution": "not_run_no_love_binary",
+  "lua_syntax_files": 51,
+  "lua_syntax_status": "pass",
+  "legacy_v021_regression": {
+    "tests": 3,
+    "status": "pass",
+    "outputs": [
+      "EBE Lua smoke test passed",
+      "EBE Lua v0.2.1 hardening tests passed",
+      "Renderer forwarding regression test passed"
+    ]
+  },
+  "v030_regression": {
+    "tests": 4,
+    "status": "pass",
+    "output": "EBE v0.3.0 package API compatibility test passed\nEBE v0.3.0 core cognition tests passed\nEBE v0.3.0 PixelGen v0.8 runtime bridge tests passed\nEBE v0.3.0 deterministic distortion test passed\nEBE v0.3.0 all tests: PASS"
+  },
+  "fuzz": {
+    "simulations": 200,
+    "received_rumor_memories": 400,
+    "distorted_transmissions": 44,
+    "status": "pass",
+    "elapsed_seconds": 0.3806,
+    "output": "EBE v0.3.0 fuzz passed: 200 simulations, 400 received rumor memories, 44 distorted transmissions"
+  },
+  "pixelgen_fixture": {
+    "unique_semantic_entities": 11,
+    "derived_events": 3,
+    "local_observations": 13,
+    "registry_shape": "entity.static + entity.dynamic"
+  },
+  "core_love_dependency_hits": []
+}

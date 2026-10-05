@@ -1,0 +1,16 @@
+Initial
+  collective: no record
+  Levko: no belief
+After Mara reports
+  collective: value=tense confidence=0.960 roots=1 reporters=1 state=tentative
+  Levko: no belief
+After Oles repeats Mara's evidence
+  collective: value=tense confidence=0.960 roots=1 reporters=2 state=tentative
+  Levko: no belief
+After independent Iva report
+  collective: value=tense confidence=0.960 roots=2 reporters=3 state=consensus
+  Levko: no belief
+After explicit council publication
+  collective: value=tense confidence=0.960 roots=2 reporters=3 state=consensus
+  Levko: belief=tense confidence=0.960 roots=2 knowledge=yes
+Summary: tick=0.0 agents=4 collectives=1 collective_reports=3 beliefs=8 knowledge=7

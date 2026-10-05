@@ -1,0 +1,27 @@
+{
+  "release": "0.8.0",
+  "lua_files": 85,
+  "core_love_dependency_hits": 0,
+  "regression": "EBE v0.8.0 package API compatibility test passed\nEBE v0.3.0 core cognition tests passed\nEBE v0.3.0 PixelGen v0.8 runtime bridge tests passed\nEBE v0.6.0 PixelGen 1.0 stable-contract compatibility test passed\nEBE v0.3.0 deterministic distortion test passed\nEBE v0.4.0 information ecology / source-lineage tests passed\nEBE v0.5.0 PixelGen automatic information-network synthesis tests passed\nEBE v0.6.0 collective epistemics tests passed\nEBE v0.7.0 institutional policy / censorship / agenda tests passed\nEBE v0.8.0 semantic action request tests passed\nEBE v0.8.0 all tests: PASS",
+  "fuzz": {
+    "v030": "EBE v0.3.0 fuzz passed: 200 simulations, 400 received rumor memories, 44 distorted transmissions",
+    "v040": "EBE v0.4.0 ecology fuzz passed: 120 simulations, 240 institutional evidence memories",
+    "v050": "EBE v0.5.0 network synthesis fuzz passed: 120 variants, avg institutions 11.04, avg routes 9.75, disconnected forests 48, routing log entries 2015",
+    "v060": "EBE v0.6.0 collective fuzz passed: 120 simulations, 120 echo reports, 120 independent consensuses, 120 publications",
+    "v070": "EBE v0.7.0 policy fuzz passed: 120 simulations, 40 suppressions, 30 holds, 90 direct publications, 200 root-lineage checks",
+    "v080": "EBE v0.8.0 action fuzz: 160 simulations PASS\nrequests=160 exports=160 rejected=40 applied=120"
+  },
+  "soak": {
+    "v060": "EBE v0.6.0 collective soak passed: 300 simulations, 240 consensus, 60 conflicts, 60 institution publications, 6900 submitted reports",
+    "v070": "EBE v0.7.0 policy soak passed: 300 simulations, 1500 decisions, 1200 delivered, 300 suppressed, 300 held",
+    "v080": "EBE v0.8.0 action soak: 1200 requests PASS\nbounded_action_log=512"
+  },
+  "pixelgen_1_0_roundtrip": "EBE v0.8.0 <-> PixelGen 1.0 real action roundtrip: PASS\nrequest=ebe_action_1 front_deescalation front_0 amount=0.120000\npixelgen_revision=2 derived_event=derived_event_2",
+  "canonical_demo_hashes": [
+    "044f0311280ca1958ae4f854509ae644753a7efb8afd8e59c498e0281c82a204",
+    "044f0311280ca1958ae4f854509ae644753a7efb8afd8e59c498e0281c82a204",
+    "044f0311280ca1958ae4f854509ae644753a7efb8afd8e59c498e0281c82a204",
+    "044f0311280ca1958ae4f854509ae644753a7efb8afd8e59c498e0281c82a204",
+    "044f0311280ca1958ae4f854509ae644753a7efb8afd8e59c498e0281c82a204"
+  ]
+}

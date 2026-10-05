@@ -1,0 +1,587 @@
+{
+  "gameplay": {
+    "ability_order": [
+      "freeze_water",
+      "wall_run",
+      "high_jump",
+      "nano_bridge"
+    ],
+    "ability_pickups": [
+      {
+        "ability": "freeze_water",
+        "id": "ability_01_freeze_water",
+        "sector": [
+          2,
+          0
+        ],
+        "stage": 1,
+        "x": 5,
+        "y": 3
+      },
+      {
+        "ability": "wall_run",
+        "id": "ability_02_wall_run",
+        "sector": [
+          3,
+          1
+        ],
+        "stage": 2,
+        "x": 15,
+        "y": 6
+      },
+      {
+        "ability": "high_jump",
+        "id": "ability_03_high_jump",
+        "sector": [
+          2,
+          2
+        ],
+        "stage": 3,
+        "x": 1,
+        "y": 6
+      },
+      {
+        "ability": "nano_bridge",
+        "id": "ability_04_nano_bridge",
+        "sector": [
+          1,
+          1
+        ],
+        "stage": 4,
+        "x": 16,
+        "y": 14
+      }
+    ],
+    "contract": {
+      "gated_links_require_ability": true,
+      "open_links_are_traversable": true,
+      "sealed_links_are_not_traversable": true,
+      "secret_links_require_ability": true
+    },
+    "effective_ability_count": 4,
+    "final_sector": [
+      0,
+      2
+    ],
+    "gates": [
+      {
+        "ability": "freeze_water",
+        "from": [
+          2,
+          0
+        ],
+        "id": "gate_01_freeze_water",
+        "kind": "frozen_crossing",
+        "main_path_edge": 2,
+        "to": [
+          3,
+          0
+        ]
+      },
+      {
+        "ability": "wall_run",
+        "from": [
+          3,
+          1
+        ],
+        "id": "gate_02_wall_run",
+        "kind": "wall_run_gap",
+        "main_path_edge": 4,
+        "to": [
+          2,
+          1
+        ]
+      },
+      {
+        "ability": "high_jump",
+        "from": [
+          2,
+          2
+        ],
+        "id": "gate_03_high_jump",
+        "kind": "high_ledge",
+        "main_path_edge": 6,
+        "to": [
+          1,
+          2
+        ]
+      },
+      {
+        "ability": "nano_bridge",
+        "from": [
+          1,
+          1
+        ],
+        "id": "gate_04_nano_bridge",
+        "kind": "broken_floor",
+        "main_path_edge": 8,
+        "to": [
+          0,
+          1
+        ]
+      }
+    ],
+    "generator_version": "1.0.0",
+    "main_path": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        0
+      ],
+      [
+        3,
+        0
+      ],
+      [
+        3,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ]
+    ],
+    "requested_ability_count": 4,
+    "secrets": [
+      {
+        "id": "secret_01_freeze_water",
+        "requires": "freeze_water",
+        "reward": "lore_fragment",
+        "sector": [
+          3,
+          0
+        ],
+        "x": 17,
+        "y": 12
+      },
+      {
+        "id": "secret_02_wall_run",
+        "requires": "wall_run",
+        "reward": "sealed_cache",
+        "sector": [
+          2,
+          1
+        ],
+        "x": 7,
+        "y": 9
+      },
+      {
+        "id": "secret_03_high_jump",
+        "requires": "high_jump",
+        "reward": "alternate_route",
+        "sector": [
+          1,
+          2
+        ],
+        "x": 4,
+        "y": 3
+      },
+      {
+        "id": "secret_04_nano_bridge",
+        "requires": "nano_bridge",
+        "reward": "rare_find",
+        "sector": [
+          0,
+          1
+        ],
+        "x": 2,
+        "y": 2
+      }
+    ],
+    "shortcuts": [
+      {
+        "from": [
+          0,
+          0
+        ],
+        "id": "shortcut_01_nano_bridge",
+        "requires": "nano_bridge",
+        "to": [
+          0,
+          1
+        ],
+        "tree_distance": 9
+      },
+      {
+        "from": [
+          1,
+          0
+        ],
+        "id": "shortcut_02_high_jump",
+        "requires": "high_jump",
+        "to": [
+          1,
+          1
+        ],
+        "tree_distance": 7
+      },
+      {
+        "from": [
+          2,
+          0
+        ],
+        "id": "shortcut_03_wall_run",
+        "requires": "wall_run",
+        "to": [
+          2,
+          1
+        ],
+        "tree_distance": 3
+      },
+      {
+        "from": [
+          1,
+          1
+        ],
+        "id": "shortcut_04_high_jump",
+        "requires": "high_jump",
+        "to": [
+          2,
+          1
+        ],
+        "tree_distance": 3
+      },
+      {
+        "from": [
+          3,
+          1
+        ],
+        "id": "shortcut_05_wall_run",
+        "requires": "wall_run",
+        "to": [
+          3,
+          2
+        ],
+        "tree_distance": 3
+      },
+      {
+        "from": [
+          0,
+          2
+        ],
+        "id": "shortcut_06_nano_bridge",
+        "requires": "nano_bridge",
+        "to": [
+          1,
+          2
+        ],
+        "tree_distance": 3
+      }
+    ],
+    "start_sector": [
+      0,
+      0
+    ],
+    "tree_edge_count": 11,
+    "version": "0.6"
+  },
+  "simulation": {
+    "abilities": [
+      "freeze_water",
+      "high_jump",
+      "nano_bridge",
+      "wall_run"
+    ],
+    "all_sectors_reachable": true,
+    "collected_pickups": [
+      "ability_01_freeze_water",
+      "ability_02_wall_run",
+      "ability_03_high_jump",
+      "ability_04_nano_bridge"
+    ],
+    "final_sector_reachable": true,
+    "reachable_sectors": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        0
+      ],
+      [
+        3,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        3,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "stages": [
+      {
+        "abilities": [
+          "freeze_water"
+        ],
+        "gained": [
+          "freeze_water"
+        ],
+        "iteration": 1,
+        "reachable_sectors": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ]
+        ]
+      },
+      {
+        "abilities": [
+          "freeze_water",
+          "wall_run"
+        ],
+        "gained": [
+          "wall_run"
+        ],
+        "iteration": 2,
+        "reachable_sectors": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            1
+          ]
+        ]
+      },
+      {
+        "abilities": [
+          "freeze_water",
+          "high_jump",
+          "wall_run"
+        ],
+        "gained": [
+          "high_jump"
+        ],
+        "iteration": 3,
+        "reachable_sectors": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ]
+        ]
+      },
+      {
+        "abilities": [
+          "freeze_water",
+          "high_jump",
+          "nano_bridge",
+          "wall_run"
+        ],
+        "gained": [
+          "nano_bridge"
+        ],
+        "iteration": 4,
+        "reachable_sectors": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ]
+        ]
+      },
+      {
+        "abilities": [
+          "freeze_water",
+          "high_jump",
+          "nano_bridge",
+          "wall_run"
+        ],
+        "gained": [],
+        "iteration": 5,
+        "reachable_sectors": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ]
+        ]
+      }
+    ]
+  }
+}

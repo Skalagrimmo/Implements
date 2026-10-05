@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pixelgen.local/schemas/world-state-0.8.0.schema.json",
+  "title": "PixelGen Dynamic World State 0.8.0",
+  "type": "object",
+  "required": ["version", "source_world", "clock", "territories", "fronts", "event_log", "mutations", "derived_events", "observations"],
+  "properties": {
+    "version": {"const": "0.8.0"},
+    "source_world": {"type": "object", "required": ["fingerprint", "seed", "dimensions"]},
+    "clock": {"type": "object", "required": ["tick", "revision"]},
+    "territories": {"type": "object"},
+    "fronts": {"type": "object"},
+    "event_log": {"type": "array"},
+    "mutations": {"type": "array"},
+    "derived_events": {"type": "array"},
+    "observations": {"type": "array"}
+  },
+  "additionalProperties": true
+}

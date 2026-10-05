@@ -1,0 +1,44 @@
+[
+  {
+    "id": "runtime_event_1",
+    "event_type": "front_escalation",
+    "target_type": "front",
+    "target_id": "front_0",
+    "amount": 0.2,
+    "sector": [
+      0,
+      3
+    ],
+    "source": "runtime_cli",
+    "actor_id": null,
+    "cause_id": null
+  },
+  {
+    "id": "runtime_event_2",
+    "event_type": "territory_weaken",
+    "target_type": "territory",
+    "target_id": "territory_0",
+    "amount": 0.12,
+    "sector": [
+      1,
+      0
+    ],
+    "source": "runtime_cli",
+    "actor_id": null,
+    "cause_id": null
+  },
+  {
+    "id": "runtime_event_3",
+    "event_type": "front_deescalation",
+    "target_type": "front",
+    "target_id": "front_1",
+    "amount": 0.09,
+    "sector": [
+      1,
+      1
+    ],
+    "source": "runtime_cli",
+    "actor_id": null,
+    "cause_id": null
+  }
+]

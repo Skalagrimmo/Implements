@@ -1,0 +1,55 @@
+=== EBE v0.5.0 — PixelGen Automatic Information Network ===
+World seed=7301 size=6x5 institutions=14 routes=16 components=1 access=30/30
+Plan fingerprint: 1314574499
+
+Institution kinds:
+  caravan_exchange   1
+  front_watch        4
+  printing_house     2
+  roadside_relay     2
+  shrine_circle      5
+
+Generated institutions:
+  auto_caravan_01  caravan_exchange sector=(3,4) roles=front_watch,road_corridor
+  auto_front_01    front_watch      sector=(0,3) roles=front_watch
+  auto_front_02    front_watch      sector=(1,1) roles=front_watch
+  auto_front_03    front_watch      sector=(2,2) roles=front_watch
+  auto_front_04    front_watch      sector=(2,4) roles=front_watch
+  auto_landmark_01 shrine_circle    sector=(3,2) roles=landmark_node
+  auto_landmark_02 printing_house   sector=(0,4) roles=landmark_node,regional_hub
+  auto_landmark_03 shrine_circle    sector=(1,0) roles=landmark_node
+  auto_landmark_04 shrine_circle    sector=(5,0) roles=landmark_node
+  auto_landmark_05 printing_house   sector=(5,4) roles=landmark_node,regional_hub
+  auto_landmark_06 shrine_circle    sector=(2,3) roles=landmark_node
+  auto_landmark_07 roadside_relay   sector=(0,0) roles=landmark_node
+  auto_landmark_08 roadside_relay   sector=(4,3) roles=landmark_node
+  auto_region_01   shrine_circle    sector=(2,1) roles=regional_hub
+
+Route backbone:
+  auto_route_01 auto_caravan_01 -> auto_front_04 cost=1.00 delay=0.64 trust=0.883 frontX=1 backbone
+  auto_route_02 auto_caravan_01 -> auto_landmark_01 cost=2.03 delay=0.77 trust=0.890 frontX=0 backbone
+  auto_route_03 auto_caravan_01 -> auto_landmark_08 cost=1.56 delay=0.97 trust=0.800 frontX=2 backbone
+  auto_route_04 auto_front_01 -> auto_front_03 cost=5.00 delay=2.38 trust=0.690 frontX=2 redundancy
+  auto_route_05 auto_front_01 -> auto_landmark_02 cost=1.00 delay=0.34 trust=0.948 frontX=0 backbone
+  auto_route_06 auto_front_01 -> auto_landmark_06 cost=4.00 delay=1.82 trust=0.787 frontX=1 backbone
+  auto_route_07 auto_front_02 -> auto_landmark_03 cost=0.78 delay=0.27 trust=0.955 frontX=0 backbone
+  auto_route_08 auto_front_02 -> auto_landmark_07 cost=1.56 delay=0.53 trust=0.930 frontX=0 backbone
+  auto_route_09 auto_front_03 -> auto_landmark_06 cost=1.00 delay=0.56 trust=0.883 frontX=1 backbone
+  auto_route_10 auto_front_04 -> auto_landmark_02 cost=2.00 delay=0.90 trust=0.851 frontX=1 backbone
+  auto_route_11 auto_landmark_01 -> auto_region_01 cost=1.56 delay=0.53 trust=0.930 frontX=0 backbone
+  auto_route_12 auto_landmark_03 -> auto_landmark_07 cost=2.34 delay=0.80 trust=0.905 frontX=0 redundancy
+  auto_route_13 auto_landmark_03 -> auto_region_01 cost=2.03 delay=0.91 trust=0.825 frontX=1 backbone
+  auto_route_14 auto_landmark_04 -> auto_landmark_05 cost=3.81 delay=1.81 trust=0.703 frontX=2 backbone
+  auto_route_15 auto_landmark_04 -> auto_landmark_08 cost=4.06 delay=2.12 trust=0.605 frontX=3 redundancy
+  auto_route_16 auto_landmark_05 -> auto_landmark_08 cost=2.25 delay=0.98 trust=0.818 frontX=1 backbone
+
+Automatic access:
+  Mara   -> auto_front_01
+  Reader -> auto_front_03
+Mara report enters: auto_front_01
+Reader after network propagation: belief=tense confidence=0.324 roots=1
+Queue drained: true
+Routing log entries: 29
+World-route provenance:
+  auto_route_04 cost=5.0 front_crossings=2 path_cells=6
+Route provenance preserved: true

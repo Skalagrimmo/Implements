@@ -1,0 +1,24 @@
+{
+  "release": "0.7.0",
+  "package_verification": "PASS",
+  "love_structure": "PASS",
+  "love_runtime_executed_here": false,
+  "zip_bytes": 323740,
+  "zip_sha256": "7e265fa3ef72a997bec979a5d9025ac0b502850f31f4b1c0b8eac5aff0f3634e",
+  "love_bytes": 315740,
+  "love_sha256": "f26bd83440172ddebabdbc5a91ff3efbb566c0069b3c322213a01358b40488f2",
+  "packaged_outputs": {
+    "texlua tests/smoke.lua": "EBE Lua smoke test passed",
+    "texlua tests/hardening.lua": "EBE Lua v0.2.1 hardening tests passed",
+    "texlua tests/renderer_forwarding.lua": "Renderer forwarding regression test passed",
+    "texlua tests/run_all.lua /tmp/ebe-v070-package-verify/ebe-v0.7.0-institutional-policy": "EBE v0.7.0 package API compatibility test passed\nEBE v0.3.0 core cognition tests passed\nEBE v0.3.0 PixelGen v0.8 runtime bridge tests passed\nEBE v0.6.0 PixelGen 1.0 stable-contract compatibility test passed\nEBE v0.3.0 deterministic distortion test passed\nEBE v0.4.0 information ecology / source-lineage tests passed\nEBE v0.5.0 PixelGen automatic information-network synthesis tests passed\nEBE v0.6.0 collective epistemics tests passed\nEBE v0.7.0 institutional policy / censorship / agenda tests passed\nEBE v0.7.0 all tests: PASS",
+    "texlua tests/fuzz_v030.lua /tmp/ebe-v070-package-verify/ebe-v0.7.0-institutional-policy": "EBE v0.3.0 fuzz passed: 200 simulations, 400 received rumor memories, 44 distorted transmissions",
+    "texlua tests/fuzz_v040.lua /tmp/ebe-v070-package-verify/ebe-v0.7.0-institutional-policy": "EBE v0.4.0 ecology fuzz passed: 120 simulations, 240 institutional evidence memories",
+    "texlua tests/fuzz_v050.lua /tmp/ebe-v070-package-verify/ebe-v0.7.0-institutional-policy": "EBE v0.5.0 network synthesis fuzz passed: 120 variants, avg institutions 11.04, avg routes 9.75, disconnected forests 48, routing log entries 2015",
+    "texlua tests/fuzz_v060.lua /tmp/ebe-v070-package-verify/ebe-v0.7.0-institutional-policy": "EBE v0.6.0 collective fuzz passed: 120 simulations, 120 echo reports, 120 independent consensuses, 120 publications",
+    "texlua tests/soak_v060.lua /tmp/ebe-v070-package-verify/ebe-v0.7.0-institutional-policy": "EBE v0.6.0 collective soak passed: 300 simulations, 240 consensus, 60 conflicts, 60 institution publications, 6900 submitted reports",
+    "texlua tests/fuzz_v070.lua /tmp/ebe-v070-package-verify/ebe-v0.7.0-institutional-policy": "EBE v0.7.0 policy fuzz passed: 120 simulations, 40 suppressions, 30 holds, 90 direct publications, 200 root-lineage checks",
+    "texlua tests/soak_v070.lua /tmp/ebe-v070-package-verify/ebe-v0.7.0-institutional-policy": "EBE v0.7.0 policy soak passed: 300 simulations, 1500 decisions, 1200 delivered, 300 suppressed, 300 held",
+    "texlua demo/institutional_policy_demo.lua /tmp/ebe-v070-package-verify/ebe-v0.7.0-institutional-policy": "Submitted: institution_report_1 roots=1\nPolicy target=levko action=publish priority=0.80 rule=prioritize_levko\nPolicy target=outsider action=suppress priority=0.40 rule=censor_outsider\nLevko: tense roots=1\nOutsider: no belief\nPress archive reports: 1"
+  }
+}

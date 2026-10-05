@@ -1,0 +1,28 @@
+=== EBE v0.3.0 — Information Locality / PixelGen Runtime Bridge ===
+PixelGen import: entities=11 events=3 observations=13 direct-deliveries=2
+
+[t=0] same external event, different epistemic states
+Mara : belief=tense conf=0.960 sources=1 knowledge=tense [direct_evidence]
+Iva  : belief=tense conf=0.960 sources=1 knowledge=tense [direct_evidence]
+Levko: no belief / no knowledge
+
+Mara transmits rumor tx_1 -> Levko; deliver_at=2.0 distortion=false
+[t=1] Levko: no belief / no knowledge
+[t=2] Levko after one report: belief=tense conf=0.757 sources=1 knowledge=no
+Iva independently transmits tx_2; deliver_at=5.0 distortion=false
+[t=5] Levko after corroboration: belief=tense conf=1.000 sources=2 knowledge=tense [corroborated_reports]
+
+Reactions:
+  reaction_1 agent=mara kind=avoid_front belief=tense conf=0.960
+  reaction_2 agent=iva kind=avoid_front belief=tense conf=0.960
+  reaction_3 agent=levko kind=avoid_front belief=tense conf=0.757
+
+Propagation delivery log:
+  t=0 agent=mara obs=observation_1_0 evidence=direct_local source=nil
+  t=0 agent=iva obs=observation_1_1 evidence=direct_local source=nil
+  t=2 agent=levko obs=rumor_tx_1 evidence=transmitted source=mara
+  t=5 agent=levko obs=rumor_tx_2 evidence=transmitted source=iva
+
+Summary: tick=5 agents=3 memory=4 beliefs=7 knowledge=7 queued=0 reactions=3
+Snapshot semantic equality: true
+Snapshot hash: 1235651750

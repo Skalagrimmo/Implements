@@ -1,0 +1,9 @@
+{
+  "deterministic_replay": true,
+  "dynamic_state": true,
+  "ebe_incremental_bundle": true,
+  "regional_corridors": true,
+  "renderer_required": false,
+  "semantic_world": true,
+  "version": "0.9.1"
+}

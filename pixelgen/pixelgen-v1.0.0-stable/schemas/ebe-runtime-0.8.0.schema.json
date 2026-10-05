@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pixelgen.local/schemas/ebe-runtime-0.8.0.schema.json",
+  "title": "PixelGen to EBE Runtime Bundle 0.8.0",
+  "type": "object",
+  "required": ["version", "source", "contract", "static_entities", "dynamic_entities", "events", "observations"],
+  "properties": {
+    "version": {"const": "0.8.0"},
+    "contract": {
+      "type": "object",
+      "required": ["global_knowledge", "observation_semantics"],
+      "properties": {
+        "global_knowledge": {"const": "forbidden"},
+        "observation_semantics": {"const": "local evidence only"}
+      }
+    },
+    "static_entities": {"type": "array"},
+    "dynamic_entities": {"type": "array"},
+    "events": {"type": "array"},
+    "observations": {"type": "array"}
+  },
+  "additionalProperties": true
+}

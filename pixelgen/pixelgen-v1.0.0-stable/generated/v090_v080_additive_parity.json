@@ -1,0 +1,45 @@
+{
+  "cases": [
+    {
+      "seed": 7301,
+      "dims": [
+        6,
+        5
+      ],
+      "v080_projection": "351d2f345756b2e517cfec5a6848d1c6b2b7353a0f5e24e1529d67f6c461f0d0",
+      "v090_projection": "351d2f345756b2e517cfec5a6848d1c6b2b7353a0f5e24e1529d67f6c461f0d0",
+      "equal": true
+    },
+    {
+      "seed": 6060,
+      "dims": [
+        4,
+        3
+      ],
+      "v080_projection": "171fea2682fb792b5e45b651b64f06fc3d42496c024a242a375893b46dc59df6",
+      "v090_projection": "171fea2682fb792b5e45b651b64f06fc3d42496c024a242a375893b46dc59df6",
+      "equal": true
+    },
+    {
+      "seed": 42,
+      "dims": [
+        8,
+        6
+      ],
+      "v080_projection": "09f4563e08bac8a65ef4dae9fbd9b54d16c7a243e6c425871246697c5cb8bc85",
+      "v090_projection": "09f4563e08bac8a65ef4dae9fbd9b54d16c7a243e6c425871246697c5cb8bc85",
+      "equal": true
+    },
+    {
+      "seed": -777,
+      "dims": [
+        1,
+        1
+      ],
+      "v080_projection": "867667147bcfc30cbc2c856a8b05c7901db771787a923d6859edd353e8ed9b06",
+      "v090_projection": "867667147bcfc30cbc2c856a8b05c7901db771787a923d6859edd353e8ed9b06",
+      "equal": true
+    }
+  ],
+  "all_equal": true
+}

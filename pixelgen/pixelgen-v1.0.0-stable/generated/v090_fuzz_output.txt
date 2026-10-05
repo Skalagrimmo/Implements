@@ -1,0 +1,1 @@
+PixelGen v0.9.0 corridor fuzz passed: 240 worlds, 982 corridors, 3440 local segments
