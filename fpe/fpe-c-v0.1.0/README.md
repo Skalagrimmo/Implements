@@ -28,7 +28,7 @@ The next compatibility slice now has a bounded JSON entry point, separate from t
 - `fpe_projection_json_destroy()` releases the projection returned by the JSON parser. `fpe_runtime_create()` then deep-copies it, so the parsed projection may be destroyed immediately after runtime creation.
 - The JSON parser rejects duplicate object keys, invalid UTF-8, malformed escapes, unpaired surrogate escapes, embedded NUL escapes, non-finite numbers, trailing data, and inputs beyond its explicit resource limits (8 MiB, depth 64, 300,000 parsed nodes, 100,000 clusters).
 
-The C tests now include SHA-256/canonicalization checks and both stable FPE 1.0 golden projection fixtures: 30 clusters / 120 buds for the initial projection and the after-state projection. The C parser checks each known fingerprint, converts the projection, creates a runtime, then verifies that the runtime remains valid after the temporary parsed projection is released.
+The C tests include SHA-256/canonicalization checks, both stable FPE 1.0 golden projection fixtures (30 clusters / 120 buds each), and a generated 256-case Python→C fingerprint corpus. The corpus follows the stable FPE reference generator exactly: numeric boundary values, deterministic mutations, Ukrainian + emoji metadata and Python-produced fingerprints. The C parser verifies each complete document before conversion, creates runtimes from the golden fixtures, then verifies ownership after releasing the temporary parsed projections.
 
 This is **projection JSON compatibility work**, not full FPE 1.0 wire compatibility. Portable JSON checkpoint restore, historical 0.11/0.12 snapshot migration, complete JSON action-request envelopes, and the full 256-case Python↔JavaScript numeric/UTF-8 differential corpus remain open gates.
 
@@ -39,6 +39,7 @@ Requires a C11 compiler and CMake 3.16 or newer. There are no third-party runtim
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build --parallel
+python tests/generate_fingerprint_vectors.py build/fpe-json-vectors.jsonl
 ctest --test-dir build --output-on-failure
 ```
 
@@ -72,7 +73,7 @@ This iteration combines the typed C 0.1 runtime with an in-progress projection J
 
 1. Portable JSON snapshots are not implemented. Checkpoints remain deep-owned in-memory C objects and do not restore JavaScript runtime snapshot versions 0.11.0 / 0.12.0 / 1.0.0.
 2. Full JSON action-request envelope serialization is not implemented; `fpe_runtime_request()` still returns the typed C request structure.
-3. The 256-case Python↔JavaScript edge corpus and a frozen JS↔C runtime trace have not yet passed against C.
+3. The 256-case Python→C fingerprint test is now included in CI; the JavaScript↔C runtime trace and portable checkpoint round-trip remain open gates.
 4. The parser rejects escaped U+0000 because the current public C structures use NUL-terminated strings. JSON input is bounded to 8 MiB, depth 64, 300,000 parsed nodes and 100,000 clusters.
 5. IDs and seed keys are bounded to 127 bytes and the deterministic runtime key hash uses canonical ASCII identifiers. Full non-ASCII JavaScript UTF-16 key parity is not claimed.
 6. Parsed source metadata outside the typed runtime fields is integrity-checked as part of the full projection fingerprint, but is not retained in the reduced C `FPEProjection` representation.
