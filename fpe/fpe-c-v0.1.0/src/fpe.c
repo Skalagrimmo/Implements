@@ -1269,6 +1269,202 @@ void fpe_checkpoint_destroy(FPECheckpoint *checkpoint) {
     free(checkpoint);
 }
 
+typedef struct FPESnapshotBuffer {
+    char *data;
+    size_t length;
+    size_t capacity;
+    bool failed;
+} FPESnapshotBuffer;
+
+static bool snapshot_buffer_reserve(FPESnapshotBuffer *b,size_t extra) {
+    size_t needed,capacity;
+    char *next;
+    if(b->failed || extra>SIZE_MAX-b->length-1u) { b->failed=true; return false; }
+    needed=b->length+extra+1u;
+    if(needed<=b->capacity) return true;
+    capacity=b->capacity!=0u?b->capacity:512u;
+    while(capacity<needed) {
+        if(capacity>SIZE_MAX/2u) { capacity=needed; break; }
+        capacity*=2u;
+    }
+    next=(char *)realloc(b->data,capacity);
+    if(next==NULL) { b->failed=true; return false; }
+    b->data=next; b->capacity=capacity;
+    return true;
+}
+static void snapshot_buffer_bytes(FPESnapshotBuffer *b,const char *data,size_t length) {
+    if(!snapshot_buffer_reserve(b,length)) return;
+    if(length!=0u) memcpy(b->data+b->length,data,length);
+    b->length+=length; b->data[b->length]='\0';
+}
+static void snapshot_buffer_text(FPESnapshotBuffer *b,const char *text) {
+    snapshot_buffer_bytes(b,text,strlen(text));
+}
+static void snapshot_buffer_string(FPESnapshotBuffer *b,const char *text) {
+    const unsigned char *p=(const unsigned char *)text;
+    snapshot_buffer_text(b,"\"");
+    while(*p!=0u) {
+        const unsigned char ch=*p++;
+        switch(ch) {
+            case '"': snapshot_buffer_text(b,"\\\""); break;
+            case '\\': snapshot_buffer_text(b,"\\\\"); break;
+            case '\b': snapshot_buffer_text(b,"\\b"); break;
+            case '\f': snapshot_buffer_text(b,"\\f"); break;
+            case '\n': snapshot_buffer_text(b,"\\n"); break;
+            case '\r': snapshot_buffer_text(b,"\\r"); break;
+            case '\t': snapshot_buffer_text(b,"\\t"); break;
+            default:
+                if(ch<0x20u) {
+                    char escaped[7];
+                    (void)snprintf(escaped,sizeof(escaped),"\\u%04x",(unsigned)ch);
+                    snapshot_buffer_bytes(b,escaped,6u);
+                } else snapshot_buffer_bytes(b,(const char *)&ch,1u);
+                break;
+        }
+    }
+    snapshot_buffer_text(b,"\"");
+}
+static void snapshot_buffer_i64(FPESnapshotBuffer *b,int64_t value) {
+    char text[32];
+    int n=snprintf(text,sizeof(text),"%lld",(long long)value);
+    if(n<0 || (size_t)n>=sizeof(text)) { b->failed=true; return; }
+    snapshot_buffer_bytes(b,text,(size_t)n);
+}
+static void snapshot_buffer_size(FPESnapshotBuffer *b,size_t value) {
+    char text[32];
+    int n=snprintf(text,sizeof(text),"%llu",(unsigned long long)value);
+    if(n<0 || (size_t)n>=sizeof(text)) { b->failed=true; return; }
+    snapshot_buffer_bytes(b,text,(size_t)n);
+}
+static void snapshot_buffer_double(FPESnapshotBuffer *b,double value) {
+    char text[64];
+    int precision,n=-1;
+    if(!isfinite(value)) { b->failed=true; return; }
+    for(precision=1;precision<=17;++precision) {
+        char *end=NULL;
+        double parsed;
+        int candidate=snprintf(text,sizeof(text),"%.*g",precision,value);
+        if(candidate<=0 || (size_t)candidate>=sizeof(text)) continue;
+        parsed=strtod(text,&end);
+        if(end!=NULL && *end=='\0' && parsed==value) { n=candidate; break; }
+    }
+    if(n<=0 || (size_t)n>=sizeof(text)) { b->failed=true; return; }
+    snapshot_buffer_bytes(b,text,(size_t)n);
+}
+static const char *snapshot_detail_name(FPEPlanKind detail) {
+    switch(detail) {
+        case FPE_PLAN_CLUSTER_PROXY: return "cluster_proxy";
+        case FPE_PLAN_BUD_PROXY: return "bud_proxy";
+        case FPE_PLAN_GEOMETRY: return "geometry";
+        default: return NULL;
+    }
+}
+
+void fpe_json_string_destroy(char *json) { free(json); }
+
+FPEErrorCode fpe_runtime_serialize_json(const FPERuntime *runtime,
+                                        char **out_json,size_t *out_length,
+                                        FPEError *error) {
+    FPESnapshotBuffer b;
+    FPEViewState view;
+    size_t i;
+    fpe_error_clear(error);
+    memset(&b,0,sizeof(b));
+    memset(&view,0,sizeof(view));
+    if(runtime==NULL || out_json==NULL || out_length==NULL) {
+        set_error(error,FPE_INVALID_OPTIONS,"runtime and JSON output pointers are required");
+        return FPE_INVALID_OPTIONS;
+    }
+    *out_json=NULL; *out_length=0u;
+    if(runtime->projection.json_document==NULL || runtime->projection.json_document_length==0u ||
+       runtime->budget==0u || (uint64_t)runtime->budget>(uint64_t)FPE_MAX_SAFE_INTEGER) {
+        set_error(error,FPE_INVALID_SNAPSHOT,"portable JSON snapshots require a verified JSON-origin projection and safe budget");
+        return FPE_INVALID_SNAPSHOT;
+    }
+    if(normalize_view(&runtime->projection,&runtime->view,&view,error)!=FPE_OK) {
+        set_error(error,FPE_INVALID_SNAPSHOT,"runtime view cannot be normalized for snapshot");
+        return FPE_INVALID_SNAPSHOT;
+    }
+    snapshot_buffer_text(&b,"{\"schema\":\"fpe.runtime_snapshot/0.11.0\",\"runtime_version\":\"1.0.0\"");
+    snapshot_buffer_text(&b,",\"projection_schema\":");
+    snapshot_buffer_string(&b,FPE_PROJECTION_SCHEMA);
+    snapshot_buffer_text(&b,",\"action_request_schema\":");
+    snapshot_buffer_string(&b,FPE_ACTION_SCHEMA);
+    snapshot_buffer_text(&b,",\"options\":{\"budget\":");
+    snapshot_buffer_size(&b,runtime->budget);
+    snapshot_buffer_text(&b,"},\"projection\":");
+    snapshot_buffer_bytes(&b,runtime->projection.json_document,runtime->projection.json_document_length);
+
+    snapshot_buffer_text(&b,",\"view\":{\"expandedClusters\":[");
+    for(i=0;i<view.expanded_cluster_count;++i) {
+        if(i!=0u) snapshot_buffer_text(&b,",");
+        snapshot_buffer_string(&b,view.expanded_clusters[i]);
+    }
+    snapshot_buffer_text(&b,"],\"expandedBuds\":[");
+    for(i=0;i<view.expanded_bud_count;++i) {
+        if(i!=0u) snapshot_buffer_text(&b,",");
+        snapshot_buffer_string(&b,view.expanded_buds[i]);
+    }
+    snapshot_buffer_text(&b,"]},\"clock\":{\"last_tick\":");
+    snapshot_buffer_i64(&b,runtime->last_tick);
+    snapshot_buffer_text(&b,"},\"scheduler\":{\"schema\":\"fpe.scheduler_state/0.11.0\",\"budget\":");
+    snapshot_buffer_size(&b,runtime->budget);
+    snapshot_buffer_text(&b,",\"projection_fingerprint\":");
+    snapshot_buffer_string(&b,runtime->projection.projection_fingerprint);
+    snapshot_buffer_text(&b,",\"source_revision\":");
+    snapshot_buffer_i64(&b,(int64_t)runtime->projection.state_revision);
+    snapshot_buffer_text(&b,",\"source_tick\":");
+    snapshot_buffer_i64(&b,(int64_t)runtime->projection.state_tick);
+    snapshot_buffer_text(&b,",\"last_tick\":");
+    snapshot_buffer_i64(&b,runtime->scheduler_last_tick);
+    snapshot_buffer_text(&b,",\"entries\":[");
+    for(i=0;i<runtime->entry_count;++i) {
+        const FPEEntry *entry=&runtime->entries[i];
+        const FPECluster *cluster;
+        const char *detail;
+        if(entry->cluster_index>=runtime->projection.cluster_count) { b.failed=true; break; }
+        cluster=&runtime->projection.clusters[entry->cluster_index];
+        detail=snapshot_detail_name(entry->detail);
+        if(detail==NULL) { b.failed=true; break; }
+        if(i!=0u) snapshot_buffer_text(&b,",");
+        snapshot_buffer_text(&b,"{\"id\":");
+        snapshot_buffer_string(&b,cluster->id);
+        snapshot_buffer_text(&b,",\"rate\":");
+        snapshot_buffer_double(&b,cluster->projection.update_rate);
+        snapshot_buffer_text(&b,",\"next\":");
+        snapshot_buffer_i64(&b,entry->next_tick);
+        snapshot_buffer_text(&b,",\"last\":");
+        if(entry->has_last) snapshot_buffer_i64(&b,entry->last_tick);
+        else snapshot_buffer_text(&b,"null");
+        snapshot_buffer_text(&b,",\"detail\":");
+        snapshot_buffer_string(&b,detail);
+        snapshot_buffer_text(&b,"}");
+    }
+    snapshot_buffer_text(&b,"]},\"request_context\":{\"action_request_schema\":");
+    snapshot_buffer_string(&b,FPE_ACTION_SCHEMA);
+    snapshot_buffer_text(&b,",\"source\":{\"seed\":");
+    snapshot_buffer_i64(&b,runtime->projection.seed);
+    snapshot_buffer_text(&b,",\"pixelgen_world_fingerprint\":");
+    snapshot_buffer_string(&b,runtime->projection.pixelgen_world_fingerprint);
+    snapshot_buffer_text(&b,",\"dimensions\":[");
+    snapshot_buffer_size(&b,runtime->projection.columns);
+    snapshot_buffer_text(&b,",");
+    snapshot_buffer_size(&b,runtime->projection.rows);
+    snapshot_buffer_text(&b,"],\"state_revision\":");
+    snapshot_buffer_i64(&b,(int64_t)runtime->projection.state_revision);
+    snapshot_buffer_text(&b,",\"state_tick\":");
+    snapshot_buffer_i64(&b,(int64_t)runtime->projection.state_tick);
+    snapshot_buffer_text(&b,"}}}");
+    fpe_view_state_destroy(&view);
+    if(b.failed || b.data==NULL) {
+        free(b.data);
+        set_error(error,FPE_INVALID_SNAPSHOT,"out of memory or invalid data serializing portable snapshot");
+        return FPE_INVALID_SNAPSHOT;
+    }
+    *out_json=b.data; *out_length=b.length;
+    return FPE_OK;
+}
+
 void fpe_update_batch_destroy(FPEUpdateBatch *batch) {
     if(batch==NULL) return;
     free(batch->updates);
