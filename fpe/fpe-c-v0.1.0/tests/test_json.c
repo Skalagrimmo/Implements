@@ -74,6 +74,87 @@ static void test_golden_projection(const char *path, const char *expected_fp) {
     free(json);
 }
 
+static void assert_batches_equal(const FPEUpdateBatch *a,const FPEUpdateBatch *b) {
+    size_t i;
+    assert(a->tick==b->tick);
+    assert(a->update_count==b->update_count);
+    assert(a->deferred_count==b->deferred_count);
+    assert(a->repeated==b->repeated);
+    for(i=0;i<a->update_count;++i) {
+        assert(strcmp(a->updates[i].cluster_id,b->updates[i].cluster_id)==0);
+        assert(a->updates[i].tick==b->updates[i].tick);
+        assert(a->updates[i].elapsed==b->updates[i].elapsed);
+        assert(a->updates[i].period==b->updates[i].period);
+        assert(a->updates[i].detail==b->updates[i].detail);
+    }
+}
+
+static void test_snapshot_fixture(const char *path,bool fresh_scheduler) {
+    FPEError error;
+    FPERuntime *runtime=NULL,*roundtrip=NULL,*bad_runtime=NULL;
+    FPEUpdateBatch first,second;
+    char *json,*serialized=NULL,*corrupt=NULL,*budget_field;
+    size_t length=0u,serialized_length=0u;
+    json=read_text_file(path,&length);
+    assert(json!=NULL);
+    assert(fpe_runtime_restore_json(json,length,&runtime,&error)==FPE_OK);
+    assert(runtime!=NULL);
+    assert(fpe_runtime_serialize_json(runtime,&serialized,&serialized_length,&error)==FPE_OK);
+    assert(serialized!=NULL && serialized_length!=0u);
+    assert(strstr(serialized,"\"runtime_version\":\"1.0.0\"")!=NULL);
+    assert(fpe_runtime_restore_json(serialized,serialized_length,&roundtrip,&error)==FPE_OK);
+    assert(roundtrip!=NULL);
+
+    memset(&first,0,sizeof(first));
+    memset(&second,0,sizeof(second));
+    if(fresh_scheduler) {
+        /* Historical 0.11: host clock 13, new-revision scheduler clock -1. */
+        assert(fpe_runtime_step(runtime,12,&first,&error)==FPE_INVALID_TICK);
+        assert(fpe_runtime_step(roundtrip,12,&second,&error)==FPE_INVALID_TICK);
+        assert(fpe_runtime_step(runtime,13,&first,&error)==FPE_OK);
+        assert(fpe_runtime_step(roundtrip,13,&second,&error)==FPE_OK);
+        assert(!first.repeated && !second.repeated);
+        assert_batches_equal(&first,&second);
+        fpe_update_batch_destroy(&first);
+        fpe_update_batch_destroy(&second);
+        assert(fpe_runtime_step(runtime,13,&first,&error)==FPE_OK);
+        assert(fpe_runtime_step(roundtrip,13,&second,&error)==FPE_OK);
+        assert(first.repeated && second.repeated);
+        assert_batches_equal(&first,&second);
+    } else {
+        /* Historical 0.12: both clocks are already at tick 19. */
+        assert(fpe_runtime_step(runtime,18,&first,&error)==FPE_INVALID_TICK);
+        assert(fpe_runtime_step(roundtrip,18,&second,&error)==FPE_INVALID_TICK);
+        assert(fpe_runtime_step(runtime,19,&first,&error)==FPE_OK);
+        assert(fpe_runtime_step(roundtrip,19,&second,&error)==FPE_OK);
+        assert(first.repeated && second.repeated);
+        assert_batches_equal(&first,&second);
+        fpe_update_batch_destroy(&first);
+        fpe_update_batch_destroy(&second);
+        assert(fpe_runtime_step(runtime,20,&first,&error)==FPE_OK);
+        assert(fpe_runtime_step(roundtrip,20,&second,&error)==FPE_OK);
+        assert_batches_equal(&first,&second);
+    }
+    fpe_update_batch_destroy(&first);
+    fpe_update_batch_destroy(&second);
+
+    /* A modified budget in the snapshot must be rejected, not normalized. */
+    corrupt=(char *)malloc(serialized_length+1u);
+    assert(corrupt!=NULL);
+    memcpy(corrupt,serialized,serialized_length+1u);
+    budget_field=strstr(corrupt,"\"budget\":3");
+    assert(budget_field!=NULL);
+    budget_field[strlen("\"budget\":")]='4';
+    assert(fpe_runtime_restore_json(corrupt,serialized_length,&bad_runtime,&error)==FPE_INVALID_SNAPSHOT);
+    assert(bad_runtime==NULL);
+
+    free(corrupt);
+    free(json);
+    fpe_json_string_destroy(serialized);
+    fpe_runtime_destroy(runtime);
+    fpe_runtime_destroy(roundtrip);
+}
+
 static void test_projection_bridge(void) {
     FPEError error;
     FPEProjection projection;
@@ -108,11 +189,13 @@ static void test_projection_bridge(void) {
 }
 
 int main(int argc, char **argv) {
-    assert(argc == 3);
+    assert(argc == 5);
     test_canonical_sha256();
     test_projection_bridge();
     test_golden_projection(argv[1], "e62718146d9393f265317e3a2351fecc0ba0757862748be2d322ec4043e699c8");
     test_golden_projection(argv[2], "678c6027a279ceeade30c7f0284554bdc47dfe94507a6aa1d4276dc4f69750c1");
-    puts("FPE C JSON bridge: PASS (SHA-256, UTF-8, canonical keys, projection validation, runtime ownership)");
+    test_snapshot_fixture(argv[3], true);
+    test_snapshot_fixture(argv[4], false);
+    puts("FPE C JSON bridge: PASS (projection fingerprints, 0.11/0.12 snapshot restore, round-trip, split clocks)");
     return 0;
 }
