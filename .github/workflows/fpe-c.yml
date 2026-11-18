@@ -1,0 +1,29 @@
+name: FPE C 0.1.0
+
+on:
+  push:
+    branches: [main, 'fpe-c-*']
+    paths:
+      - 'fpe/fpe-c-v0.1.0/**'
+      - '.github/workflows/fpe-c.yml'
+  pull_request:
+    paths:
+      - 'fpe/fpe-c-v0.1.0/**'
+      - '.github/workflows/fpe-c.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S fpe/fpe-c-v0.1.0 -B build/fpe-c -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build/fpe-c --config Release --parallel 2
+      - name: Test
+        run: ctest --test-dir build/fpe-c -C Release --output-on-failure
