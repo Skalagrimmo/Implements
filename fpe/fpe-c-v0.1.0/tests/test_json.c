@@ -5,6 +5,7 @@
 #endif
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static const char k_projection[] =
@@ -16,6 +17,8 @@ static void test_canonical_sha256(void) {
     const char basic[] = "{\"projection_fingerprint\":\"ignored\",\"a\":1}";
     const char unicode[] = "{\"projection_fingerprint\":\"x\",\"z\":\"ліс 🌲\",\"a\":false}";
     const char duplicate[] = "{\"a\":1,\"a\":2}";
+    const char trailing[] = "{\"a\":1} trailing";
+    const char nul_escape[] = "{\"a\":\"\\u0000\"}";
     assert(fpe_json_canonical_fingerprint(basic, sizeof(basic)-1u, fingerprint, &error) == FPE_OK);
     assert(strcmp(fingerprint, "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862") == 0);
     assert(fpe_json_canonical_fingerprint(unicode, sizeof(unicode)-1u, fingerprint, &error) == FPE_OK);
@@ -39,7 +42,7 @@ static char *read_text_file(const char *path, size_t *out_length) {
     if (fread(data, 1u, (size_t)size, file) != (size_t)size) {
         free(data); fclose(file); return NULL;
     }
-    data[(size_t)size] = '\\0';
+    data[(size_t)size] = '\0';
     fclose(file);
     *out_length = (size_t)size;
     return data;
