@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: fpe-c-v0.1.0
+          ref: ${{ github.sha }}
           persist-credentials: true
       - name: Materialize and validate C iteration
         run: |
@@ -27,10 +27,10 @@ jobs:
           cmake -S fpe/fpe-c-v0.1.0 -B /tmp/fpe-c-build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-Werror
           cmake --build /tmp/fpe-c-build --parallel 2
           ctest --test-dir /tmp/fpe-c-build --output-on-failure -C Release
-          rm -f fpe-c-payload.part*
+          rm -f fpe-c-payload.part* fpe-c-bootstrap-trigger.txt
           rm -f .github/workflows/fpe-c-bootstrap.yml
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Add typed FPE C 0.1.0 runtime iteration"
-          git push origin HEAD:fpe-c-v0.1.0
+          git push origin HEAD:"$GITHUB_REF_NAME"
