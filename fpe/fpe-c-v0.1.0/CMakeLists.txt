@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.16)
+project(fpe_c VERSION 0.1.0 LANGUAGES C)
+
+add_library(fpe_c STATIC src/fpe.c)
+target_include_directories(fpe_c PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_compile_features(fpe_c PUBLIC c_std_11)
+if(MSVC)
+    target_compile_options(fpe_c PRIVATE /W4)
+else()
+    target_compile_options(fpe_c PRIVATE -Wall -Wextra -Wpedantic -Wconversion -Wshadow)
+endif()
+
+add_executable(fpe_c_tests tests/test_fpe.c)
+target_link_libraries(fpe_c_tests PRIVATE fpe_c)
+if(NOT MSVC)
+    target_link_libraries(fpe_c_tests PRIVATE m)
+    target_compile_options(fpe_c_tests PRIVATE -Wall -Wextra -Wpedantic -Wconversion -Wshadow)
+endif()
+
+enable_testing()
+add_test(NAME fpe_c_tests COMMAND fpe_c_tests)
