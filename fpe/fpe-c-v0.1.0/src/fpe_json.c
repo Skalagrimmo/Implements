@@ -652,43 +652,36 @@ static void sha_init(SHA256 *ctx) {
     };
     memcpy(ctx->h, initial, sizeof(initial)); ctx->total=0u; ctx->used=0u;
 }
-static void sha_update(SHA256 *ctx, const unsigned char *data, size_t length) {
-    size_t take;
-    ctx->total += (uint64_t)length;
-    while (length != 0u) {
-        take = 64u - ctx->used;
-        if (take > length) take = length;
-        memcpy(ctx->block + ctx->used, data, take);
-        ctx->used += take; data += take; length -= take;
-        if (ctx->used == 64u) { sha_transform(ctx, ctx->block); ctx->used=0u; }
-    }
-}
-static void sha_final(SHA256 *ctx, unsigned char digest[32]) {
-    uint64_t bits = ctx->total * 8u;
-    size_t i;
-    ctx->block[ctx->used++] = 0x80u;
-    if (ctx->used > 56u) {
-        while (ctx->used < 64u) ctx->block[ctx->used++]=0u;
-        sha_transform(ctx,ctx->block); ctx->used=0u;
-    }
-    while (ctx->used < 56u) ctx->block[ctx->used++]=0u;
-    for (i=0;i<8u;++i) ctx->block[63u-i]=(unsigned char)(bits>>(i*8u));
-    sha_transform(ctx,ctx->block);
-    for (i=0;i<8u;++i) {
-        digest[i*4u]=(unsigned char)(ctx->h[i]>>24);
-        digest[i*4u+1u]=(unsigned char)(ctx->h[i]>>16);
-        digest[i*4u+2u]=(unsigned char)(ctx->h[i]>>8);
-        digest[i*4u+3u]=(unsigned char)ctx->h[i];
-    }
-}
 static void sha_hex(const char *data, size_t length, char output[65]) {
-    static const char hex[]="0123456789abcdef";
+    static const char hex[] = "0123456789abcdef";
     SHA256 ctx;
     unsigned char digest[32];
-    size_t i;
-    sha_init(&ctx); sha_update(&ctx,(const unsigned char *)data,length); sha_final(&ctx,digest);
-    for(i=0;i<32u;++i) { output[i*2u]=hex[digest[i]>>4]; output[i*2u+1u]=hex[digest[i]&15u]; }
-    output[64]='\0';
+    unsigned char *padded;
+    uint64_t bits = (uint64_t)length * 8u;
+    size_t total = ((length + 9u + 63u) / 64u) * 64u;
+    size_t offset, i;
+    padded = (unsigned char *)calloc(total, 1u);
+    if (padded == NULL) {
+        output[0] = '\0';
+        return;
+    }
+    if (length != 0u) memcpy(padded, data, length);
+    padded[length] = 0x80u;
+    for (i = 0; i < 8u; ++i) padded[total - 1u - i] = (unsigned char)(bits >> (i * 8u));
+    sha_init(&ctx);
+    for (offset = 0u; offset < total; offset += 64u) sha_transform(&ctx, padded + offset);
+    free(padded);
+    for (i = 0; i < 8u; ++i) {
+        digest[i * 4u] = (unsigned char)(ctx.h[i] >> 24);
+        digest[i * 4u + 1u] = (unsigned char)(ctx.h[i] >> 16);
+        digest[i * 4u + 2u] = (unsigned char)(ctx.h[i] >> 8);
+        digest[i * 4u + 3u] = (unsigned char)ctx.h[i];
+    }
+    for (i = 0; i < 32u; ++i) {
+        output[i * 2u] = hex[digest[i] >> 4];
+        output[i * 2u + 1u] = hex[digest[i] & 15u];
+    }
+    output[64] = '\0';
 }
 
 static bool canonical_hash(const JNode *root, char output[65], char *error, size_t error_size) {
@@ -704,7 +697,6 @@ static bool canonical_hash(const JNode *root, char output[65], char *error, size
         (void)snprintf(error,error_size,"out of memory or unsupported number during canonicalization");
         return false;
     }
-    (void)fprintf(stderr,"CANON[%lu]=%.*s\\n",(unsigned long)buffer.length,(int)buffer.length,buffer.data != NULL ? buffer.data : "");
     sha_hex(buffer.data != NULL ? buffer.data : "",buffer.length,output);
     free(buffer.data);
     return true;
