@@ -145,14 +145,7 @@ static void test_snapshot_fixture(const char *path,bool fresh_scheduler) {
     budget_field=strstr(corrupt,"\"budget\":3");
     assert(budget_field!=NULL);
     budget_field[strlen("\"budget\":")]='4';
-    {
-        FPEErrorCode corrupt_result=fpe_runtime_restore_json(corrupt,serialized_length,&bad_runtime,&error);
-        if(corrupt_result!=FPE_INVALID_SNAPSHOT) {
-            (void)fprintf(stderr,"corrupt budget was accepted: result=%d error=%s context=%.48s\\n",
-                          (int)corrupt_result,error.message,budget_field-10);
-        }
-        assert(corrupt_result==FPE_INVALID_SNAPSHOT);
-    }
+    assert(fpe_runtime_restore_json(corrupt,serialized_length,&bad_runtime,&error)==FPE_INVALID_SNAPSHOT);
     assert(bad_runtime==NULL);
 
     free(corrupt);
