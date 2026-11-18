@@ -1177,6 +1177,116 @@ cleanup:
     return result;
 }
 
+
+static char *json_payload_to_text(const JNode *node,size_t *out_length) {
+    JBuffer buffer;
+    memset(&buffer,0,sizeof(buffer));
+    if(node==NULL || node->type!=J_OBJECT) return NULL;
+    canonical_node(&buffer,node,C_OTHER,false,false);
+    if(buffer.failed || buffer.data==NULL) { free(buffer.data); return NULL; }
+    *out_length=buffer.length;
+    return buffer.data;
+}
+
+static void envelope_i64(JBuffer *buffer,int64_t value) {
+    char text[32];
+    int n=snprintf(text,sizeof(text),"%lld",(long long)value);
+    if(n<0 || (size_t)n>=sizeof(text)) { buffer->failed=true; return; }
+    buffer_bytes(buffer,text,(size_t)n);
+}
+
+FPEErrorCode fpe_action_request_to_json(const FPEActionRequest *request,
+                                        char **out_json,size_t *out_length,
+                                        FPEError *error) {
+    JNode *payload=NULL;
+    JBuffer buffer;
+    char message[FPE_ERROR_CAPACITY];
+    char *payload_text=NULL;
+    size_t payload_length=0u,i;
+    const char *kind;
+    FPEErrorCode result=FPE_INVALID_REQUEST;
+    fpe_error_clear(error);
+    memset(&buffer,0,sizeof(buffer));
+    if(out_json==NULL || out_length==NULL) {
+        json_error(error,FPE_INVALID_REQUEST,"action JSON output pointers are required");
+        return FPE_INVALID_REQUEST;
+    }
+    *out_json=NULL; *out_length=0u;
+    if(request==NULL || strcmp(request->schema,FPE_ACTION_SCHEMA)!=0 ||
+       request->action[0]=='\0' || strlen(request->action)>FPE_MAX_ACTION_BYTES ||
+       request->target_id[0]=='\0' ||
+       request->seed < -FPE_MAX_SAFE_INTEGER || request->seed > FPE_MAX_SAFE_INTEGER ||
+       request->columns==0u || request->rows==0u ||
+       request->source_revision>(uint64_t)FPE_MAX_SAFE_INTEGER ||
+       request->source_tick>(uint64_t)FPE_MAX_SAFE_INTEGER) {
+        json_error(error,FPE_INVALID_REQUEST,"invalid typed action request identity or source context");
+        return FPE_INVALID_REQUEST;
+    }
+    if(request->target_kind==FPE_TARGET_CLUSTER) kind="cluster";
+    else if(request->target_kind==FPE_TARGET_BUD) kind="bud";
+    else {
+        json_error(error,FPE_INVALID_REQUEST,"invalid action target kind");
+        return FPE_INVALID_REQUEST;
+    }
+    if(strlen(request->pixelgen_world_fingerprint)!=64u) {
+        json_error(error,FPE_INVALID_REQUEST,"invalid action source fingerprint");
+        return FPE_INVALID_REQUEST;
+    }
+    for(i=0;i<64u;++i) {
+        const char ch=request->pixelgen_world_fingerprint[i];
+        if(!((ch>='0'&&ch<='9')||(ch>='a'&&ch<='f'))) {
+            json_error(error,FPE_INVALID_REQUEST,"invalid action source fingerprint");
+            return FPE_INVALID_REQUEST;
+        }
+    }
+    payload=json_parse(request->payload_json,request->payload_json!=NULL?strlen(request->payload_json):0u,
+                       message,sizeof(message));
+    if(payload==NULL || payload->type!=J_OBJECT) {
+        node_destroy(payload);
+        json_error(error,FPE_INVALID_REQUEST,payload==NULL?message:"action payload must be a JSON object");
+        return FPE_INVALID_REQUEST;
+    }
+    payload_text=json_payload_to_text(payload,&payload_length);
+    node_destroy(payload);
+    if(payload_text==NULL) {
+        json_error(error,FPE_INVALID_REQUEST,"could not canonicalize action payload JSON");
+        return FPE_INVALID_REQUEST;
+    }
+    buffer_bytes(&buffer,"{\"schema\":",10u);
+    canonical_string(&buffer,FPE_ACTION_SCHEMA);
+    buffer_bytes(&buffer,",\"action\":",10u);
+    canonical_string(&buffer,request->action);
+    buffer_bytes(&buffer,",\"target\":{\"kind\":",19u);
+    canonical_string(&buffer,kind);
+    buffer_bytes(&buffer,",\"id\":",6u);
+    canonical_string(&buffer,request->target_id);
+    buffer_bytes(&buffer,"},\"payload\":",12u);
+    buffer_bytes(&buffer,payload_text,payload_length);
+    buffer_bytes(&buffer,",\"source\":{\"seed\":",19u);
+    envelope_i64(&buffer,request->seed);
+    buffer_bytes(&buffer,",\"pixelgen_world_fingerprint\":",31u);
+    canonical_string(&buffer,request->pixelgen_world_fingerprint);
+    buffer_bytes(&buffer,",\"dimensions\":[",15u);
+    envelope_i64(&buffer,(int64_t)request->columns);
+    buffer_char(&buffer,',');
+    envelope_i64(&buffer,(int64_t)request->rows);
+    buffer_bytes(&buffer,"],\"state_revision\":",19u);
+    envelope_i64(&buffer,(int64_t)request->source_revision);
+    buffer_bytes(&buffer,",\"state_tick\":",14u);
+    envelope_i64(&buffer,(int64_t)request->source_tick);
+    buffer_bytes(&buffer,"}}}",3u);
+    free(payload_text);
+    if(buffer.failed || buffer.data==NULL) {
+        free(buffer.data);
+        json_error(error,FPE_INVALID_REQUEST,"out of memory serializing semantic action request");
+        return FPE_INVALID_REQUEST;
+    }
+    *out_json=buffer.data;
+    *out_length=buffer.length;
+    result=FPE_OK;
+    return result;
+}
+
 FPEErrorCode fpe_projection_from_json(const char *json,size_t length,
                                       FPEProjection *out_projection,FPEError *error) {
     JNode *root;
