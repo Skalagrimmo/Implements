@@ -29,6 +29,6 @@ jobs:
         with:
           python-version: '3.x'
       - name: Generate Python fingerprint parity vectors
-        run: python fpe/fpe-c-v0.1.0/tests/generate_fingerprint_vectors.py build/fpe-json-vectors.jsonl
+        run: python fpe/fpe-c-v0.1.0/tests/generate_fingerprint_vectors.py build/fpe-c/fpe-json-vectors.jsonl
       - name: Test
         run: ctest --test-dir build/fpe-c -C Release --output-on-failure
