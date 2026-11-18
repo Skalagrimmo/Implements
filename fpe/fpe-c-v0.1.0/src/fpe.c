@@ -1,4 +1,5 @@
 #include "fpe/fpe.h"
+#include "fpe_internal.h"
 
 #include <ctype.h>
 #include <math.h>
