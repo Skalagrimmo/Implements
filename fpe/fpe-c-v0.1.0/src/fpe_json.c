@@ -776,6 +776,7 @@ void fpe_projection_json_destroy(FPEProjection *projection) {
     free((void *)projection->schema); free((void *)projection->mode);
     free((void *)projection->projection_fingerprint);
     free((void *)projection->pixelgen_world_fingerprint);
+    free((void *)projection->json_document);
     memset(projection,0,sizeof(*projection));
 }
 
@@ -984,6 +985,15 @@ FPEErrorCode fpe_projection_from_json(const char *json,size_t length,
     if(!parse_projection_tree(root,&projection,message,sizeof(message))) {
         node_destroy(root); json_error(error,FPE_INVALID_PROJECTION,message); return FPE_INVALID_PROJECTION;
     }
+    projection.json_document=(const char *)malloc(length+1u);
+    if(projection.json_document==NULL) {
+        node_destroy(root); fpe_projection_json_destroy(&projection);
+        json_error(error,FPE_INVALID_PROJECTION,"out of memory retaining verified projection JSON");
+        return FPE_INVALID_PROJECTION;
+    }
+    memcpy((char *)projection.json_document,json,length);
+    ((char *)projection.json_document)[length]='\\0';
+    projection.json_document_length=length;
     node_destroy(root);
     *out_projection=projection;
     return FPE_OK;
