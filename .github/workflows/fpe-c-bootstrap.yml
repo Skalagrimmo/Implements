@@ -23,7 +23,6 @@ jobs:
           cp /tmp/fpe-c-payload/INDEX.md fpe/README.md
           cp /tmp/fpe-c-payload/CMakeLists.txt /tmp/fpe-c-payload/README.md /tmp/fpe-c-payload/CHANGELOG.md /tmp/fpe-c-payload/FPE_C_0_1_CONTRACT.md fpe/fpe-c-v0.1.0/
           cp -a /tmp/fpe-c-payload/include /tmp/fpe-c-payload/src /tmp/fpe-c-payload/tests fpe/fpe-c-v0.1.0/
-          cp /tmp/fpe-c-payload/.github/workflows/fpe-c.yml .github/workflows/fpe-c.yml
           cmake -S fpe/fpe-c-v0.1.0 -B /tmp/fpe-c-build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-Werror
           cmake --build /tmp/fpe-c-build --parallel 2
           ctest --test-dir /tmp/fpe-c-build --output-on-failure -C Release
