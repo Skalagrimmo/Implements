@@ -1163,6 +1163,104 @@ fail:
     return FPE_INVALID_SNAPSHOT;
 }
 
+static int snapshot_entry_ptr_compare(const void *a,const void *b) {
+    const FPESnapshotSchedulerEntry *const *x=(const FPESnapshotSchedulerEntry *const *)a;
+    const FPESnapshotSchedulerEntry *const *y=(const FPESnapshotSchedulerEntry *const *)b;
+    return strcmp((*x)->id,(*y)->id);
+}
+
+static bool view_state_equal(const FPEViewState *a,const FPEViewState *b) {
+    size_t i;
+    if(a->expanded_cluster_count!=b->expanded_cluster_count ||
+       a->expanded_bud_count!=b->expanded_bud_count) return false;
+    for(i=0;i<a->expanded_cluster_count;++i)
+        if(strcmp(a->expanded_clusters[i],b->expanded_clusters[i])!=0) return false;
+    for(i=0;i<a->expanded_bud_count;++i)
+        if(strcmp(a->expanded_buds[i],b->expanded_buds[i])!=0) return false;
+    return true;
+}
+
+FPEErrorCode fpe_runtime_restore_snapshot_parts(
+    const FPEProjection *projection,size_t budget,const FPEViewState *view,
+    int64_t runtime_last_tick,int64_t scheduler_last_tick,
+    const FPESnapshotSchedulerEntry *entries,size_t entry_count,
+    FPERuntime **out_runtime,FPEError *error) {
+    FPERuntime *runtime=NULL;
+    FPEViewState normalized;
+    const FPESnapshotSchedulerEntry **ordered=NULL;
+    size_t i;
+    memset(&normalized,0,sizeof(normalized));
+    fpe_error_clear(error);
+    if(out_runtime==NULL) {
+        set_error(error,FPE_INVALID_SNAPSHOT,"snapshot runtime output is required");
+        return FPE_INVALID_SNAPSHOT;
+    }
+    *out_runtime=NULL;
+    if((uint64_t)budget>(uint64_t)FPE_MAX_SAFE_INTEGER ||
+       runtime_last_tick < -1 || runtime_last_tick > FPE_MAX_SAFE_INTEGER-16 ||
+       scheduler_last_tick < -1 || scheduler_last_tick > runtime_last_tick ||
+       (scheduler_last_tick!=-1 && scheduler_last_tick!=runtime_last_tick) ||
+       entry_count!=(projection!=NULL?projection->cluster_count:0u) ||
+       (entry_count!=0u && entries==NULL)) {
+        set_error(error,FPE_INVALID_SNAPSHOT,"snapshot options, clocks or scheduler entry count are invalid");
+        return FPE_INVALID_SNAPSHOT;
+    }
+    if(fpe_runtime_create(projection,budget,&runtime,error)!=FPE_OK) {
+        set_error(error,FPE_INVALID_SNAPSHOT,"snapshot projection or budget is invalid");
+        return FPE_INVALID_SNAPSHOT;
+    }
+    if(normalize_view(&runtime->projection,view,&normalized,error)!=FPE_OK ||
+       !view_state_equal(&normalized,view)) {
+        fpe_view_state_destroy(&normalized);
+        fpe_runtime_destroy(runtime);
+        set_error(error,FPE_INVALID_SNAPSHOT,"snapshot view is not canonical for its projection");
+        return FPE_INVALID_SNAPSHOT;
+    }
+    if(entry_count!=0u) {
+        ordered=(const FPESnapshotSchedulerEntry **)malloc(entry_count*sizeof(*ordered));
+        if(ordered==NULL) {
+            fpe_view_state_destroy(&normalized);
+            fpe_runtime_destroy(runtime);
+            set_error(error,FPE_INVALID_SNAPSHOT,"out of memory validating snapshot scheduler entries");
+            return FPE_INVALID_SNAPSHOT;
+        }
+        for(i=0;i<entry_count;++i) ordered[i]=&entries[i];
+        qsort(ordered,entry_count,sizeof(*ordered),snapshot_entry_ptr_compare);
+    }
+    for(i=0;i<entry_count;++i) {
+        const FPESnapshotSchedulerEntry *raw=ordered[i];
+        FPEEntry *dst=&runtime->entries[i];
+        const FPECluster *cluster=&runtime->projection.clusters[dst->cluster_index];
+        if(raw->id==NULL || raw->id[0]=='\0' ||
+           (i!=0u && strcmp(ordered[i-1u]->id,raw->id)==0) ||
+           strcmp(raw->id,cluster->id)!=0 ||
+           !isfinite(raw->rate) || raw->rate!=cluster->projection.update_rate ||
+           raw->next_tick<0 || raw->next_tick>FPE_MAX_SAFE_INTEGER ||
+           raw->detail<FPE_PLAN_CLUSTER_PROXY || raw->detail>FPE_PLAN_GEOMETRY ||
+           (raw->has_last && (raw->last_tick<0 || raw->last_tick>scheduler_last_tick ||
+                              raw->next_tick<=raw->last_tick)) ||
+           (!raw->has_last && raw->next_tick!=0) ||
+           (scheduler_last_tick==-1 &&
+             (raw->has_last || raw->next_tick!=0 || raw->detail!=FPE_PLAN_CLUSTER_PROXY))) {
+            free(ordered);
+            fpe_view_state_destroy(&normalized);
+            fpe_runtime_destroy(runtime);
+            set_error(error,FPE_INVALID_SNAPSHOT,"snapshot scheduler entry is invalid or does not match projection");
+            return FPE_INVALID_SNAPSHOT;
+        }
+        dst->next_tick=raw->next_tick;
+        dst->last_tick=raw->has_last?raw->last_tick:0;
+        dst->has_last=raw->has_last;
+        dst->detail=raw->detail;
+    }
+    free(ordered);
+    runtime->view=normalized;
+    runtime->last_tick=runtime_last_tick;
+    runtime->scheduler_last_tick=scheduler_last_tick;
+    *out_runtime=runtime;
+    return FPE_OK;
+}
+
 void fpe_checkpoint_destroy(FPECheckpoint *checkpoint) {
     if(checkpoint==NULL) return;
     projection_destroy(&checkpoint->projection);
