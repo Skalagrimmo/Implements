@@ -1,6 +1,6 @@
 # FPE C 0.2 — JSON compatibility contract
 
-Status: partially implemented. The bounded parser, canonical projection fingerprint verifier, typed projection mapping, two stable golden projections and the generated 256-case Python→C numeric/UTF-8 differential corpus are implemented. The 256-case corpus and all three base test suites have passed on Ubuntu and Windows CI; macOS is still queued. Portable snapshot compatibility remains open.
+Status: partially implemented. The bounded parser, canonical projection fingerprint verifier, typed projection mapping, two stable golden projections, generated 256-case Python→C numeric/UTF-8 differential corpus, and portable snapshot serialization/restoration are implemented. The stable historical 0.11.0/0.12.0 snapshot fixtures and 3 CTest suites pass on Ubuntu and Windows CI; macOS is still queued.
 
 This document pins the compatibility target to the repository's stable FPE 1.0 package at `fpe-v1.0.0-stable/`. It does not change the C 0.1 ABI or claim JSON interoperability yet.
 
@@ -77,16 +77,30 @@ The implementation is not considered fully compatible until all of these are cov
 
 Golden values must be generated from the stable Python/JavaScript sources and committed as fixtures. Never generate expected values from the C implementation under test.
 
-## 6. Explicitly out of scope for this first compatibility slice
+## 6. Snapshot compatibility now implemented
 
-- Portable runtime snapshot serialization and restoration.
-- Migration of snapshot runtime versions 0.11.0 and 0.12.0 to 1.0.0.
+The C snapshot API uses the frozen schema identifiers:
+
+- runtime snapshot: `fpe.runtime_snapshot/0.11.0`
+- scheduler state: `fpe.scheduler_state/0.11.0`
+- action request context: `fpe.action_request/0.10.0`
+
+`fpe_runtime_restore_json()` accepts runtime versions `0.11.0`, `0.12.0`, and `1.0.0`, verifies the full embedded projection fingerprint and all cross-linked source identities, checks canonical view state, validates the scheduler entry set/rates/ticks/detail classes, and enforces the stable split-clock rule. `fpe_runtime_serialize_json()` writes `runtime_version: 1.0.0` while retaining the frozen schema identifiers.
+
+For portable JSON persistence, the runtime must originate from `fpe_projection_from_json()`. The C projection retains an owned opaque copy of the complete verified source JSON because the reduced typed projection structure intentionally does not model every PixelGen metadata field. A caller-created typed projection without that full source document can still use the native in-memory checkpoint API, but cannot be serialized as a complete stable JSON snapshot.
+
+Historical stable snapshot fixtures for 0.11.0 and 0.12.0 are tested through restore → serialize as 1.0.0 → restore, including the host-clock/scheduler-clock split and invalid snapshot rejection.
+
+## 7. Explicitly open compatibility gates
+
 - Full action-request JSON envelope serialization.
+- Frozen JS↔C deterministic runtime trace fixtures covering view transitions, scheduling, requests and revision handoff.
+- Broader malformed snapshot/request fuzzing and resource-limit tests.
 - Any renderer, GPU, rigid-body physics, particle, fracture or destruction system.
 - Any writeback or mutation of PixelGen world state.
 
 Those remain separate milestones after projection parsing and fingerprint parity are demonstrated.
 
-## 7. Acceptance gate
+## 8. Acceptance gate
 
-C 0.2 is a projection-compatibility milestone only when the C implementation independently verifies the stable golden fingerprints and passes the same deterministic cross-runtime edge corpus. The two checked-in canonical projection fixtures and 256-case Python→C corpus pass on Ubuntu and Windows CI; macOS verification is still pending. Broader malformed-input coverage, portable/versioned JSON checkpoints, the stable historical snapshot migrations and JS↔C runtime trace fixtures remain incomplete, so this branch must not yet be described as fully FPE 1.0 wire-compatible.
+C 0.2 is a projection-compatibility milestone only when the C implementation independently verifies the stable golden fingerprints and passes the same deterministic cross-runtime edge corpus. The two checked-in canonical projection fixtures, 256-case Python→C corpus, stable 0.11/0.12 historical snapshot round-trips, and the 3 CTest suites pass on Ubuntu and Windows CI; macOS verification is still pending. Action-request JSON, a frozen JS↔C runtime trace suite and broader malformed-input fuzzing remain incomplete, so this branch must not yet be described as fully FPE 1.0 wire-compatible.
