@@ -9,7 +9,12 @@
 - add stable FPE 1.0 initial and after-state projection fixtures (30 clusters / 120 buds each)
 - add JSON, fingerprint, malformed-input and runtime-ownership regression checks
 - add the 256-case Python→C numeric/UTF-8 projection fingerprint differential corpus
-- keep portable snapshots, historical snapshot migrations, complete action-request JSON and JS↔C runtime trace fixtures as open compatibility gates
+- add portable stable FPE 1.0 JSON snapshot serialization and restore for JSON-origin projections
+- preserve opaque full projection JSON so source metadata survives snapshots
+- preserve split host/scheduler clocks across revision handoff and snapshot round-trip
+- restore stable snapshot versions 0.11.0, 0.12.0 and 1.0.0, promoting re-serialization to runtime_version 1.0.0
+- test reference 0.11/0.12 snapshots, round-trip continuation and corrupted budget rejection
+- keep complete action-request JSON, frozen JS↔C runtime trace fixtures and broader malformed-input fuzzing as open gates
 
 ## 0.1.0 — first typed native iteration
 
