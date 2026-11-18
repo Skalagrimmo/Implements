@@ -704,6 +704,7 @@ static bool canonical_hash(const JNode *root, char output[65], char *error, size
         (void)snprintf(error,error_size,"out of memory or unsupported number during canonicalization");
         return false;
     }
+    (void)fprintf(stderr,"CANON[%lu]=%.*s\\n",(unsigned long)buffer.length,(int)buffer.length,buffer.data != NULL ? buffer.data : "");
     sha_hex(buffer.data != NULL ? buffer.data : "",buffer.length,output);
     free(buffer.data);
     return true;
