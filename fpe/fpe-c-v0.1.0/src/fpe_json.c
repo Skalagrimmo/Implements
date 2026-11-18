@@ -668,6 +668,12 @@ static void sha_hex(const char *data, size_t length, char output[65]) {
     if (length != 0u) memcpy(padded, data, length);
     padded[length] = 0x80u;
     for (i = 0; i < 8u; ++i) padded[total - 1u - i] = (unsigned char)(bits >> (i * 8u));
+    if (length == 7u) {
+        size_t z;
+        (void)fprintf(stderr,"PAD:");
+        for (z=0;z<64u;++z) (void)fprintf(stderr,"%02x",padded[z]);
+        (void)fprintf(stderr,"\\n");
+    }
     sha_init(&ctx);
     for (offset = 0u; offset < total; offset += 64u) sha_transform(&ctx, padded + offset);
     (void)fprintf(stderr,"SHA RAW %08x %08x %08x %08x %08x %08x %08x %08x\\n",ctx.h[0],ctx.h[1],ctx.h[2],ctx.h[3],ctx.h[4],ctx.h[5],ctx.h[6],ctx.h[7]);
