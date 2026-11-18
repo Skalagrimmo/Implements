@@ -615,35 +615,36 @@ static void sha_transform(SHA256 *ctx, const unsigned char block[64]) {
         0xd807aa98u,0x12835b01u,0x243185beu,0x550c7dc3u,0x72be5d74u,0x80deb1feu,0x9bdc06a7u,0xc19bf174u,
         0xe49b69c1u,0xefbe4786u,0x0fc19dc6u,0x240ca1ccu,0x2de92c6fu,0x4a7484aau,0x5cb0a9dcu,0x76f988dau,
         0x983e5152u,0xa831c66du,0xb00327c8u,0xbf597fc7u,0xc6e00bf3u,0xd5a79147u,0x06ca6351u,0x14292967u,
-        0x27b70a85u,0x2e1b2138u,0x4d2c6dfcu,0x53380d13u,0x650a7353u,0x766a0abbu,0x81c2c92eu,0x92722c85u,
+        0x27b70a85u,0x2e1b2138u,0x4d2c6dfcu,0x53380d13u,0x650a7354u,0x766a0abbu,0x81c2c92eu,0x92722c85u,
         0xa2bfe8a1u,0xa81a664bu,0xc24b8b70u,0xc76c51a3u,0xd192e819u,0xd6990624u,0xf40e3585u,0x106aa070u,
         0x19a4c116u,0x1e376c08u,0x2748774cu,0x34b0bcb5u,0x391c0cb3u,0x4ed8aa4au,0x5b9cca4fu,0x682e6ff3u,
         0x748f82eeu,0x78a5636fu,0x84c87814u,0x8cc70208u,0x90befffau,0xa4506cebu,0xbef9a3f7u,0xc67178f2u
     };
-    uint32_t w[64],a,b,c,d,e,f,g,h;
+    uint32_t w[64];
+    uint32_t v[8];
     size_t i;
-    for (i = 0; i < 16u; ++i) {
-        size_t j = i * 4u;
-        w[i] = ((uint32_t)block[j] << 24) | ((uint32_t)block[j+1u] << 16) |
-               ((uint32_t)block[j+2u] << 8) | (uint32_t)block[j+3u];
+    for (i=0;i<16u;++i) {
+        size_t j=i*4u;
+        w[i]=((uint32_t)block[j]<<24)|((uint32_t)block[j+1u]<<16)|
+             ((uint32_t)block[j+2u]<<8)|(uint32_t)block[j+3u];
     }
-    for (i = 16u; i < 64u; ++i) {
-        uint32_t s0 = rotr32(w[i-15u],7u) ^ rotr32(w[i-15u],18u) ^ (w[i-15u] >> 3);
-        uint32_t s1 = rotr32(w[i-2u],17u) ^ rotr32(w[i-2u],19u) ^ (w[i-2u] >> 10);
-        w[i] = w[i-16u] + s0 + w[i-7u] + s1;
+    for (i=16u;i<64u;++i) {
+        uint32_t s0=rotr32(w[i-15u],7u)^rotr32(w[i-15u],18u)^(w[i-15u]>>3);
+        uint32_t s1=rotr32(w[i-2u],17u)^rotr32(w[i-2u],19u)^(w[i-2u]>>10);
+        w[i]=w[i-16u]+s0+w[i-7u]+s1;
     }
-    (void)fprintf(stderr,"W16=%08x W63=%08x H0=%08x\\n",w[16],w[63],ctx->h[0]);
-    a=ctx->h[0]; b=ctx->h[1]; c=ctx->h[2]; d=ctx->h[3];
-    e=ctx->h[4]; f=ctx->h[5]; g=ctx->h[6]; h=ctx->h[7];
-    for (i = 0; i < 64u; ++i) {
-        uint32_t s1=rotr32(e,6u)^rotr32(e,11u)^rotr32(e,25u);
-        uint32_t ch=(e&f)^((~e)&g), t1=h+s1+ch+k[i]+w[i];
-        uint32_t s0=rotr32(a,2u)^rotr32(a,13u)^rotr32(a,22u);
-        uint32_t maj=(a&b)^(a&c)^(b&c), t2=s0+maj;
-        h=g; g=f; f=e; e=d+t1; d=c; c=b; b=a; a=t1+t2;
+    memcpy(v,ctx->h,sizeof(v));
+    for (i=0;i<64u;++i) {
+        uint32_t e1=rotr32(v[4],6u)^rotr32(v[4],11u)^rotr32(v[4],25u);
+        uint32_t choose=(v[4]&v[5])^((~v[4])&v[6]);
+        uint32_t t1=v[7]+e1+choose+k[i]+w[i];
+        uint32_t a0=rotr32(v[0],2u)^rotr32(v[0],13u)^rotr32(v[0],22u);
+        uint32_t majority=(v[0]&v[1])^(v[0]&v[2])^(v[1]&v[2]);
+        uint32_t t2=a0+majority;
+        v[7]=v[6]; v[6]=v[5]; v[5]=v[4]; v[4]=v[3]+t1;
+        v[3]=v[2]; v[2]=v[1]; v[1]=v[0]; v[0]=t1+t2;
     }
-    ctx->h[0]+=a; ctx->h[1]+=b; ctx->h[2]+=c; ctx->h[3]+=d;
-    ctx->h[4]+=e; ctx->h[5]+=f; ctx->h[6]+=g; ctx->h[7]+=h;
+    for (i=0;i<8u;++i) ctx->h[i]+=v[i];
 }
 
 static void sha_init(SHA256 *ctx) {
@@ -669,15 +670,8 @@ static void sha_hex(const char *data, size_t length, char output[65]) {
     if (length != 0u) memcpy(padded, data, length);
     padded[length] = 0x80u;
     for (i = 0; i < 8u; ++i) padded[total - 1u - i] = (unsigned char)(bits >> (i * 8u));
-    if (length == 7u) {
-        size_t z;
-        (void)fprintf(stderr,"PAD:");
-        for (z=0;z<64u;++z) (void)fprintf(stderr,"%02x",padded[z]);
-        (void)fprintf(stderr,"\\n");
-    }
     sha_init(&ctx);
     for (offset = 0u; offset < total; offset += 64u) sha_transform(&ctx, padded + offset);
-    (void)fprintf(stderr,"SHA RAW %08x %08x %08x %08x %08x %08x %08x %08x\\n",ctx.h[0],ctx.h[1],ctx.h[2],ctx.h[3],ctx.h[4],ctx.h[5],ctx.h[6],ctx.h[7]);
     free(padded);
     for (i = 0; i < 8u; ++i) {
         digest[i * 4u] = (unsigned char)(ctx.h[i] >> 24);
