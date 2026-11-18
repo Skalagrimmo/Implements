@@ -754,10 +754,6 @@ static bool expect_text(const JNode *object,const char *key,const char *expected
     const char *value;
     return get_string(object,key,&value) && strcmp(value,expected)==0;
 }
-static char *copy_node_string(const JNode *node) {
-    if(node==NULL||node->type!=J_STRING) return NULL;
-    return json_copy_string(node->string);
-}
 static bool parse_front_status(const char *s,FPEFrontStatus *out) {
     if(strcmp(s,"quiet")==0) *out=FPE_FRONT_QUIET;
     else if(strcmp(s,"active")==0) *out=FPE_FRONT_ACTIVE;
@@ -905,7 +901,7 @@ static bool parse_projection_tree(const JNode *root,FPEProjection *out,char *mes
             if(front_list==NULL) BAD("out of memory allocating front ids");
             dst->front_ids=front_list;
             for(j=0;j<dst->front_count;++j) {
-                if(fronts->items[j]->type!=J_STRING||fronts->items[j]->string[0]=='\\0') BAD("invalid front id");
+                if(fronts->items[j]->type!=J_STRING||fronts->items[j]->string[0]=='\0') BAD("invalid front id");
                 front_list[j]=json_copy_string(fronts->items[j]->string);
                 if(front_list[j]==NULL) BAD("out of memory copying front id");
             }
