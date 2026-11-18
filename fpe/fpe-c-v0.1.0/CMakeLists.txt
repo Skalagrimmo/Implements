@@ -15,11 +15,16 @@ target_link_libraries(fpe_c_tests PRIVATE fpe_c)
 
 add_executable(fpe_c_json_tests tests/test_json.c)
 target_link_libraries(fpe_c_json_tests PRIVATE fpe_c)
+
+add_executable(fpe_c_json_corpus_tests tests/test_json_corpus.c)
+target_link_libraries(fpe_c_json_corpus_tests PRIVATE fpe_c)
 if(NOT MSVC)
     target_link_libraries(fpe_c_tests PRIVATE m)
     target_link_libraries(fpe_c_json_tests PRIVATE m)
+    target_link_libraries(fpe_c_json_corpus_tests PRIVATE m)
     target_compile_options(fpe_c_tests PRIVATE -Wall -Wextra -Wpedantic -Wconversion -Wshadow)
     target_compile_options(fpe_c_json_tests PRIVATE -Wall -Wextra -Wpedantic -Wconversion -Wshadow)
+    target_compile_options(fpe_c_json_corpus_tests PRIVATE -Wall -Wextra -Wpedantic -Wconversion -Wshadow)
 endif()
 
 enable_testing()
@@ -27,3 +32,5 @@ add_test(NAME fpe_c_tests COMMAND fpe_c_tests)
 add_test(NAME fpe_c_json_tests COMMAND fpe_c_json_tests
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/canonical_initial.json
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/canonical_after.json)
+add_test(NAME fpe_c_json_corpus_tests COMMAND fpe_c_json_corpus_tests
+    ${CMAKE_BINARY_DIR}/fpe-json-vectors.jsonl)
