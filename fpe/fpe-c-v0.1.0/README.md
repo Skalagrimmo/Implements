@@ -37,10 +37,10 @@ This is **projection JSON compatibility work**, not full FPE 1.0 wire compatibil
 Requires a C11 compiler and CMake 3.16 or newer. There are no third-party runtime dependencies.
 
 ```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-cmake --build build --parallel
+cmake -S . -B build/fpe-c -DCMAKE_BUILD_TYPE=Debug
+cmake --build build/fpe-c --parallel
 python tests/generate_fingerprint_vectors.py build/fpe-c/fpe-json-vectors.jsonl
-ctest --test-dir build --output-on-failure
+ctest --test-dir build/fpe-c --output-on-failure
 ```
 
 The test suite covers projection validation, ownership isolation, hierarchy transitions, straight and curved geometry determinism, scheduler budget/rates/replay, revision handoff, request validation and checkpoint restore. It also creates a 100×100 projection (10,000 clusters / 40,000 buds) and exercises plan generation plus bounded scheduling.
