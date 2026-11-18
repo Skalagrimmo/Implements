@@ -17,11 +17,58 @@ static void test_canonical_sha256(void) {
     const char unicode[] = "{\"projection_fingerprint\":\"x\",\"z\":\"ліс 🌲\",\"a\":false}";
     const char duplicate[] = "{\"a\":1,\"a\":2}";
     assert(fpe_json_canonical_fingerprint(basic, sizeof(basic)-1u, fingerprint, &error) == FPE_OK);
-    fprintf(stderr, "basic digest: %s\\n", fingerprint); fflush(stderr);
     assert(strcmp(fingerprint, "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862") == 0);
     assert(fpe_json_canonical_fingerprint(unicode, sizeof(unicode)-1u, fingerprint, &error) == FPE_OK);
     assert(strcmp(fingerprint, "536e4f605f37403dd17a302a6a7227a8e1f50e92df933531f9013e965e861912") == 0);
     assert(fpe_json_canonical_fingerprint(duplicate, sizeof(duplicate)-1u, fingerprint, &error) == FPE_INVALID_PROJECTION);
+    assert(fpe_json_canonical_fingerprint(trailing, sizeof(trailing)-1u, fingerprint, &error) == FPE_INVALID_PROJECTION);
+    assert(fpe_json_canonical_fingerprint(nul_escape, sizeof(nul_escape)-1u, fingerprint, &error) == FPE_INVALID_PROJECTION);
+}
+
+static char *read_text_file(const char *path, size_t *out_length) {
+    FILE *file = fopen(path, "rb");
+    long size;
+    char *data;
+    if (file == NULL) return NULL;
+    if (fseek(file, 0, SEEK_END) != 0) { fclose(file); return NULL; }
+    size = ftell(file);
+    if (size < 0 || (unsigned long)size > 8u * 1024u * 1024u) { fclose(file); return NULL; }
+    if (fseek(file, 0, SEEK_SET) != 0) { fclose(file); return NULL; }
+    data = (char *)malloc((size_t)size + 1u);
+    if (data == NULL) { fclose(file); return NULL; }
+    if (fread(data, 1u, (size_t)size, file) != (size_t)size) {
+        free(data); fclose(file); return NULL;
+    }
+    data[(size_t)size] = '\\0';
+    fclose(file);
+    *out_length = (size_t)size;
+    return data;
+}
+
+static void test_golden_projection(const char *path, const char *expected_fp) {
+    FPEError error;
+    FPEProjection projection;
+    FPERuntime *runtime = NULL;
+    FPEPlan plan;
+    char fingerprint[65];
+    char *json;
+    size_t length = 0u;
+    json = read_text_file(path, &length);
+    assert(json != NULL);
+    assert(fpe_json_canonical_fingerprint(json, length, fingerprint, &error) == FPE_OK);
+    assert(strcmp(fingerprint, expected_fp) == 0);
+    assert(fpe_projection_from_json(json, length, &projection, &error) == FPE_OK);
+    assert(projection.cluster_count == 30u);
+    assert(projection.summary.bud_count == 120u);
+    assert(projection.columns == 6u && projection.rows == 5u);
+    assert(fpe_runtime_create(&projection, 8u, &runtime, &error) == FPE_OK);
+    fpe_projection_json_destroy(&projection);
+    memset(&plan, 0, sizeof(plan));
+    assert(fpe_runtime_get_plan(runtime, &plan, &error) == FPE_OK);
+    assert(plan.item_count == 30u && plan.counts.cluster_proxies == 30u);
+    fpe_plan_destroy(&plan);
+    fpe_runtime_destroy(runtime);
+    free(json);
 }
 
 static void test_projection_bridge(void) {
@@ -57,9 +104,12 @@ static void test_projection_bridge(void) {
     assert(fpe_projection_from_json(altered, sizeof(altered)-1u, &projection, &error) == FPE_INVALID_PROJECTION);
 }
 
-int main(void) {
+int main(int argc, char **argv) {
+    assert(argc == 3);
     test_canonical_sha256();
     test_projection_bridge();
+    test_golden_projection(argv[1], "e62718146d9393f265317e3a2351fecc0ba0757862748be2d322ec4043e699c8");
+    test_golden_projection(argv[2], "678c6027a279ceeade30c7f0284554bdc47dfe94507a6aa1d4276dc4f69750c1");
     puts("FPE C JSON bridge: PASS (SHA-256, UTF-8, canonical keys, projection validation, runtime ownership)");
     return 0;
 }
