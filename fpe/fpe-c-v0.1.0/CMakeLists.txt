@@ -31,6 +31,8 @@ enable_testing()
 add_test(NAME fpe_c_tests COMMAND fpe_c_tests)
 add_test(NAME fpe_c_json_tests COMMAND fpe_c_json_tests
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/canonical_initial.json
-    ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/canonical_after.json)
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/canonical_after.json
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/snapshot-v0.11.0.json
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/snapshot-v0.12.0.json)
 add_test(NAME fpe_c_json_corpus_tests COMMAND fpe_c_json_corpus_tests
     ${CMAKE_BINARY_DIR}/fpe-json-vectors.jsonl)
