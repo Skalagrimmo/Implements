@@ -1017,6 +1017,7 @@ FPEErrorCode fpe_runtime_restore_json(const char *json,size_t length,
     memset(&view,0,sizeof(view));
     fpe_error_clear(error);
 #define SNAPSHOT_FAIL(msg) do { \
+        result=FPE_INVALID_SNAPSHOT; \
         json_error(error,FPE_INVALID_SNAPSHOT,(msg)); \
         goto cleanup; \
     } while(0)
