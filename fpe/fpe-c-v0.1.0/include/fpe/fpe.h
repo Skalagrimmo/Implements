@@ -137,6 +137,10 @@ typedef struct FPEProjection {
     const FPECluster *clusters;
     size_t cluster_count;
     FPEProjectionSummary summary;
+    /* Optional full JSON projection backing, populated by fpe_projection_from_json.
+       The runtime deep-copies it so portable snapshots can preserve all source metadata. */
+    const char *json_document;
+    size_t json_document_length;
 } FPEProjection;
 
 typedef struct FPEViewState {
