@@ -1,0 +1,36 @@
+name: FPE C bootstrap
+on:
+  push:
+    branches: [fpe-c-v0.1.0]
+    paths:
+      - ".github/workflows/fpe-c-bootstrap.yml"
+permissions:
+  contents: write
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fpe-c-v0.1.0
+          persist-credentials: true
+      - name: Materialize and validate C iteration
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/fpe-c-payload
+          cat fpe-c-payload.part* | base64 --decode | tar -xz -C /tmp/fpe-c-payload
+          mkdir -p fpe/fpe-c-v0.1.0
+          cp /tmp/fpe-c-payload/INDEX.md fpe/README.md
+          cp /tmp/fpe-c-payload/CMakeLists.txt /tmp/fpe-c-payload/README.md /tmp/fpe-c-payload/CHANGELOG.md /tmp/fpe-c-payload/FPE_C_0_1_CONTRACT.md fpe/fpe-c-v0.1.0/
+          cp -a /tmp/fpe-c-payload/include /tmp/fpe-c-payload/src /tmp/fpe-c-payload/tests fpe/fpe-c-v0.1.0/
+          cp /tmp/fpe-c-payload/.github/workflows/fpe-c.yml .github/workflows/fpe-c.yml
+          cmake -S fpe/fpe-c-v0.1.0 -B /tmp/fpe-c-build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-Werror
+          cmake --build /tmp/fpe-c-build --parallel 2
+          ctest --test-dir /tmp/fpe-c-build --output-on-failure -C Release
+          rm -f fpe-c-payload.part*
+          rm -f .github/workflows/fpe-c-bootstrap.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+users.noreply.github.com"
+          git add -A
+          git commit -m "Add typed FPE C 0.1.0 runtime iteration"
+          git push origin HEAD:fpe-c-v0.1.0
