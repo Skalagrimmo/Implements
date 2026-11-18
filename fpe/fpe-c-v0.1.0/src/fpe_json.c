@@ -1004,7 +1004,7 @@ FPEErrorCode fpe_projection_from_json(const char *json,size_t length,
         return FPE_INVALID_PROJECTION;
     }
     memcpy((char *)projection.json_document,json,length);
-    ((char *)projection.json_document)[length]='\\0';
+    ((char *)projection.json_document)[length]='\0';
     projection.json_document_length=length;
     node_destroy(root);
     *out_projection=projection;
