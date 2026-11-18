@@ -21,6 +21,7 @@ struct JNode {
     char *string;
     double number;
     bool integer_token;
+    bool boolean_value;
     int64_t integer;
     JNode **items;
     size_t count;
@@ -215,7 +216,7 @@ static char *parse_string(JParser *p) {
                         if (!hex4(p, &low) || low < 0xdc00u || low > 0xdfffu) goto bad;
                         cp = 0x10000u + ((cp - 0xd800u) << 10) + (low - 0xdc00u);
                     } else if (cp >= 0xdc00u && cp <= 0xdfffu) goto bad;
-                    if (!append_utf8(out, p->length, &used, cp)) goto bad;
+                    if (cp == 0u || !append_utf8(out, p->length, &used, cp)) goto bad;
                     break;
                 default: goto bad;
             }
@@ -391,12 +392,16 @@ static JNode *parse_value(JParser *p, size_t depth) {
             return node;
         case 't':
             if (p->length - p->pos >= 4u && memcmp(p->input + p->pos, "true", 4u) == 0) {
-                p->pos += 4u; return node_new(p, J_BOOL);
+                p->pos += 4u; node = node_new(p, J_BOOL);
+                if (node != NULL) node->boolean_value = true;
+                return node;
             }
             break;
         case 'f':
             if (p->length - p->pos >= 5u && memcmp(p->input + p->pos, "false", 5u) == 0) {
-                p->pos += 5u; return node_new(p, J_BOOL);
+                p->pos += 5u; node = node_new(p, J_BOOL);
+                if (node != NULL) node->boolean_value = false;
+                return node;
             }
             break;
         case 'n':
@@ -556,9 +561,9 @@ static void canonical_node(JBuffer *b, const JNode *node, CanonContext context, 
     switch (node->type) {
         case J_NULL: buffer_bytes(b, "null", 4u); break;
         case J_BOOL:
-            /* Boolean value is represented by the parser token span only as a
-               type; both literals are distinguished by their source byte. */
-            buffer_bytes(b, "true", 4u); break;
+            if (node->boolean_value) buffer_bytes(b, "true", 4u);
+            else buffer_bytes(b, "false", 5u);
+            break;
         case J_NUMBER: canonical_number(b, node->number, as_float); break;
         case J_STRING: canonical_string(b, node->string); break;
         case J_ARRAY:
@@ -900,7 +905,7 @@ static bool parse_projection_tree(const JNode *root,FPEProjection *out,char *mes
             if(front_list==NULL) BAD("out of memory allocating front ids");
             dst->front_ids=front_list;
             for(j=0;j<dst->front_count;++j) {
-                if(fronts->items[j]->type!=J_STRING||fronts->items[j]->string[0]=='') BAD("invalid front id");
+                if(fronts->items[j]->type!=J_STRING||fronts->items[j]->string[0]=='\\0') BAD("invalid front id");
                 front_list[j]=json_copy_string(fronts->items[j]->string);
                 if(front_list[j]==NULL) BAD("out of memory copying front id");
             }
@@ -945,12 +950,11 @@ static bool parse_projection_tree(const JNode *root,FPEProjection *out,char *mes
     summary=object_get(root,"summary");
     if(!parse_summary(summary,&p)) BAD("invalid projection summary");
     {
-        char validation[FPE_ERROR_CAPACITY];
-        if(fpe_projection_validate(&p,NULL)!=FPE_OK) {
-            (void)snprintf(message,message_size,"typed projection validation failed");
+        FPEError validation_error;
+        if(fpe_projection_validate(&p,&validation_error)!=FPE_OK) {
+            (void)snprintf(message,message_size,"%s",validation_error.message);
             goto fail;
         }
-        (void)validation;
     }
     *out=p;
 #undef BAD
