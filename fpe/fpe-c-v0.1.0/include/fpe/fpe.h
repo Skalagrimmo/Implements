@@ -220,6 +220,14 @@ const char *fpe_version(void);
 const char *fpe_error_name(FPEErrorCode code);
 const char *fpe_glyph(uint32_t index);
 
+/* Bounded JSON compatibility boundary. The returned projection owns its strings
+   and arrays; destroy it after fpe_runtime_create/accept has copied it. */
+FPEErrorCode fpe_json_canonical_fingerprint(const char *json, size_t length,
+                                             char out_fingerprint[65], FPEError *error);
+FPEErrorCode fpe_projection_from_json(const char *json, size_t length,
+                                      FPEProjection *out_projection, FPEError *error);
+void fpe_projection_json_destroy(FPEProjection *projection);
+
 FPEErrorCode fpe_projection_validate(const FPEProjection *projection, FPEError *error);
 FPEErrorCode fpe_runtime_create(const FPEProjection *projection, size_t budget,
                                 FPERuntime **out_runtime, FPEError *error);
