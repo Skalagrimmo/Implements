@@ -265,6 +265,9 @@ FPEErrorCode fpe_runtime_serialize_json(const FPERuntime *runtime,
 FPEErrorCode fpe_runtime_restore_json(const char *json, size_t length,
                                       FPERuntime **out_runtime, FPEError *error);
 void fpe_json_string_destroy(char *json);
+FPEErrorCode fpe_action_request_to_json(const FPEActionRequest *request,
+                                        char **out_json, size_t *out_length,
+                                        FPEError *error);
 
 /* Native typed checkpoints remain available for projections created in C. */
 FPEErrorCode fpe_runtime_checkpoint(const FPERuntime *runtime,
