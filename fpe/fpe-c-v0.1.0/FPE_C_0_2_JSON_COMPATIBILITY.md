@@ -1,6 +1,6 @@
 # FPE C 0.2 — JSON compatibility contract
 
-Status: partially implemented. The bounded parser, canonical projection fingerprint verifier, typed projection mapping and two stable golden projections are now in the C branch. The full 256-case numeric/UTF-8 differential corpus and portable snapshot compatibility remain open.
+Status: partially implemented. The bounded parser, canonical projection fingerprint verifier, typed projection mapping, two stable golden projections and the generated 256-case Python→C numeric/UTF-8 differential corpus are implemented. The 256-case corpus and all three base test suites have passed on Ubuntu and Windows CI; macOS is still queued. Portable snapshot compatibility remains open.
 
 This document pins the compatibility target to the repository's stable FPE 1.0 package at `fpe-v1.0.0-stable/`. It does not change the C 0.1 ABI or claim JSON interoperability yet.
 
@@ -66,7 +66,7 @@ The C 0.1 typed API remains available. JSON entry points are additive and must n
 
 ## 5. Differential test plan
 
-The implementation is not considered fully compatible until all of these are covered. Current coverage includes the canonical initial/after-state 30-cluster fixtures, SHA digest checks, duplicate-key rejection, trailing-data rejection, embedded-NUL escape rejection and runtime ownership after projection decoding:
+The implementation is not considered fully compatible until all of these are covered. Current coverage includes the canonical initial/after-state 30-cluster fixtures, SHA digest checks, duplicate-key rejection, trailing-data rejection, embedded-NUL escape rejection, runtime ownership after projection decoding and all 256 generated Python→C numeric/UTF-8 fingerprint vectors:
 
 1. Standard SHA-256 vectors (empty input, `abc`, and a multi-block input).
 2. The stable canonical initial and after-state projections.
@@ -89,4 +89,4 @@ Those remain separate milestones after projection parsing and fingerprint parity
 
 ## 7. Acceptance gate
 
-C 0.2 is a projection-compatibility milestone only when the C implementation independently verifies the stable golden fingerprints and passes the same deterministic cross-runtime edge corpus. The two checked-in canonical projection fixtures currently pass on Ubuntu and Windows CI; macOS verification is still pending. The 256-case corpus and broader malformed-input suite remain incomplete, so this branch must not yet be described as fully JSON-compatible.
+C 0.2 is a projection-compatibility milestone only when the C implementation independently verifies the stable golden fingerprints and passes the same deterministic cross-runtime edge corpus. The two checked-in canonical projection fixtures and 256-case Python→C corpus pass on Ubuntu and Windows CI; macOS verification is still pending. Broader malformed-input coverage, portable/versioned JSON checkpoints, the stable historical snapshot migrations and JS↔C runtime trace fixtures remain incomplete, so this branch must not yet be described as fully FPE 1.0 wire-compatible.
