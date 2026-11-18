@@ -8,7 +8,8 @@
 - add an additive JSON-to-typed-projection API with explicit ownership cleanup
 - add stable FPE 1.0 initial and after-state projection fixtures (30 clusters / 120 buds each)
 - add JSON, fingerprint, malformed-input and runtime-ownership regression checks
-- keep portable snapshots, historical snapshot migrations, complete action-request JSON and the 256-case differential corpus as open compatibility gates
+- add the 256-case Python→C numeric/UTF-8 projection fingerprint differential corpus
+- keep portable snapshots, historical snapshot migrations, complete action-request JSON and JS↔C runtime trace fixtures as open compatibility gates
 
 ## 0.1.0 — first typed native iteration
 
