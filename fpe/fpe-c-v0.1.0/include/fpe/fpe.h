@@ -257,7 +257,16 @@ FPEErrorCode fpe_runtime_request(const FPERuntime *runtime, const char *action,
                                  const char *target_id, const char *payload_json,
                                  FPEActionRequest *out_request, FPEError *error);
 
-/* Native typed checkpoints; JSON snapshot interoperability is a later milestone. */
+/* Portable FPE 1.0 JSON snapshots. Buffers returned by serialize_json use malloc
+   and must be released with fpe_json_string_destroy. */
+FPEErrorCode fpe_runtime_serialize_json(const FPERuntime *runtime,
+                                        char **out_json, size_t *out_length,
+                                        FPEError *error);
+FPEErrorCode fpe_runtime_restore_json(const char *json, size_t length,
+                                      FPERuntime **out_runtime, FPEError *error);
+void fpe_json_string_destroy(char *json);
+
+/* Native typed checkpoints remain available for projections created in C. */
 FPEErrorCode fpe_runtime_checkpoint(const FPERuntime *runtime,
                                     FPECheckpoint **out_checkpoint, FPEError *error);
 FPEErrorCode fpe_runtime_restore(const FPECheckpoint *checkpoint,
