@@ -27,7 +27,8 @@ struct FPERuntime {
     FPEViewState view;
     FPEEntry *entries;
     size_t entry_count;
-    int64_t last_tick;
+    int64_t last_tick;           /* Monotonic host/runtime clock. */
+    int64_t scheduler_last_tick; /* Reset on projection handoff. */
 };
 
 struct FPECheckpoint {
@@ -37,6 +38,7 @@ struct FPECheckpoint {
     FPEEntry *entries;
     size_t entry_count;
     int64_t last_tick;
+    int64_t scheduler_last_tick;
 };
 
 static void set_error(FPEError *error, FPEErrorCode code, const char *message) {
@@ -678,6 +680,7 @@ FPEErrorCode fpe_runtime_create(const FPEProjection *projection,size_t budget,
     }
     runtime->budget=budget;
     runtime->last_tick=-1;
+    runtime->scheduler_last_tick=-1;
     *out_runtime=runtime;
     return FPE_OK;
 }
@@ -753,7 +756,8 @@ FPEErrorCode fpe_runtime_accept(FPERuntime *runtime,const FPEProjection *incomin
     runtime->view=next_view;
     runtime->entries=next_entries;
     runtime->entry_count=next_count;
-    runtime->last_tick=-1;
+    /* Preserve the host clock; only the new revision's scheduler restarts. */
+    runtime->scheduler_last_tick=-1;
     *changed=true;
     return FPE_OK;
 }
@@ -891,10 +895,10 @@ FPEErrorCode fpe_runtime_step(FPERuntime *runtime,int64_t tick,FPEUpdateBatch *o
     if(runtime==NULL || out_batch==NULL) { set_error(error,FPE_INVALID_OPTIONS,"runtime and update batch are required"); return FPE_INVALID_OPTIONS; }
     memset(out_batch,0,sizeof(*out_batch));
     if(tick<0 || tick>INT64_MAX-16 || tick<runtime->last_tick) {
-        set_error(error,FPE_INVALID_TICK,"scheduler tick must be monotonic and within safe range"); return FPE_INVALID_TICK;
+        set_error(error,FPE_INVALID_TICK,"host runtime tick must be monotonic and within safe range"); return FPE_INVALID_TICK;
     }
     batch.tick=tick;
-    if(tick==runtime->last_tick) { batch.repeated=true; *out_batch=batch; return FPE_OK; }
+    if(tick==runtime->scheduler_last_tick) { batch.repeated=true; *out_batch=batch; return FPE_OK; }
     working=(FPEEntry *)malloc(runtime->entry_count*sizeof(FPEEntry));
     due=(size_t *)malloc(runtime->entry_count*sizeof(size_t));
     if((runtime->entry_count!=0u) && (working==NULL || due==NULL)) goto oom;
@@ -936,6 +940,7 @@ FPEErrorCode fpe_runtime_step(FPERuntime *runtime,int64_t tick,FPEUpdateBatch *o
     }
     if(runtime->entry_count!=0u) memcpy(runtime->entries,working,runtime->entry_count*sizeof(FPEEntry));
     runtime->last_tick=tick;
+    runtime->scheduler_last_tick=tick;
     free(working); free(due);
     *out_batch=batch;
     return FPE_OK;
@@ -1075,11 +1080,14 @@ FPEErrorCode fpe_runtime_request(const FPERuntime *runtime,const char *action,
 
 static bool checkpoint_scheduler_valid(const FPECheckpoint *cp) {
     size_t i;
-    if(cp->entry_count!=cp->projection.cluster_count || (cp->entry_count!=0u && cp->entries==NULL) || cp->last_tick < -1) return false;
+    if(cp->entry_count!=cp->projection.cluster_count || (cp->entry_count!=0u && cp->entries==NULL) ||
+       cp->last_tick < -1 || cp->scheduler_last_tick < -1 ||
+       cp->scheduler_last_tick > cp->last_tick ||
+       (cp->scheduler_last_tick != -1 && cp->scheduler_last_tick != cp->last_tick)) return false;
     for(i=0;i<cp->entry_count;++i) {
         const FPEEntry *e=&cp->entries[i];
         if(e->cluster_index>=cp->projection.cluster_count || e->next_tick<0 ||
-           (e->has_last && (e->last_tick<0 || e->last_tick>cp->last_tick || e->next_tick<=e->last_tick)) ||
+           (e->has_last && (e->last_tick<0 || e->last_tick>cp->scheduler_last_tick || e->next_tick<=e->last_tick)) ||
            (!e->has_last && e->next_tick!=0) ||
            e->detail<FPE_PLAN_CLUSTER_PROXY || e->detail>FPE_PLAN_GEOMETRY) return false;
         if(i>0u && strcmp(cp->projection.clusters[cp->entries[i-1u].cluster_index].id,
@@ -1100,7 +1108,8 @@ FPEErrorCode fpe_runtime_checkpoint(const FPERuntime *runtime,FPECheckpoint **ou
     cp->entries=(FPEEntry *)malloc(runtime->entry_count*sizeof(FPEEntry));
     if(runtime->entry_count!=0u && cp->entries==NULL) goto fail;
     if(runtime->entry_count!=0u) memcpy(cp->entries,runtime->entries,runtime->entry_count*sizeof(FPEEntry));
-    cp->entry_count=runtime->entry_count; cp->budget=runtime->budget; cp->last_tick=runtime->last_tick;
+    cp->entry_count=runtime->entry_count; cp->budget=runtime->budget;
+    cp->last_tick=runtime->last_tick; cp->scheduler_last_tick=runtime->scheduler_last_tick;
     *out_checkpoint=cp;
     return FPE_OK;
 fail:
@@ -1132,7 +1141,8 @@ FPEErrorCode fpe_runtime_restore(const FPECheckpoint *checkpoint,FPERuntime **ou
     runtime->entries=(FPEEntry *)malloc(checkpoint->entry_count*sizeof(FPEEntry));
     if(checkpoint->entry_count!=0u && runtime->entries==NULL) goto fail;
     if(checkpoint->entry_count!=0u) memcpy(runtime->entries,checkpoint->entries,checkpoint->entry_count*sizeof(FPEEntry));
-    runtime->entry_count=checkpoint->entry_count; runtime->budget=checkpoint->budget; runtime->last_tick=checkpoint->last_tick;
+    runtime->entry_count=checkpoint->entry_count; runtime->budget=checkpoint->budget;
+    runtime->last_tick=checkpoint->last_tick; runtime->scheduler_last_tick=checkpoint->scheduler_last_tick;
     *out_runtime=runtime;
     return FPE_OK;
 fail:
