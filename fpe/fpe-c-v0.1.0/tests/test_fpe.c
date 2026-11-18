@@ -235,6 +235,9 @@ static void test_request_and_revision_handoff(void) {
     FPEError e;
     FPERuntime *rt=NULL;
     FPEActionRequest request;
+    FPEUpdateBatch batch;
+    FPECheckpoint *checkpoint=NULL;
+    FPERuntime *restored=NULL;
     bool changed=false;
     require_ok(fpe_runtime_create(&p,8,&rt,&e),&e);
     memset(&request,0,sizeof(request));
@@ -247,11 +250,34 @@ static void test_request_and_revision_handoff(void) {
     assert(fpe_runtime_request(rt,"explode","not-a-target","{}",&request,&e)==FPE_UNKNOWN_ID);
     assert(fpe_runtime_request(rt,"explode","sector_0_0","{bad}",&request,&e)==FPE_INVALID_REQUEST);
 
+    /* Host time must survive a revision handoff even though scheduler entries restart. */
+    memset(&batch,0,sizeof(batch));
+    require_ok(fpe_runtime_step(rt,20,&batch,&e),&e);
+    assert(!batch.repeated);
+    fpe_update_batch_destroy(&batch);
+
     next=p;
     next.state_revision=2; next.state_tick=11;
     next.projection_fingerprint="1123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     require_ok(fpe_runtime_accept(rt,&next,&changed,&e),&e);
     assert(changed);
+    assert(fpe_runtime_step(rt,19,&batch,&e)==FPE_INVALID_TICK);
+    require_ok(fpe_runtime_step(rt,20,&batch,&e),&e);
+    assert(!batch.repeated && batch.update_count==4u);
+    fpe_update_batch_destroy(&batch);
+    require_ok(fpe_runtime_step(rt,20,&batch,&e),&e);
+    assert(batch.repeated && batch.update_count==0u);
+    fpe_update_batch_destroy(&batch);
+    require_ok(fpe_runtime_checkpoint(rt,&checkpoint,&e),&e);
+    require_ok(fpe_runtime_restore(checkpoint,&restored,&e),&e);
+    assert(fpe_runtime_step(restored,19,&batch,&e)==FPE_INVALID_TICK);
+    require_ok(fpe_runtime_step(restored,20,&batch,&e),&e);
+    assert(batch.repeated);
+    fpe_update_batch_destroy(&batch);
+    fpe_checkpoint_destroy(checkpoint);
+    fpe_runtime_destroy(restored);
+    restored=NULL; checkpoint=NULL;
+
     require_ok(fpe_runtime_accept(rt,&next,&changed,&e),&e);
     assert(!changed); /* Identical same-revision delivery is a no-op. */
 
