@@ -39,7 +39,7 @@ Requires a C11 compiler and CMake 3.16 or newer. There are no third-party runtim
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build --parallel
-python tests/generate_fingerprint_vectors.py build/fpe-json-vectors.jsonl
+python tests/generate_fingerprint_vectors.py build/fpe-c/fpe-json-vectors.jsonl
 ctest --test-dir build --output-on-failure
 ```
 
