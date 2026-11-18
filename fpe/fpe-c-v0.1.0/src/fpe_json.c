@@ -632,6 +632,7 @@ static void sha_transform(SHA256 *ctx, const unsigned char block[64]) {
         uint32_t s1 = rotr32(w[i-2u],17u) ^ rotr32(w[i-2u],19u) ^ (w[i-2u] >> 10);
         w[i] = w[i-16u] + s0 + w[i-7u] + s1;
     }
+    (void)fprintf(stderr,"W16=%08x W63=%08x H0=%08x\\n",w[16],w[63],ctx->h[0]);
     a=ctx->h[0]; b=ctx->h[1]; c=ctx->h[2]; d=ctx->h[3];
     e=ctx->h[4]; f=ctx->h[5]; g=ctx->h[6]; h=ctx->h[7];
     for (i = 0; i < 64u; ++i) {
