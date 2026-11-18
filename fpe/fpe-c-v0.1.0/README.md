@@ -1,10 +1,10 @@
-# FPE C 0.1.0 — Native runtime iteration
+# FPE C — native runtime and JSON bridge iteration
 
 This folder contains an independent, dependency-free C11 implementation of the first native FPE runtime slice. It does **not** replace or edit the stable JavaScript FPE 1.0 package.
 
 FPE in this repository is the deterministic **manifestation/view runtime** for PixelGen objective state. PixelGen remains authoritative for the world; FPE owns its local hierarchy/view state, generated manifestation geometry, bounded update scheduling, semantic-intent envelopes and runtime checkpoints. FPE never writes objective state back to PixelGen.
 
-## Included in C 0.1.0
+## C 0.1.0 typed runtime
 
 - Typed, read-only projection input with schema, source identity/clock, sector layout, per-cluster state/projection metrics, four buds per cluster and summary validation.
 - Deep-copy ownership at runtime creation and revision handoff.
@@ -18,6 +18,19 @@ FPE in this repository is the deterministic **manifestation/view runtime** for P
 - Semantic action-request envelopes bound to world identity, revision and source tick. Requests are intents only; they are never executed or written back.
 - In-memory typed checkpoint/restore for projection, view, scheduler entries and runtime clock.
 - The stable 11 error names and C cleanup functions for allocated outputs.
+
+## JSON projection bridge — C 0.2 development
+
+The next compatibility slice now has a bounded JSON entry point, separate from the original typed C API:
+
+- `fpe_json_canonical_fingerprint()` parses an object, sorts object keys recursively, preserves array order and emits canonical UTF-8 JSON before hashing it with the internal SHA-256 implementation. The root `projection_fingerprint` member is excluded from the hash.
+- `fpe_projection_from_json()` verifies the supplied fingerprint **before** mapping stable FPE 0.6 projection fields into the typed C representation.
+- `fpe_projection_json_destroy()` releases the projection returned by the JSON parser. `fpe_runtime_create()` then deep-copies it, so the parsed projection may be destroyed immediately after runtime creation.
+- The JSON parser rejects duplicate object keys, invalid UTF-8, malformed escapes, unpaired surrogate escapes, embedded NUL escapes, non-finite numbers, trailing data, and inputs beyond its explicit resource limits (8 MiB, depth 64, 300,000 parsed nodes, 100,000 clusters).
+
+The C tests now include SHA-256/canonicalization checks and both stable FPE 1.0 golden projection fixtures: 30 clusters / 120 buds for the initial projection and the after-state projection. The C parser checks each known fingerprint, converts the projection, creates a runtime, then verifies that the runtime remains valid after the temporary parsed projection is released.
+
+This is **projection JSON compatibility work**, not full FPE 1.0 wire compatibility. Portable JSON checkpoint restore, historical 0.11/0.12 snapshot migration, complete JSON action-request envelopes, and the full 256-case Python↔JavaScript numeric/UTF-8 differential corpus remain open gates.
 
 ## Build and test
 
@@ -53,19 +66,20 @@ The public functions in `include/fpe/fpe.h` are C equivalents of the FPE 1.0 res
 
 The C version keeps the FPE 1.0 error code names: `INVALID_OPTIONS`, `INVALID_PROJECTION`, `FOREIGN_WORLD`, `STALE_REVISION`, `REVISION_CONFLICT`, `INVALID_VIEW`, `UNKNOWN_ID`, `PARENT_COLLAPSED`, `INVALID_TICK`, `INVALID_REQUEST` and `INVALID_SNAPSHOT`.
 
-## Deliberate 0.1 limits — not yet 1.0 wire-compatible
+## Deliberate compatibility limits — not yet full FPE 1.0 wire-compatible
 
-This iteration is a typed C ABI, not a drop-in JSON runtime:
+This iteration combines the typed C 0.1 runtime with an in-progress projection JSON bridge. It is still not a drop-in FPE 1.0 runtime:
 
-1. It does not parse PixelGen JSON projections or emit the stable JSON snapshot/request schemas. C callers construct `FPEProjection` structures.
-2. Fingerprint fields are checked for the expected 64-character lowercase-hex form, but C 0.1 does **not** recompute the Python-compatible canonical SHA-256 projection fingerprint. Structural validation is not cryptographic verification.
-3. Checkpoints are deep-owned in-memory C objects. They are not yet portable files and do not yet restore the JavaScript 0.11/0.12/1.0 historical checkpoint formats.
-4. IDs and seed keys are bounded to 127 bytes and expected to use the canonical ASCII identifiers. The JSON action payload is limited to 64 KiB and depth 32.
-5. The deterministic hash currently follows the stable FPE FNV-1a 32-bit key derivation for ASCII keys. Full non-ASCII JavaScript UTF-16 key parity is not claimed.
-6. Geometry is returned as renderer-neutral points/edges. This library does not own a GPU renderer, lighting, particles, rigid-body physics, fracture simulation or destruction effects.
-7. Runtime instances are not internally synchronized; callers must serialize access to a given runtime.
+1. Portable JSON snapshots are not implemented. Checkpoints remain deep-owned in-memory C objects and do not restore JavaScript runtime snapshot versions 0.11.0 / 0.12.0 / 1.0.0.
+2. Full JSON action-request envelope serialization is not implemented; `fpe_runtime_request()` still returns the typed C request structure.
+3. The 256-case Python↔JavaScript edge corpus and a frozen JS↔C runtime trace have not yet passed against C.
+4. The parser rejects escaped U+0000 because the current public C structures use NUL-terminated strings. JSON input is bounded to 8 MiB, depth 64, 300,000 parsed nodes and 100,000 clusters.
+5. IDs and seed keys are bounded to 127 bytes and the deterministic runtime key hash uses canonical ASCII identifiers. Full non-ASCII JavaScript UTF-16 key parity is not claimed.
+6. Parsed source metadata outside the typed runtime fields is integrity-checked as part of the full projection fingerprint, but is not retained in the reduced C `FPEProjection` representation.
+7. Geometry is renderer-neutral points/edges. This library does not own a GPU renderer, lighting, particles, rigid-body physics, fracture simulation or destruction effects.
+8. Runtime instances are not internally synchronized; callers must serialize access to a given runtime.
 
-These are explicit porting boundaries, not silent substitutions. The next compatibility milestone is a strict JSON bridge/canonicalizer plus SHA-256 parity and a versioned portable checkpoint format. Only after those tests pass should the C implementation be described as a full FPE 1.0-compatible runtime.
+The next gates are the stable 256-case numeric/UTF-8 differential corpus, a broader malformed-input suite, portable/versioned JSON checkpoints and JS↔C trace fixtures. Only after those gates pass should the C implementation be described as fully FPE 1.0 wire-compatible.
 
 ## Ownership notes
 
