@@ -969,6 +969,209 @@ fail:
     return false;
 }
 
+
+static bool snapshot_runtime_version_ok(const JNode *root) {
+    const char *version;
+    if(!get_string(root,"runtime_version",&version)) return false;
+    return strcmp(version,"0.11.0")==0 || strcmp(version,"0.12.0")==0 ||
+           strcmp(version,"1.0.0")==0;
+}
+
+static bool snapshot_view_array(const JNode *view,const char *key,
+                                char ***out_items,size_t *out_count,size_t maximum) {
+    JNode *array=object_get(view,key);
+    size_t i;
+    if(!is_array(array) || array->count>maximum) return false;
+    *out_items=NULL; *out_count=0u;
+    if(array->count==0u) return true;
+    *out_items=(char **)calloc(array->count,sizeof(char *));
+    if(*out_items==NULL) return false;
+    for(i=0;i<array->count;++i) {
+        JNode *item=array->items[i];
+        char *copy;
+        if(item->type!=J_STRING || item->string[0]=='\0') return false;
+        copy=json_copy_string(item->string);
+        if(copy==NULL) return false;
+        (*out_items)[(*out_count)++]=copy;
+    }
+    return true;
+}
+
+FPEErrorCode fpe_runtime_restore_json(const char *json,size_t length,
+                                      FPERuntime **out_runtime,FPEError *error) {
+    JNode *root=NULL,*options=NULL,*projection_node=NULL,*view_node=NULL;
+    JNode *clock_node=NULL,*scheduler_node=NULL,*entries_node=NULL;
+    JNode *request_node=NULL,*request_source_node=NULL,*projection_source_node=NULL;
+    FPEProjection projection;
+    FPEViewState view;
+    FPESnapshotSchedulerEntry *entries=NULL;
+    FPERuntime *runtime=NULL;
+    char *projection_json=NULL;
+    size_t projection_length=0u,entry_count=0u,i;
+    int64_t budget_value,runtime_tick,scheduler_tick,seed,revision,state_tick,columns,rows;
+    const char *text;
+    char message[FPE_ERROR_CAPACITY];
+    bool projection_loaded=false;
+    FPEErrorCode result=FPE_INVALID_SNAPSHOT;
+    memset(&projection,0,sizeof(projection));
+    memset(&view,0,sizeof(view));
+    fpe_error_clear(error);
+#define SNAPSHOT_FAIL(msg) do { \
+        json_error(error,FPE_INVALID_SNAPSHOT,(msg)); \
+        goto cleanup; \
+    } while(0)
+    if(out_runtime==NULL) {
+        json_error(error,FPE_INVALID_SNAPSHOT,"snapshot runtime output pointer is required");
+        return FPE_INVALID_SNAPSHOT;
+    }
+    *out_runtime=NULL;
+    root=json_parse(json,length,message,sizeof(message));
+    if(root==NULL) SNAPSHOT_FAIL(message);
+    if(!is_object(root) ||
+       !expect_text(root,"schema",FPE_SNAPSHOT_SCHEMA) ||
+       !snapshot_runtime_version_ok(root) ||
+       !expect_text(root,"projection_schema",FPE_PROJECTION_SCHEMA) ||
+       !expect_text(root,"action_request_schema",FPE_ACTION_SCHEMA))
+        SNAPSHOT_FAIL("unsupported snapshot schema, runtime version or contract");
+
+    options=object_get(root,"options");
+    if(!is_object(options) || !get_integer(options,"budget",&budget_value) ||
+       budget_value<1 || (uint64_t)budget_value>(uint64_t)SIZE_MAX)
+        SNAPSHOT_FAIL("invalid snapshot scheduler budget");
+
+    projection_node=object_get(root,"projection");
+    if(!is_object(projection_node)) SNAPSHOT_FAIL("snapshot projection must be an object");
+    projection_json=json_node_to_text(projection_node,&projection_length);
+    if(projection_json==NULL) SNAPSHOT_FAIL("could not canonicalize snapshot projection");
+    result=fpe_projection_from_json(projection_json,projection_length,&projection,error);
+    if(result!=FPE_OK) {
+        result=FPE_INVALID_SNAPSHOT;
+        SNAPSHOT_FAIL(error!=NULL && error->message[0]!='\0'?error->message:"invalid snapshot projection");
+    }
+    projection_loaded=true;
+
+    view_node=object_get(root,"view");
+    if(!is_object(view_node)) SNAPSHOT_FAIL("snapshot view must be an object");
+    if(!snapshot_view_array(view_node,"expandedClusters",&view.expanded_clusters,
+                            &view.expanded_cluster_count,projection.cluster_count))
+        SNAPSHOT_FAIL("invalid snapshot expandedClusters");
+    if(!snapshot_view_array(view_node,"expandedBuds",&view.expanded_buds,
+                            &view.expanded_bud_count,projection.cluster_count*FPE_BUDS_PER_CLUSTER))
+        SNAPSHOT_FAIL("invalid snapshot expandedBuds");
+
+    clock_node=object_get(root,"clock");
+    if(!is_object(clock_node) || !get_integer(clock_node,"last_tick",&runtime_tick) ||
+       runtime_tick < -1 || runtime_tick > FPE_MAX_SAFE_INTEGER-16)
+        SNAPSHOT_FAIL("invalid snapshot host runtime clock");
+
+    scheduler_node=object_get(root,"scheduler");
+    if(!is_object(scheduler_node) ||
+       !expect_text(scheduler_node,"schema",FPE_SCHEDULER_SCHEMA) ||
+       !get_integer(scheduler_node,"budget",&budget_value) || budget_value<1 ||
+       (uint64_t)budget_value>(uint64_t)SIZE_MAX ||
+       (size_t)budget_value==0u)
+        SNAPSHOT_FAIL("invalid snapshot scheduler contract or budget");
+    {
+        int64_t options_budget;
+        if(!get_integer(options,"budget",&options_budget) || options_budget!=budget_value)
+            SNAPSHOT_FAIL("snapshot options and scheduler budgets disagree");
+    }
+    if(!get_required_string(scheduler_node,"projection_fingerprint",&text) ||
+       strcmp(text,projection.projection_fingerprint)!=0 ||
+       !get_integer(scheduler_node,"source_revision",&revision) ||
+       !get_integer(scheduler_node,"source_tick",&state_tick) ||
+       revision<0 || state_tick<0 ||
+       (uint64_t)revision!=projection.state_revision ||
+       (uint64_t)state_tick!=projection.state_tick ||
+       !get_integer(scheduler_node,"last_tick",&scheduler_tick) ||
+       scheduler_tick < -1 || scheduler_tick > runtime_tick ||
+       (scheduler_tick!=-1 && scheduler_tick!=runtime_tick))
+        SNAPSHOT_FAIL("snapshot scheduler identity or clock mismatch");
+
+    entries_node=object_get(scheduler_node,"entries");
+    if(!is_array(entries_node) || entries_node->count!=projection.cluster_count)
+        SNAPSHOT_FAIL("snapshot scheduler entry count mismatch");
+    entry_count=entries_node->count;
+    if(entry_count!=0u) {
+        entries=(FPESnapshotSchedulerEntry *)calloc(entry_count,sizeof(FPESnapshotSchedulerEntry));
+        if(entries==NULL) SNAPSHOT_FAIL("out of memory reading snapshot scheduler entries");
+    }
+    for(i=0;i<entry_count;++i) {
+        JNode *raw=entries_node->items[i],*last_node;
+        int64_t next_tick,last_value;
+        const char *detail;
+        if(!is_object(raw) || !get_required_string(raw,"id",&entries[i].id) ||
+           !get_number(raw,"rate",&entries[i].rate) ||
+           !get_integer(raw,"next",&next_tick) || next_tick<0 ||
+           next_tick>FPE_MAX_SAFE_INTEGER)
+            SNAPSHOT_FAIL("invalid snapshot scheduler entry");
+        entries[i].next_tick=next_tick;
+        last_node=object_get(raw,"last");
+        if(last_node==NULL) SNAPSHOT_FAIL("snapshot scheduler entry missing last field");
+        if(last_node->type==J_NULL) {
+            entries[i].has_last=false;
+            entries[i].last_tick=0;
+        } else {
+            if(!parse_safe_int(last_node,&last_value) || last_value<0)
+                SNAPSHOT_FAIL("invalid snapshot scheduler last tick");
+            entries[i].has_last=true;
+            entries[i].last_tick=last_value;
+        }
+        if(!get_required_string(raw,"detail",&detail))
+            SNAPSHOT_FAIL("invalid snapshot scheduler detail");
+        if(strcmp(detail,"cluster_proxy")==0) entries[i].detail=FPE_PLAN_CLUSTER_PROXY;
+        else if(strcmp(detail,"bud_proxy")==0) entries[i].detail=FPE_PLAN_BUD_PROXY;
+        else if(strcmp(detail,"geometry")==0) entries[i].detail=FPE_PLAN_GEOMETRY;
+        else SNAPSHOT_FAIL("unknown snapshot scheduler detail");
+    }
+
+    request_node=object_get(root,"request_context");
+    if(!is_object(request_node) ||
+       !expect_text(request_node,"action_request_schema",FPE_ACTION_SCHEMA))
+        SNAPSHOT_FAIL("invalid snapshot request context");
+    request_source_node=object_get(request_node,"source");
+    projection_source_node=object_get(projection_node,"source");
+    if(!is_object(request_source_node) || request_source_node->count!=5u ||
+       !is_object(projection_source_node) ||
+       !get_integer(request_source_node,"seed",&seed) ||
+       !get_integer(request_source_node,"state_revision",&revision) ||
+       !get_integer(request_source_node,"state_tick",&state_tick) ||
+       !get_required_string(request_source_node,"pixelgen_world_fingerprint",&text) ||
+       seed!=projection.seed || revision<0 || state_tick<0 ||
+       (uint64_t)revision!=projection.state_revision ||
+       (uint64_t)state_tick!=projection.state_tick ||
+       strcmp(text,projection.pixelgen_world_fingerprint)!=0)
+        SNAPSHOT_FAIL("snapshot request source does not match accepted projection");
+    {
+        JNode *dimensions=object_get(request_source_node,"dimensions");
+        if(!is_array(dimensions) || dimensions->count!=2u ||
+           !parse_safe_int(dimensions->items[0],&columns) ||
+           !parse_safe_int(dimensions->items[1],&rows) ||
+           columns!=(int64_t)projection.columns || rows!=(int64_t)projection.rows)
+            SNAPSHOT_FAIL("snapshot request dimensions do not match accepted projection");
+    }
+
+    result=fpe_runtime_restore_snapshot_parts(&projection,(size_t)budget_value,&view,
+        runtime_tick,scheduler_tick,entries,entry_count,&runtime,error);
+    if(result!=FPE_OK) {
+        result=FPE_INVALID_SNAPSHOT;
+        if(error!=NULL) error->code=FPE_INVALID_SNAPSHOT;
+        goto cleanup;
+    }
+    *out_runtime=runtime;
+    runtime=NULL;
+    result=FPE_OK;
+cleanup:
+    if(root!=NULL) node_destroy(root);
+    free(projection_json);
+    free(entries);
+    fpe_view_state_destroy(&view);
+    if(projection_loaded) fpe_projection_json_destroy(&projection);
+    if(runtime!=NULL) fpe_runtime_destroy(runtime);
+#undef SNAPSHOT_FAIL
+    return result;
+}
+
 FPEErrorCode fpe_projection_from_json(const char *json,size_t length,
                                       FPEProjection *out_projection,FPEError *error) {
     JNode *root;
