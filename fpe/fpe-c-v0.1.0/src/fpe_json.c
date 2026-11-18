@@ -514,7 +514,7 @@ static bool float_path(CanonContext context, const char *key) {
     return false;
 }
 
-static void canonical_node(JBuffer *b, const JNode *node, CanonContext context, bool as_float);
+static void canonical_node(JBuffer *b, const JNode *node, CanonContext context, bool as_float, bool omit_root_fingerprint);
 
 static void canonical_number(JBuffer *b, double value, bool as_float) {
     char text[64];
@@ -557,7 +557,7 @@ static void canonical_number(JBuffer *b, double value, bool as_float) {
     buffer_bytes(b, text, (size_t)n);
 }
 
-static void canonical_node(JBuffer *b, const JNode *node, CanonContext context, bool as_float) {
+static void canonical_node(JBuffer *b, const JNode *node, CanonContext context, bool as_float, bool omit_root_fingerprint) {
     size_t i;
     switch (node->type) {
         case J_NULL: buffer_bytes(b, "null", 4u); break;
@@ -571,7 +571,7 @@ static void canonical_node(JBuffer *b, const JNode *node, CanonContext context, 
             buffer_char(b, '[');
             for (i = 0; i < node->count; ++i) {
                 if (i != 0u) buffer_char(b, ',');
-                canonical_node(b, node->items[i], context == C_CLUSTERS ? C_CLUSTER : C_OTHER, false);
+                canonical_node(b, node->items[i], context == C_CLUSTERS ? C_CLUSTER : C_OTHER, false, false);
             }
             buffer_char(b, ']');
             break;
@@ -595,11 +595,11 @@ static void canonical_node(JBuffer *b, const JNode *node, CanonContext context, 
                     if (strcmp(member->key, "state") == 0) child = C_CLUSTER_STATE;
                     else if (strcmp(member->key, "projection") == 0) child = C_CLUSTER_PROJECTION;
                 }
-                if (context == C_ROOT && strcmp(member->key, "projection_fingerprint") == 0) continue;
+                if (context == C_ROOT && omit_root_fingerprint && strcmp(member->key, "projection_fingerprint") == 0) continue;
                 if (written++ != 0u) buffer_char(b, ',');
                 canonical_string(b, member->key);
                 buffer_char(b, ':');
-                canonical_node(b, member->value, child, float_path(context, member->key));
+                canonical_node(b, member->value, child, float_path(context, member->key), false);
             }
             buffer_char(b, '}');
             free(order);
@@ -687,6 +687,17 @@ static void sha_hex(const char *data, size_t length, char output[65]) {
     output[64] = '\0';
 }
 
+
+static char *json_node_to_text(const JNode *node,size_t *out_length) {
+    JBuffer buffer;
+    memset(&buffer,0,sizeof(buffer));
+    if(node==NULL) return NULL;
+    canonical_node(&buffer,node,C_ROOT,false,false);
+    if(buffer.failed || buffer.data==NULL) { free(buffer.data); return NULL; }
+    *out_length=buffer.length;
+    return buffer.data;
+}
+
 static bool canonical_hash(const JNode *root, char output[65], char *error, size_t error_size) {
     JBuffer buffer;
     memset(&buffer,0,sizeof(buffer));
@@ -694,7 +705,7 @@ static bool canonical_hash(const JNode *root, char output[65], char *error, size
         (void)snprintf(error,error_size,"canonical fingerprint input must be a JSON object");
         return false;
     }
-    canonical_node(&buffer,root,C_ROOT,false);
+    canonical_node(&buffer,root,C_ROOT,false,true);
     if (buffer.failed) {
         free(buffer.data);
         (void)snprintf(error,error_size,"out of memory or unsupported number during canonicalization");
