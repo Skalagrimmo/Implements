@@ -1046,7 +1046,11 @@ FPEErrorCode fpe_runtime_restore_json(const char *json,size_t length,
     result=fpe_projection_from_json(projection_json,projection_length,&projection,error);
     if(result!=FPE_OK) {
         result=FPE_INVALID_SNAPSHOT;
-        SNAPSHOT_FAIL(error!=NULL && error->message[0]!='\0'?error->message:"invalid snapshot projection");
+        if(error!=NULL && error->message[0]!='\0')
+            (void)snprintf(message,sizeof(message),"%s",error->message);
+        else
+            (void)snprintf(message,sizeof(message),"%s","invalid snapshot projection");
+        SNAPSHOT_FAIL(message);
     }
     projection_loaded=true;
 
