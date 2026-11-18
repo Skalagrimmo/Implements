@@ -17,7 +17,7 @@ static void test_canonical_sha256(void) {
     const char unicode[] = "{\"projection_fingerprint\":\"x\",\"z\":\"ліс 🌲\",\"a\":false}";
     const char duplicate[] = "{\"a\":1,\"a\":2}";
     assert(fpe_json_canonical_fingerprint(basic, sizeof(basic)-1u, fingerprint, &error) == FPE_OK);
-    printf("basic digest: %s\\n", fingerprint);
+    fprintf(stderr, "basic digest: %s\\n", fingerprint); fflush(stderr);
     assert(strcmp(fingerprint, "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862") == 0);
     assert(fpe_json_canonical_fingerprint(unicode, sizeof(unicode)-1u, fingerprint, &error) == FPE_OK);
     assert(strcmp(fingerprint, "536e4f605f37403dd17a302a6a7227a8e1f50e92df933531f9013e965e861912") == 0);
