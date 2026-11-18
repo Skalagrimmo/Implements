@@ -24,4 +24,6 @@ endif()
 
 enable_testing()
 add_test(NAME fpe_c_tests COMMAND fpe_c_tests)
-add_test(NAME fpe_c_json_tests COMMAND fpe_c_json_tests)
+add_test(NAME fpe_c_json_tests COMMAND fpe_c_json_tests
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/canonical_initial.json
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/canonical_after.json)
