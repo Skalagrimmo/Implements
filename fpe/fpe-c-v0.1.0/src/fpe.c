@@ -253,6 +253,7 @@ static void projection_destroy(FPEProjection *p) {
     free((void *)p->mode);
     free((void *)p->projection_fingerprint);
     free((void *)p->pixelgen_world_fingerprint);
+    free((void *)p->json_document);
     memset(p, 0, sizeof(*p));
 }
 
@@ -265,9 +266,19 @@ static bool projection_clone(const FPEProjection *source, FPEProjection *out) {
     copy.mode = copy_string(source->mode);
     copy.projection_fingerprint = copy_string(source->projection_fingerprint);
     copy.pixelgen_world_fingerprint = copy_string(source->pixelgen_world_fingerprint);
+    copy.json_document = NULL;
+    if (source->json_document != NULL && source->json_document_length != 0u) {
+        char *document = (char *)malloc(source->json_document_length + 1u);
+        if (document != NULL) {
+            memcpy(document, source->json_document, source->json_document_length);
+            document[source->json_document_length] = '\\0';
+            copy.json_document = document;
+        }
+    }
     copy.clusters = (FPECluster *)calloc(source->cluster_count, sizeof(FPECluster));
     if (copy.schema == NULL || copy.mode == NULL || copy.projection_fingerprint == NULL ||
-        copy.pixelgen_world_fingerprint == NULL || copy.clusters == NULL) goto fail;
+        copy.pixelgen_world_fingerprint == NULL || copy.clusters == NULL ||
+        (source->json_document != NULL && source->json_document_length != 0u && copy.json_document == NULL)) goto fail;
     for (i = 0; i < source->cluster_count; ++i) {
         const FPECluster *src = &source->clusters[i];
         FPECluster *dst = (FPECluster *)&copy.clusters[i];
